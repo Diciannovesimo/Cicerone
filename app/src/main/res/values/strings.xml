@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Cicerone</string>
+
+    <!-- LoginActivity -->
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="emailTextFieldHint">Email</string>
+    <string name="passwordTextFieldHint">Password</string>
+    <string name="loginButtonText">Login</string>
+    <string name="loginText1">Non hai un account?</string>
+    <string name="loginText2">Registrati</string>
+    <string name="loginText3">Oppure</string>
+    <string name="signInGoogle">Accedi con Google</string>
+    <string name="signInFacebook">Accedi con Facebook</string>
+
 </resources>
