@@ -4,7 +4,9 @@
     <!-- LoginActivity -->
     <string name="title_activity_login">LoginActivity</string>
     <string name="emailTextFieldHint">Email</string>
+    <string name="emailTextFieldError">Email non valida!</string>
     <string name="passwordTextFieldHint">Password</string>
+    <string name="passwordTextFieldError">Password troppo corta!</string>
     <string name="loginButtonText">Login</string>
     <string name="loginText1">Non hai un account?</string>
     <string name="loginText2">Registrati</string>

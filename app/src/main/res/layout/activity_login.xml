@@ -15,6 +15,7 @@
         android:scrollbars="none">
 
         <com.cunoraz.continuouscrollable.ContinuousScrollableImageView
+            android:id="@+id/loginBackgroundImage"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             app:direction="left"
