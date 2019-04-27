@@ -25,10 +25,23 @@ dependencies
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0-beta01'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
+
+    /*
+            FireBase
+     */
+    implementation 'com.google.firebase:firebase-core:16.0.8'
+    implementation 'com.google.firebase:firebase-auth:16.2.1'
+
+    /*
+            Facebook login
+            https://firebase.google.com/docs/auth/android/facebook-login
+            https://developers.facebook.com/docs/facebook-login/android
+     */
+    implementation 'com.facebook.android:facebook-login:[4,5)'
 
     /*
             QButton
@@ -48,4 +61,18 @@ dependencies
      */
     implementation 'com.github.Cutta:ContinuousScrollableImageView:1.0'
 
+    /*
+            Lottie
+            https://github.com/airbnb/lottie-android
+     */
+    implementation 'com.airbnb.android:lottie:3.0.1'
+
+    /*
+            KAlertDiaog
+            https://android-arsenal.com/details/1/7588
+     */
+    implementation 'com.github.TutorialsAndroid:KAlertDialog:v4.1'
+
 }
+
+apply plugin: 'com.google.gms.google-services'

@@ -1,20 +1,35 @@
-package com.nullpointerexception.cicerone;
+package com.nullpointerexception.cicerone.activities;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
-import android.widget.ScrollView;
 import android.widget.TextView;
-
-import com.cunoraz.continuouscrollable.ContinuousScrollableImageView;
+import android.widget.Toast;
+import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+import com.kinda.alert.KAlertDialog;
+import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.LogManager;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *      LoginActivity
@@ -25,13 +40,14 @@ import com.cunoraz.continuouscrollable.ContinuousScrollableImageView;
  */
 public class LoginActivity extends AppCompatActivity
 {
+    /** Request code for google sign-in intent */
+    private final int GOOGLE_SIGNIN_REQUEST = 10;
 
     /*
             Views
      */
     private View loginButton, googleSignInButton, facebookSignInButton;
     private HorizontalScrollView imageScroller;
-    //private ContinuousScrollableImageView backgroundImage;
     private EditText emailField, passwordField;
     private TextView registrationButton;
 
@@ -40,14 +56,12 @@ public class LoginActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_login);
 
         /*
                 Assignments
          */
         imageScroller = findViewById(R.id.imageScroller);
-        //backgroundImage = findViewById(R.id.loginBackgroundImage);
         emailField = findViewById(R.id.emailTextField);
         passwordField = findViewById(R.id.passwordTextField);
         loginButton = findViewById(R.id.loginButton);
@@ -56,10 +70,16 @@ public class LoginActivity extends AppCompatActivity
         facebookSignInButton = findViewById(R.id.facebookSignInButton);
 
         /*
+                Google sign in
+         */
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(LoginActivity.this);
+
+        /*
                 Initialization
          */
 
-        //     Prevent user to scroll background image
+        //  Prevent user to scroll background image
         imageScroller.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
@@ -71,7 +91,7 @@ public class LoginActivity extends AppCompatActivity
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         registrationButton.setText(content);
 
-        //  Set color variation with user interactions
+        //  Set color variation on user click
         registrationButton.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
@@ -111,6 +131,22 @@ public class LoginActivity extends AppCompatActivity
             }
         });
 
+        googleSignInButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestEmail()
+                        .build();
+                GoogleSignInClient mGoogleSignInClient;
+                mGoogleSignInClient = GoogleSignIn.getClient(LoginActivity.this, gso);
+
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, GOOGLE_SIGNIN_REQUEST);
+            }
+        });
+
     }
 
     /** Regular expression to validate email addresses. */
@@ -124,12 +160,14 @@ public class LoginActivity extends AppCompatActivity
     {
         boolean alright = true;
 
+        //  Check email
         if( ! emailField.getText().toString().trim().matches(EMAIL_REGEX))
         {
             alright = false;
             emailField.setError( getResources().getString(R.string.emailTextFieldError) );
         }
 
+        // Check password
         if(passwordField.getText().toString().trim().length() < 8)
         {
             alright = false;
@@ -140,11 +178,146 @@ public class LoginActivity extends AppCompatActivity
             login();
     }
 
+    /** Tag of a view with an animation displayed while logging in. */
+    private final String LOGIN_ANIMATION_TAG = "com.nullpointerexception.cicerone.LoginAnimation";
+    /** Limit time to try to access with user credentials, expressed in milliseconds. */
+    private final int LOGIN_TIMEOUT = 30 * 1000;    // 30 seconds
+    /** Timer that avoids login attempt after a given delay. */
+    private Timer loginTimer;
+
     /**
      *      Tries to access to the account with credentials inserted by user.
      */
+    @SuppressLint("ClickableViewAccessibility")
     private void login()
     {
-        // TODO: Access to FireBase account
+
+        /*
+                Add graphic loading animation
+         */
+        ViewGroup root = (ViewGroup) passwordField.getRootView();
+        FrameLayout container = new FrameLayout(this);
+        container.setTag(LOGIN_ANIMATION_TAG);
+        container.setBackgroundColor(Color.parseColor("#77000000"));
+        LottieAnimationView animationView = new LottieAnimationView(this);
+        animationView.setAnimation(R.raw.loading);
+        animationView.loop(true);
+        int size = getResources().getDisplayMetrics().widthPixels / 4;
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(size, size);
+        params.gravity = Gravity.CENTER;
+        animationView.setLayoutParams(params);
+        animationView.playAnimation();
+        container.addView(animationView);
+        //  Disables interactions with others views under this
+        container.setOnTouchListener(new View.OnTouchListener()
+        { public boolean onTouch(View view, MotionEvent motionEvent) { return true; }});
+        root.addView(container);
+
+        /*
+                Login attempt
+         */
+        LogManager.get().login(emailField.getText().toString(), passwordField.getText().toString())
+                .addOnLoginResultListener(new LogManager.LoginAttempt.OnLoginResultListener()
+                {
+                    @Override
+                    public void onLoginResult(boolean result)
+                    {
+                        /*
+                                Removes login animation
+                         */
+                        runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                ViewGroup root = (ViewGroup) passwordField.getRootView();
+                                View target = root.findViewWithTag(LOGIN_ANIMATION_TAG);
+                                if(target != null)
+                                    root.removeView(target);
+                            }
+                        });
+                        loginTimer.cancel();
+
+                        if(result)  //  Login successful
+                        {
+                            runOnUiThread(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    Toast.makeText(LoginActivity.this,
+                                            getResources().getString(R.string.loginToast1) + " " +
+                                     LogManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                        else        // Login failed
+                        {
+                            runOnUiThread(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    // Show error message
+                                    new KAlertDialog(LoginActivity.this, KAlertDialog.ERROR_TYPE)
+                                        .setTitleText(getResources().getString(R.string.loginDialogText1))
+                                        .setContentText(getResources().getString(R.string.loginDialogText2))
+                                        .setConfirmText("OK")
+                                        .show();
+                                }
+                            });
+                        }
+                    }
+                });
+
+        /*
+                Reset and start timer
+         */
+        loginTimer = new Timer();
+        loginTimer.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        //  Remove login animation
+                        ViewGroup root = (ViewGroup) passwordField.getRootView();
+                        View target = root.findViewWithTag(LOGIN_ANIMATION_TAG);
+                        if(target != null)
+                            root.removeView(target);
+                    }
+                });
+            }
+        }, LOGIN_TIMEOUT);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == GOOGLE_SIGNIN_REQUEST)
+        {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+
+            try
+            {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                if(account != null)
+                    Toast.makeText(LoginActivity.this,
+                            getResources().getString(R.string.loginToast1) + " " +
+                                    account.getDisplayName(), Toast.LENGTH_SHORT).show();
+            }
+            catch (ApiException e)
+            {
+                e.printStackTrace();
+            }
+
+        }
+
     }
 }

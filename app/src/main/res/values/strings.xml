@@ -13,5 +13,8 @@
     <string name="loginText3">Oppure</string>
     <string name="signInGoogle">Accedi con Google</string>
     <string name="signInFacebook">Accedi con Facebook</string>
+    <string name="loginDialogText1">Account non trovato!</string>
+    <string name="loginDialogText2">Controlla i dati inseriti e riprova.</string>
+    <string name="loginToast1">Ciao, </string>
 
 </resources>

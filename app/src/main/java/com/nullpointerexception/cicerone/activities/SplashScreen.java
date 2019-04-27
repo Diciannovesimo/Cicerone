@@ -1,10 +1,13 @@
-package com.nullpointerexception.cicerone;
+package com.nullpointerexception.cicerone.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
+import com.google.firebase.FirebaseApp;
+import com.nullpointerexception.cicerone.components.LogManager;
 
 public class SplashScreen extends AppCompatActivity
 {
@@ -13,6 +16,8 @@ public class SplashScreen extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        LogManager.get().initialize(getApplicationContext());
 
         new Handler().post(new Runnable()
         {
