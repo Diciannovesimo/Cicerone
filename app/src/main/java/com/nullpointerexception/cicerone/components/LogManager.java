@@ -1,13 +1,19 @@
 package com.nullpointerexception.cicerone.components;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import androidx.annotation.NonNull;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 /**
  *      LogManager
@@ -25,21 +31,34 @@ public class LogManager
     public static LogManager get() { return ourInstance; }
     private LogManager() {  }
 
+    /** Request code for google sign-in intent */
+    private final int GOOGLE_SIGNIN_REQUEST = 10;
+
     /*
             Vars
      */
+    /** Stores instance of Firebase auth */
     private FirebaseAuth auth;
+    /** Stores context, used for some actions of this class that requires it */
     private Context context;
+    /** Current user logged in app */
+    private User currentUser;
+    /** Stores a LoginAttempt instance used when shared by more than one method */
+    private LoginAttempt currentLoginAttempt;
 
     /**
      *      Initialize all fields required to use this class
      *      @param context Context that will be used by this class
      */
-    public void initialize(Context context)
+    public void initialize(Activity context)
     {
         this.context = context;
         FirebaseApp.initializeApp(context);
         auth = FirebaseAuth.getInstance();
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount( context );
+        if(account != null)
+            currentUser = new User(account);
     }
 
     /**
@@ -63,14 +82,25 @@ public class LogManager
                     {
                         if (task.isSuccessful())
                         {
+                            //  Check if user exists and if it's verified
                             if(auth.getCurrentUser() != null && auth.getCurrentUser().isEmailVerified())
-                                loginAttempt.getOnLoginResultListener().onLoginResult(true);
+                            {
+                                //  Set current user
+                                currentUser = new User(auth.getCurrentUser());
+
+                                // call the callback method, if set, with positive result
+                                if(loginAttempt.getOnLoginResultListener() != null)
+                                    loginAttempt.getOnLoginResultListener().onLoginResult(true);
+                            }
                             else
-                                loginAttempt.getOnLoginResultListener().onLoginResult(false);
+                                if(loginAttempt.getOnLoginResultListener() != null)
+                                    loginAttempt.getOnLoginResultListener().onLoginResult(false);
                         }
                         else
                         {
-                            loginAttempt.getOnLoginResultListener().onLoginResult(false);
+                            // call the callback method, if set, with negative result
+                            if(loginAttempt.getOnLoginResultListener() != null)
+                                loginAttempt.getOnLoginResultListener().onLoginResult(false);
                         }
 
                     }
@@ -80,11 +110,93 @@ public class LogManager
     }
 
     /**
+     *      Show dialog of Google sign-in.
+     *
+     *      NOTE: Calling this method requires call also loginWithGoogle(...) in
+     *      onActivityResult(...) of the activity passed with parameters
+     *      or this method will do nothing.
+     *
+     *      @param activity Activity that will manage intent launched by this method.
+     *
+     *      @return         An instance of LoginAttempt with allows to add
+     *                      a callback method for this given attempt.
+     */
+    public LoginAttempt requestLoginWithGoogle(Activity activity)
+    {
+        currentLoginAttempt = new LoginAttempt();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient;
+        mGoogleSignInClient = GoogleSignIn.getClient(activity, gso);
+
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        activity.startActivityForResult(signInIntent, GOOGLE_SIGNIN_REQUEST);
+
+        return currentLoginAttempt;
+    }
+
+    /**
+     *      Manage result of intent launched with requestLoginWithGoogle(...) method:
+     *      Set current user with data of google account which user has just signed-in.
+     *
+     *      NOTE: Call this method only if called also before requestLoginWithGoogle(...) and only
+     *      in onActivityResult(...) of the activity where has been called the previous method.
+     *
+     *      @param requestCode  Request code provided by onActivityResult(...)
+     *      @param data         Intent provided by onActivityResult(...)
+     */
+    public void loginWithGoogle(int requestCode, Intent data)
+    {
+        //  Check if got a null intent
+        if(data == null)
+            return;
+
+        if(requestCode == GOOGLE_SIGNIN_REQUEST)
+        {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+
+            try
+            {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                if(account != null)
+                {
+                    // set current user
+                    currentUser = new User(account);
+
+                    // call the callback method, if set, with positive result
+                    if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
+                        currentLoginAttempt.getOnLoginResultListener().onLoginResult(true);
+
+                    currentLoginAttempt = null;
+                }
+                else
+                {
+                    if (currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
+                        currentLoginAttempt.getOnLoginResultListener().onLoginResult(false);
+
+                    currentLoginAttempt = null;
+                }
+            }
+            catch (ApiException e)
+            {
+                e.printStackTrace();
+
+                if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
+                    currentLoginAttempt.getOnLoginResultListener().onLoginResult(false);
+
+                currentLoginAttempt = null;
+            }
+        }
+    }
+
+    /**
      *     @return User currently logged.
      */
-    public FirebaseUser getUserLogged()
+    public User getUserLogged()
     {
-        return auth.getCurrentUser();
+        return currentUser;
     }
 
     /**
@@ -92,7 +204,29 @@ public class LogManager
      */
     public void logout()
     {
-        auth.signOut();
+        if(currentUser == null || auth == null || context == null)
+            return;
+
+        switch (currentUser.getAccessType())
+        {
+            case GOOGLE:
+                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestEmail()
+                        .build();
+                GoogleSignInClient mGoogleSignInClient;
+                mGoogleSignInClient = GoogleSignIn.getClient(((Activity) context), gso);
+
+                /*
+                        NOTE: Google sign out is ASYNCHRONOUS!
+                        If needed insert a callback method (there's one default of google)
+                 */
+                mGoogleSignInClient.signOut();
+                break;
+
+            case DEFAULT:
+            default:
+                auth.signOut();
+        }
     }
 
     /**

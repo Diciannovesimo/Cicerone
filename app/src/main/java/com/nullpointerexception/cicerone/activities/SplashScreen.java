@@ -17,7 +17,7 @@ public class SplashScreen extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
 
-        LogManager.get().initialize(getApplicationContext());
+        LogManager.get().initialize(this);
 
         new Handler().post(new Runnable()
         {

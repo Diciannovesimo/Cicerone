@@ -40,8 +40,6 @@ import java.util.TimerTask;
  */
 public class LoginActivity extends AppCompatActivity
 {
-    /** Request code for google sign-in intent */
-    private final int GOOGLE_SIGNIN_REQUEST = 10;
 
     /*
             Views
@@ -69,11 +67,8 @@ public class LoginActivity extends AppCompatActivity
         googleSignInButton = findViewById(R.id.googleSignInButton);
         facebookSignInButton = findViewById(R.id.facebookSignInButton);
 
-        /*
-                Google sign in
-         */
-
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(LoginActivity.this);
+        //  TODO: Remove this after testing
+        LogManager.get().logout();
 
         /*
                 Initialization
@@ -136,17 +131,41 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestEmail()
-                        .build();
-                GoogleSignInClient mGoogleSignInClient;
-                mGoogleSignInClient = GoogleSignIn.getClient(LoginActivity.this, gso);
-
-                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-                startActivityForResult(signInIntent, GOOGLE_SIGNIN_REQUEST);
+                LogManager.get().requestLoginWithGoogle(LoginActivity.this)
+                        .addOnLoginResultListener(new LogManager.LoginAttempt.OnLoginResultListener()
+                        {
+                            @Override
+                            public void onLoginResult(boolean result)
+                            {
+                                if(result)  //  Login successful
+                                {
+                                    runOnUiThread(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            Toast.makeText(LoginActivity.this,
+                                                    getResources().getString(R.string.loginToast1) + " " +
+                                                            LogManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                                else
+                                {
+                                    runOnUiThread(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            Toast.makeText(LoginActivity.this,
+                                                    getResources().getString(R.string.generic_error), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            }
+                        });
             }
         });
-
     }
 
     /** Regular expression to validate email addresses. */
@@ -300,24 +319,6 @@ public class LoginActivity extends AppCompatActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == GOOGLE_SIGNIN_REQUEST)
-        {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-
-            try
-            {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                if(account != null)
-                    Toast.makeText(LoginActivity.this,
-                            getResources().getString(R.string.loginToast1) + " " +
-                                    account.getDisplayName(), Toast.LENGTH_SHORT).show();
-            }
-            catch (ApiException e)
-            {
-                e.printStackTrace();
-            }
-
-        }
-
+        LogManager.get().loginWithGoogle(requestCode, data);
     }
 }
