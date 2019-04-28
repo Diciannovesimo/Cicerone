@@ -4,7 +4,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
@@ -16,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.airbnb.lottie.LottieAnimationView;
@@ -107,6 +110,34 @@ public class LoginActivity extends AppCompatActivity
                 return true;
             }
         });
+
+        /*
+              Add bottom margin to UI controls to prevent them to be hidden from system UI.
+         */
+        //  Get height of system navigation UI
+        int bottomNavigationBarHeight = 0;
+        int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0)
+            bottomNavigationBarHeight = getResources().getDimensionPixelSize(resourceId);
+        LinearLayout controlsContainer = findViewById(R.id.controlsContainer);
+        // Get views rect
+        Rect controlsRect = new Rect();
+        int screenHeight = getResources().getDisplayMetrics().heightPixels;
+        Rect systemNavigationRect = new Rect(0, screenHeight - bottomNavigationBarHeight,
+                0, screenHeight);
+        controlsContainer.getDrawingRect(controlsRect);
+        // Check if there's an intersection
+        if(systemNavigationRect.intersect(controlsRect))
+        {
+            //  Add bottom margin
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) controlsContainer.getLayoutParams();
+            params.bottomMargin += bottomNavigationBarHeight;
+            controlsContainer.setLayoutParams(params);
+        }
+
+        /*
+                Set interaction events
+          */
 
         registrationButton.setOnClickListener(new View.OnClickListener()
         {
