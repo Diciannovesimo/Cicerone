@@ -150,18 +150,6 @@ public class LoginActivity extends AppCompatActivity
                                         }
                                     });
                                 }
-                                else
-                                {
-                                    runOnUiThread(new Runnable()
-                                    {
-                                        @Override
-                                        public void run()
-                                        {
-                                            Toast.makeText(LoginActivity.this,
-                                                    getResources().getString(R.string.generic_error), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
                             }
                         });
             }
