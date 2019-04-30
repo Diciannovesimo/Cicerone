@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.nullpointerexception.cicerone.R;
 
-public class RegistationActivity extends AppCompatActivity {
+public class RegistrationActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
