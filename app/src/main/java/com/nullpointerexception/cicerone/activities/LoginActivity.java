@@ -22,6 +22,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.airbnb.lottie.LottieAnimationView;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.Profile;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -31,6 +38,9 @@ import com.google.android.gms.tasks.Task;
 import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.LogManager;
+import com.nullpointerexception.cicerone.components.User;
+
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -51,6 +61,7 @@ public class LoginActivity extends AppCompatActivity
     private HorizontalScrollView imageScroller;
     private EditText emailField, passwordField;
     private TextView registrationButton;
+    private CallbackManager callbackManager;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -72,6 +83,64 @@ public class LoginActivity extends AppCompatActivity
 
         //  TODO: Remove this after testing
         LogManager.get().logout();
+
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().setAuthType("rerequest");
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>()
+                {
+                    @Override
+                    public void onSuccess(LoginResult loginResult)
+                    {
+                        AccessToken accessToken = loginResult.getAccessToken();
+
+                        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+                        if(isLoggedIn)
+                            if(Profile.getCurrentProfile() != null)
+                                LogManager.get().setFacebookUser(Profile.getCurrentProfile());
+
+                        runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                Toast.makeText(LoginActivity.this,
+                                        getResources().getString(R.string.loginToast1) + " " +
+                                                LogManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancel()
+                    {
+                        runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                Toast.makeText(LoginActivity.this,
+                                        getResources().getString(R.string.generic_error),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception)
+                    {
+                        runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                Toast.makeText(LoginActivity.this,
+                                        getResources().getString(R.string.generic_error),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
 
         /*
                 Initialization
@@ -183,6 +252,15 @@ public class LoginActivity extends AppCompatActivity
                                 }
                             }
                         });
+            }
+        });
+
+        facebookSignInButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                LogManager.get().loginWithFacebook(LoginActivity.this);
             }
         });
     }
@@ -336,8 +414,8 @@ public class LoginActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
     {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
-
         LogManager.get().loginWithGoogle(requestCode, data);
     }
 }

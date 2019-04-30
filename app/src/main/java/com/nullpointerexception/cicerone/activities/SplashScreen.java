@@ -6,7 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.FirebaseApp;
+import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.LogManager;
 
 public class SplashScreen extends AppCompatActivity
@@ -16,6 +19,10 @@ public class SplashScreen extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        FacebookSdk.setApplicationId(getResources().getString(R.string.facebook_app_id));
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
 
         LogManager.get().initialize(this);
 

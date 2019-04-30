@@ -3,7 +3,17 @@ package com.nullpointerexception.cicerone.components;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.telecom.Call;
+
 import androidx.annotation.NonNull;
+
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.Profile;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -14,6 +24,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.nullpointerexception.cicerone.activities.LoginActivity;
+
+import java.util.Arrays;
 
 /**
  *      LogManager
@@ -56,9 +69,22 @@ public class LogManager
         FirebaseApp.initializeApp(context);
         auth = FirebaseAuth.getInstance();
 
+        // Check if already logged with Google
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount( context );
         if(account != null)
             currentUser = new User(account);
+
+        //  Check if already logged with facebook
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if(accessToken != null)
+        {
+            LoginManager.getInstance().logInWithReadPermissions(context, Arrays.asList("public_profile"));
+            boolean isLoggedIn = !accessToken.isExpired();
+            if (isLoggedIn)
+                if (Profile.getCurrentProfile() != null)
+                    currentUser = new User(Profile.getCurrentProfile());
+        }
+
     }
 
     /**
@@ -192,6 +218,33 @@ public class LogManager
     }
 
     /**
+     *      Set current user as the profile passed with parameters.
+     *
+     *      @param profile Account to be set as current user
+     */
+    public void setFacebookUser(Profile profile)
+    {
+        if(profile != null)
+            currentUser = new User(Profile.getCurrentProfile());
+    }
+
+    /**
+     *      Sign in with a facebook account.
+     *      It requires some actions made before as written on facebook login documentation.
+     *
+     *      @param activity Activity where implemented facebook sign in operations.
+     */
+    public void loginWithFacebook(Activity activity)
+    {
+        LoginManager.getInstance().logInWithReadPermissions(activity, Arrays.asList("public_profile"));
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+        if(isLoggedIn)
+            if(Profile.getCurrentProfile() != null)
+                currentUser = new User(Profile.getCurrentProfile());
+    }
+
+    /**
      *     @return User currently logged.
      */
     public User getUserLogged()
@@ -209,6 +262,10 @@ public class LogManager
 
         switch (currentUser.getAccessType())
         {
+            case FACEBOOK:
+                LoginManager.getInstance().logOut();
+                break;
+
             case GOOGLE:
                 GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestEmail()
