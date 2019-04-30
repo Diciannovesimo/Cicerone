@@ -1,6 +1,8 @@
 package com.nullpointerexception.cicerone.components;
 
 import androidx.annotation.NonNull;
+
+import com.facebook.Profile;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -40,6 +42,15 @@ public class User
         if(user.getPhotoUrl() != null)
             profileImageUrl = user.getPhotoUrl().toString();
         accessType = AccessType.GOOGLE;
+    }
+
+    /** Construct object from a Facebook account and set fields from it */
+    public User(@NonNull Profile user)
+    {
+        displayName = user.getName();
+        if(user.getProfilePictureUri(64, 64) != null)
+            profileImageUrl = user.getProfilePictureUri(64, 64).toString();
+        accessType = AccessType.FACEBOOK;
     }
 
     public String getEmail()
