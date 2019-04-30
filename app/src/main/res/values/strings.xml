@@ -1,4 +1,8 @@
 <resources>
+
+    <string name="facebook_app_id">576559802747671</string>
+    <string name="fb_login_protocol_scheme">fb576559802747671</string>
+
     <string name="app_name">Cicerone</string>
     <string name="generic_error">Si è verificato un errore.</string>
 
