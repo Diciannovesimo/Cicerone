@@ -4,13 +4,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,18 +27,10 @@ import com.facebook.FacebookException;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
 import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.LogManager;
-import com.nullpointerexception.cicerone.components.User;
 
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -75,7 +65,7 @@ public class LoginActivity extends AppCompatActivity
          */
         imageScroller = findViewById(R.id.imageScroller);
         emailField = findViewById(R.id.emailTextField);
-        passwordField = findViewById(R.id.passwordTextField);
+        passwordField = findViewById(R.id.confirmTextField);
         loginButton = findViewById(R.id.loginButton);
         registrationButton = findViewById(R.id.registerButton);
         googleSignInButton = findViewById(R.id.googleSignInButton);
@@ -173,6 +163,7 @@ public class LoginActivity extends AppCompatActivity
 
                     case MotionEvent.ACTION_UP:
                         registrationButton.setTextColor( getResources().getColor(R.color.colorAccent) );
+                        registrationButton.performClick();
                         break;
                 }
 
@@ -213,7 +204,8 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                //  TODO: Start registration activity.
+                Intent register_activity = new Intent(getApplicationContext(), RegistrationActivity.class);
+                startActivity(register_activity);
             }
         });
 
