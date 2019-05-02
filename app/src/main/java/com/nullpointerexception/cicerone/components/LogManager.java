@@ -67,7 +67,6 @@ public class LogManager
     {
         this.context = context;
         FirebaseApp.initializeApp(context);
-        auth = FirebaseAuth.getInstance();
 
         // Check if already logged with Google
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount( context );
@@ -84,6 +83,9 @@ public class LogManager
                 if (Profile.getCurrentProfile() != null)
                     currentUser = new User(Profile.getCurrentProfile());
         }
+
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance();
 
     }
 
@@ -317,4 +319,8 @@ public class LogManager
 
         private OnLoginResultListener getOnLoginResultListener() { return onLoginResultListener; }
     }
+
+
+
+
 }
