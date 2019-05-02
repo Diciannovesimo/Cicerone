@@ -59,7 +59,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="32dp"
             android:background="@color/black_overlay"
-            android:drawableLeft="@drawable/ic_identity"
+            android:drawableLeft="@android:drawable/ic_menu_my_calendar"
             android:drawablePadding="10sp"
             android:ems="10"
             android:hint="@string/data_di_nascita"
