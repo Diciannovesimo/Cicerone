@@ -1,4 +1,4 @@
-package com.nullpointerexception.cicerone;
+package com.nullpointerexception.cicerone.fragments;
 
 import android.os.Bundle;
 
@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.nullpointerexception.cicerone.R;
 
 
 public class Fragment_register1 extends Fragment {
