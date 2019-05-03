@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -78,19 +79,19 @@ public class RegistrationActivity extends AppCompatActivity {
     {
         Fragment fragment;
 
-        if(view == findViewById(R.id.next_fragment_button))
+        if(view == findViewById(R.id.animation_next_btn))
         {
 
-            if(fragment1 == null)
-                fragment1 = new Fragment_register2();
-            fragment = fragment1;
+            if(fragment2 == null)
+                fragment2 = new Fragment_register2();
+            fragment = fragment2;
 
         }
         else
         {
-            if(fragment2 == null)
-                fragment2 = new Fragment_register1();
-            fragment = fragment2;
+            if(fragment1 == null)
+                fragment1 = new Fragment_register1();
+            fragment = fragment1;
 
         }
 
@@ -106,6 +107,7 @@ public class RegistrationActivity extends AppCompatActivity {
         fragmentTransaction.add(R.id.frameview, fragment);
 
         fragmentTransaction.commit();
+
 
     }
 
