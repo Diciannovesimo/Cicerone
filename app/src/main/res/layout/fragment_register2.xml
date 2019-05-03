@@ -80,19 +80,29 @@
             android:src="@drawable/ic_left_arrow"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dateTextField"
-            app:srcCompat="@drawable/ic_left_arrow" />
+            app:srcCompat="@drawable/ic_left_arrow"
+            tools:ignore="OnClick" />
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_marginTop="32dp"
-            android:clickable="true"
+            android:src="@drawable/ic_full_circle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dateTextField" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/animation_confirm_btn"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="32dp"
             android:onClick="startRegistration"
-            android:src="@drawable/ic_check_circle_black_24dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dateTextField"
-            />
+            app:lottie_rawRes="@raw/check"
+            app:lottie_autoPlay="false"
+            tools:ignore="OnClick" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

@@ -32,6 +32,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
 
     EditText emailField, passwordField, confpassField, nameField, surnameField, date_birthField;
+    private LottieAnimationView animation_btn;
     Fragment fragment1, fragment2;
 
     private FirebaseAuth mAuth;
@@ -55,7 +56,8 @@ public class RegistrationActivity extends AppCompatActivity {
         nameField = findViewById(R.id.nameTextField);
         surnameField = findViewById(R.id.surnameTextField);
         date_birthField = findViewById(R.id.dateTextField);
-
+        animation_btn = new LottieAnimationView(this);
+        //animation_btn = (LottieAnimationView)findViewById(R.id.animation_confirm_btn);
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -108,24 +110,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
         fragmentTransaction.commit();
 
-
     }
-
-
-
-
-    /**
-     *
-     * @param view
-     */
-    public void startRegistration(View view) {
-
-        if(checkFields())
-            createFirebaseUser("ilmatty98s@gmail.com", "vitovito");
-
-    }
-
-
 
 
     /**
