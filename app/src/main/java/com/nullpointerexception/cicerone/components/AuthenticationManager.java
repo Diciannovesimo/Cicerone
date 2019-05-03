@@ -61,7 +61,6 @@ public class AuthenticationManager
     {
         this.context = context;
         FirebaseApp.initializeApp(context);
-        auth = FirebaseAuth.getInstance();
 
         /*
                 NOTE: The problem of multiple accounts logged will be resolved when will be
@@ -83,6 +82,9 @@ public class AuthenticationManager
                 if (Profile.getCurrentProfile() != null)
                     currentUser = new User(Profile.getCurrentProfile());
         }
+
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance();
 
     }
 
@@ -122,8 +124,8 @@ public class AuthenticationManager
                                     loginAttempt.getOnLoginResultListener().onLoginResult(true);
                             }
                             else
-                                if(loginAttempt.getOnLoginResultListener() != null)
-                                    loginAttempt.getOnLoginResultListener().onLoginResult(false);
+                            if(loginAttempt.getOnLoginResultListener() != null)
+                                loginAttempt.getOnLoginResultListener().onLoginResult(false);
                         }
                         else
                         {
