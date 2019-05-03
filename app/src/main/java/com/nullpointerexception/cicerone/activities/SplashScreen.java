@@ -8,9 +8,8 @@ import android.os.Handler;
 
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
-import com.google.firebase.FirebaseApp;
 import com.nullpointerexception.cicerone.R;
-import com.nullpointerexception.cicerone.components.LogManager;
+import com.nullpointerexception.cicerone.components.AuthenticationManager;
 
 public class SplashScreen extends AppCompatActivity
 {
@@ -24,7 +23,7 @@ public class SplashScreen extends AppCompatActivity
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
 
-        LogManager.get().initialize(this);
+        AuthenticationManager.get().initialize(this);
 
         new Handler().post(new Runnable()
         {

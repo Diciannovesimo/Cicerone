@@ -3,17 +3,12 @@ package com.nullpointerexception.cicerone.components;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.telecom.Call;
 
 import androidx.annotation.NonNull;
 
 import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -24,25 +19,24 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.nullpointerexception.cicerone.activities.LoginActivity;
 
 import java.util.Arrays;
 
 /**
- *      LogManager
+ *      AuthenticationManager
  *
  *      Manages user account handling login with various access methods.
  *
  *      @author Luca
  */
-public class LogManager
+public class AuthenticationManager
 {
     /*
             Singleton declaration
      */
-    private static final LogManager ourInstance = new LogManager();
-    public static LogManager get() { return ourInstance; }
-    private LogManager() {  }
+    private static final AuthenticationManager ourInstance = new AuthenticationManager();
+    public static AuthenticationManager get() { return ourInstance; }
+    private AuthenticationManager() {  }
 
     /** Request code for google sign-in intent */
     private final int GOOGLE_SIGNIN_REQUEST = 10;
@@ -68,6 +62,11 @@ public class LogManager
         this.context = context;
         FirebaseApp.initializeApp(context);
         auth = FirebaseAuth.getInstance();
+
+        /*
+                NOTE: The problem of multiple accounts logged will be resolved when will be
+                implemented the local storage of user in shared prefs.
+         */
 
         // Check if already logged with Google
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount( context );
@@ -100,6 +99,10 @@ public class LogManager
     {
         final LoginAttempt loginAttempt = new LoginAttempt();
 
+        //  Don't allow to login if before signed out with current account.
+        if(currentUser != null)
+            return loginAttempt;        // TODO: Question to user if want to sign out?
+
         auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>()
                 {
@@ -114,7 +117,7 @@ public class LogManager
                                 //  Set current user
                                 currentUser = new User(auth.getCurrentUser());
 
-                                // call the callback method, if set, with positive result
+                                //  Call the callback method, if set, with positive result
                                 if(loginAttempt.getOnLoginResultListener() != null)
                                     loginAttempt.getOnLoginResultListener().onLoginResult(true);
                             }
@@ -124,7 +127,7 @@ public class LogManager
                         }
                         else
                         {
-                            // call the callback method, if set, with negative result
+                            // Call the callback method, if set, with negative result
                             if(loginAttempt.getOnLoginResultListener() != null)
                                 loginAttempt.getOnLoginResultListener().onLoginResult(false);
                         }
@@ -188,10 +191,10 @@ public class LogManager
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 if(account != null)
                 {
-                    // set current user
+                    // Set current user
                     currentUser = new User(account);
 
-                    // call the callback method, if set, with positive result
+                    // Call the callback method, if set, with positive result
                     if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
                         currentLoginAttempt.getOnLoginResultListener().onLoginResult(true);
 
