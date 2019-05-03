@@ -71,16 +71,25 @@
             app:layout_constraintTop_toBottomOf="@+id/surnameTextField" />
 
         <ImageView
-            android:id="@+id/prev_fragment_button"
+            android:id="@+id/imageView3"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginTop="32dp"
-            android:clickable="true"
+            android:src="@drawable/ic_full_circle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dateTextField" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/animation_prev_btn"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="32dp"
             android:onClick="switchRegisterFragment"
-            android:src="@drawable/ic_left_arrow"
+            android:rotation="90"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dateTextField"
-            app:srcCompat="@drawable/ic_left_arrow"
+            app:lottie_autoPlay="true"
+            app:lottie_rawRes="@raw/arrow"
             tools:ignore="OnClick" />
 
         <ImageView
@@ -89,19 +98,21 @@
             android:layout_height="80dp"
             android:layout_marginTop="32dp"
             android:src="@drawable/ic_full_circle"
+            android:onClick="startRegistration"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dateTextField" />
+            app:layout_constraintTop_toBottomOf="@+id/dateTextField"
+            tools:ignore="OnClick" />
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/animation_confirm_btn"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginTop="32dp"
-            android:onClick="startRegistration"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dateTextField"
             app:lottie_rawRes="@raw/check"
             app:lottie_autoPlay="false"
+            app:lottie_progress="100"
             tools:ignore="OnClick" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

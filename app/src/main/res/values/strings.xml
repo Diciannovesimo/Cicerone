@@ -26,6 +26,11 @@
     <string name="conferma_password">Conferma Password</string>
     <string name="data_di_nascita">Data di nascita</string>
 
+    <!-- RegisterActivity -->
+    <string name="registrationDialogErrorText1">Impossibile registrarsi!</string>
+    <string name="registrationDialogErrorText2">Controlla i dati inseriti e riprova.</string>
+    <string name="registrationDialogSuccesText1">Registrazione effettuata!</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

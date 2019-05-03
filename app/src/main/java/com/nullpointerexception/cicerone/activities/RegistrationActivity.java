@@ -23,6 +23,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.LogManager;
 import com.nullpointerexception.cicerone.fragments.Fragment_register1;
@@ -30,11 +31,11 @@ import com.nullpointerexception.cicerone.fragments.Fragment_register2;
 
 public class RegistrationActivity extends AppCompatActivity {
 
-
+    final static String TAG = "registration_activity";
     EditText emailField, passwordField, confpassField, nameField, surnameField, date_birthField;
-    private LottieAnimationView animation_btn;
-    Fragment fragment1, fragment2;
-
+    Fragment_register1 fragment1;
+    Fragment_register2 fragment2;
+    LottieAnimationView animationView;
     private FirebaseAuth mAuth;
 
 
@@ -46,23 +47,25 @@ public class RegistrationActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        Fragment_register1 fragment_register11 = new Fragment_register1();
-        fragmentTransaction.add(R.id.frameview, fragment_register11);
+        //Inizialization UI
+        initUI();
+
+        fragmentTransaction.add(R.id.frameview, fragment1);
         fragmentTransaction.commit();
 
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+    }
+
+    private void initUI() {
+        fragment1 = new Fragment_register1();
         emailField = findViewById(R.id.emailTextField);
         passwordField = findViewById(R.id.passwordTextField);
         confpassField = findViewById(R.id.confirmTextField);
         nameField = findViewById(R.id.nameTextField);
         surnameField = findViewById(R.id.surnameTextField);
         date_birthField = findViewById(R.id.dateTextField);
-        animation_btn = new LottieAnimationView(this);
-        //animation_btn = (LottieAnimationView)findViewById(R.id.animation_confirm_btn);
-
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
     }
-
 
     @Override
     public void onStart() {
@@ -71,7 +74,6 @@ public class RegistrationActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         //updateUI(currentUser);
     }
-
 
     /**
      *      It allows to switch the fragment of registration.
@@ -102,16 +104,24 @@ public class RegistrationActivity extends AppCompatActivity {
 
         //  Remove last attached fragment
         fragmentTransaction.setCustomAnimations(R.anim.modal_in, R.anim.modal_out);
-        fragmentTransaction.remove( fragmentManager.getFragments()
-                .get(fragmentManager.getFragments().size() -1 ));
+
+        //  Check if the number of fragment is 2 after firebase registration error
+        if(fragmentManager.getFragments().size() == 2) {
+
+            for (Fragment fragment_index:getSupportFragmentManager().getFragments()) {
+                getSupportFragmentManager().beginTransaction().remove(fragment_index).commit();
+            }
+
+        }else {
+            fragmentTransaction.remove(fragmentManager.getFragments()
+                    .get(fragmentManager.getFragments().size() - 1));
+        }
 
         // Add new fragment
         fragmentTransaction.add(R.id.frameview, fragment);
-
         fragmentTransaction.commit();
 
     }
-
 
     /**
      *      Check if fields are correctly inserted by user,
@@ -121,10 +131,8 @@ public class RegistrationActivity extends AppCompatActivity {
     {
         boolean alright = true;
 
-
         return alright;
     }
-
 
     /**
      *
@@ -138,7 +146,7 @@ public class RegistrationActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            showDialog("Registrazione effettuata con successo!", "Successo", android.R.drawable.ic_dialog_info);
+                            showDialog(true);
 
                             // It call the method for send the verification email
                             sendVerificationEmail();
@@ -146,33 +154,46 @@ public class RegistrationActivity extends AppCompatActivity {
 
                         } else {
                             // If sign in fails, display a message to the user.
-
-                            showDialog("Errore nella registrazione!", "Errore", android.R.drawable.ic_dialog_alert);
+                            showDialog(false);
                         }
                     }
                 });
     }
 
-
     /**
      *
-     * @param message
-     * @param title
-     * @param icon
+     * @param result
      */
-    private void showDialog(String message, String title, int icon) {
+    private void showDialog(Boolean result) {
 
-        new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //updateUI();
-                    }
-                })
-                .setIcon(icon)
-                .show();
+        if(!result) {
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    // Show error message
+                    new KAlertDialog(RegistrationActivity.this, KAlertDialog.ERROR_TYPE)
+                            .setTitleText(getResources().getString(R.string.registrationDialogErrorText1))
+                            .setContentText(getResources().getString(R.string.registrationDialogErrorText2))
+                            .setConfirmText("OK")
+                            .show();
+                }
+            });
+        }else {
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    // Show error message
+                    new KAlertDialog(RegistrationActivity.this, KAlertDialog.SUCCESS_TYPE)
+                            .setTitleText(getResources().getString(R.string.registrationDialogSuccesText1))
+                            .setConfirmText("OK")
+                            .show();
+                }
+            });
+        }
     }
 
     /**
@@ -192,6 +213,18 @@ public class RegistrationActivity extends AppCompatActivity {
                         }
                     });
         }
+
+    }
+
+    public void startRegistration(View view) {
+
+
+        animationView = findViewById(R.id.animation_confirm_btn);
+        animationView.setSpeed(1.5f);
+        animationView.playAnimation();
+
+        if(checkFields())
+            createFirebaseUser("ilmatty98s@gmail.com", "vitovito");
 
     }
 
