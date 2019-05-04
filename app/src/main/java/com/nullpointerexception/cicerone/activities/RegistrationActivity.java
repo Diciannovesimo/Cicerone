@@ -1,7 +1,9 @@
 package com.nullpointerexception.cicerone.activities;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.DatePicker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,14 +22,20 @@ import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.fragments.Fragment_register1;
 import com.nullpointerexception.cicerone.fragments.Fragment_register2;
 
+import java.util.Calendar;
+
 public class RegistrationActivity extends AppCompatActivity {
 
+    //Universal tag for RegistrationActivity
     final static String TAG = "registration_activity";
-    Fragment_register1 fragment1;
-    Fragment_register2 fragment2;
-    LottieAnimationView animationView;
-    private FirebaseAuth mAuth;
 
+    private Fragment_register1 fragment1;
+    private Fragment_register2 fragment2;
+    private LottieAnimationView animationView;
+
+
+    //Firebase object
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,28 +212,5 @@ public class RegistrationActivity extends AppCompatActivity {
             createFirebaseUser("ilmatty98s@gmail.com", "vitovito");
 
     }
-
-
-
-
-    /*
-    È quindi possibile controllare se l'utente abbia verificato la loro e-mail in qualsiasi punto della app chiamando:
-
-
-    mAuthListener = new FirebaseAuth.AuthStateListener() {
-        @Override
-        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-          firebaseUser = firebaseAuth.getCurrentUser();
-            if (firebaseUser != null ) {
-                Log.e(TAG, firebaseUser.isEmailVerified() ? "User is signed in and email is verified" : "Email is not verified");
-            } else {
-                Log.e(TAG, "onAuthStateChanged:signed_out");
-            }
-        }
-    };
-     */
-
-
-
 
 }
