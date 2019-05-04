@@ -1,38 +1,28 @@
 package com.nullpointerexception.cicerone.activities;
 
+import android.os.Bundle;
+import android.view.View;
+
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
-
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
-import com.nullpointerexception.cicerone.components.LogManager;
 import com.nullpointerexception.cicerone.fragments.Fragment_register1;
 import com.nullpointerexception.cicerone.fragments.Fragment_register2;
 
 public class RegistrationActivity extends AppCompatActivity {
 
     final static String TAG = "registration_activity";
-    EditText emailField, passwordField, confpassField, nameField, surnameField, date_birthField;
     Fragment_register1 fragment1;
     Fragment_register2 fragment2;
     LottieAnimationView animationView;
@@ -46,25 +36,12 @@ public class RegistrationActivity extends AppCompatActivity {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        //Inizialization UI
-        initUI();
-
+        fragment1 = new Fragment_register1();
         fragmentTransaction.add(R.id.frameview, fragment1);
         fragmentTransaction.commit();
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
-    }
-
-    private void initUI() {
-        fragment1 = new Fragment_register1();
-        emailField = findViewById(R.id.emailTextField);
-        passwordField = findViewById(R.id.passwordTextField);
-        confpassField = findViewById(R.id.confirmTextField);
-        nameField = findViewById(R.id.nameTextField);
-        surnameField = findViewById(R.id.surnameTextField);
-        date_birthField = findViewById(R.id.dateTextField);
     }
 
     @Override
