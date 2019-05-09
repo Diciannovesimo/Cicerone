@@ -1,11 +1,8 @@
 package com.nullpointerexception.cicerone.activities;
 
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.DatePicker;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,8 +21,6 @@ import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.fragments.Fragment_register1;
 import com.nullpointerexception.cicerone.fragments.Fragment_register2;
 
-import java.util.Calendar;
-
 public class RegistrationActivity extends AppCompatActivity {
 
     //Universal tag for RegistrationActivity
@@ -40,7 +35,8 @@ public class RegistrationActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
@@ -92,17 +88,8 @@ public class RegistrationActivity extends AppCompatActivity {
         //  Remove last attached fragment
         fragmentTransaction.setCustomAnimations(R.anim.modal_in, R.anim.modal_out);
 
-        //  Check if the number of fragment is 2 after firebase registration error
-        if(fragmentManager.getFragments().size() == 2) {
-
-            for (Fragment fragment_index:getSupportFragmentManager().getFragments()) {
-                getSupportFragmentManager().beginTransaction().remove(fragment_index).commit();
-            }
-
-        }else {
-            fragmentTransaction.remove(fragmentManager.getFragments()
-                    .get(fragmentManager.getFragments().size() - 1));
-        }
+        for (Fragment fragment_index : getSupportFragmentManager().getFragments())
+            getSupportFragmentManager().beginTransaction().remove(fragment_index).commit();
 
         // Add new fragment
         fragmentTransaction.add(R.id.frameview, fragment);

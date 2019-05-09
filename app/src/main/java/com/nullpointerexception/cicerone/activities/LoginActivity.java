@@ -1,7 +1,5 @@
 package com.nullpointerexception.cicerone.activities;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
@@ -19,6 +17,10 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.airbnb.lottie.LottieAnimationView;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -29,7 +31,7 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
-import com.nullpointerexception.cicerone.components.LogManager;
+import com.nullpointerexception.cicerone.components.AuthenticationManager;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -72,7 +74,7 @@ public class LoginActivity extends AppCompatActivity
         facebookSignInButton = findViewById(R.id.facebookSignInButton);
 
         //  TODO: Remove this after testing
-        LogManager.get().logout();
+        AuthenticationManager.get().logout();
 
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().setAuthType("rerequest");
@@ -87,7 +89,7 @@ public class LoginActivity extends AppCompatActivity
                         boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
                         if(isLoggedIn)
                             if(Profile.getCurrentProfile() != null)
-                                LogManager.get().setFacebookUser(Profile.getCurrentProfile());
+                                AuthenticationManager.get().setFacebookUser(Profile.getCurrentProfile());
 
                         runOnUiThread(new Runnable()
                         {
@@ -96,7 +98,7 @@ public class LoginActivity extends AppCompatActivity
                             {
                                 Toast.makeText(LoginActivity.this,
                                         getResources().getString(R.string.loginToast1) + " " +
-                                                LogManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
+                                                AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -223,8 +225,8 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                LogManager.get().requestLoginWithGoogle(LoginActivity.this)
-                        .addOnLoginResultListener(new LogManager.LoginAttempt.OnLoginResultListener()
+                AuthenticationManager.get().requestLoginWithGoogle(LoginActivity.this)
+                        .addOnLoginResultListener(new AuthenticationManager.LoginAttempt.OnLoginResultListener()
                         {
                             @Override
                             public void onLoginResult(boolean result)
@@ -238,7 +240,7 @@ public class LoginActivity extends AppCompatActivity
                                         {
                                             Toast.makeText(LoginActivity.this,
                                                     getResources().getString(R.string.loginToast1) + " " +
-                                                            LogManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
+                                                            AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
@@ -252,7 +254,7 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                LogManager.get().loginWithFacebook(LoginActivity.this);
+                AuthenticationManager.get().loginWithFacebook(LoginActivity.this);
             }
         });
     }
@@ -324,8 +326,8 @@ public class LoginActivity extends AppCompatActivity
         /*
                 Login attempt
          */
-        LogManager.get().login(emailField.getText().toString(), passwordField.getText().toString())
-                .addOnLoginResultListener(new LogManager.LoginAttempt.OnLoginResultListener()
+        AuthenticationManager.get().login(emailField.getText().toString(), passwordField.getText().toString())
+                .addOnLoginResultListener(new AuthenticationManager.LoginAttempt.OnLoginResultListener()
                 {
                     @Override
                     public void onLoginResult(boolean result)
@@ -355,7 +357,7 @@ public class LoginActivity extends AppCompatActivity
                                 {
                                     Toast.makeText(LoginActivity.this,
                                             getResources().getString(R.string.loginToast1) + " " +
-                                     LogManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
+                                     AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -408,6 +410,6 @@ public class LoginActivity extends AppCompatActivity
     {
         callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
-        LogManager.get().loginWithGoogle(requestCode, data);
+        AuthenticationManager.get().loginWithGoogle(requestCode, data);
     }
 }
