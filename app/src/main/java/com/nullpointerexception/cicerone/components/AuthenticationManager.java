@@ -290,6 +290,31 @@ public class AuthenticationManager
     }
 
     /**
+     *  Create a new createAccount method which takes in an email address and password,
+     *  validates them and then creates a new user
+     *
+     *  @param email of the user who has registered
+     *  @param password of the user who has registered
+     *  @param onCompleteListener Callback method to manage actions for different results
+     */
+    public void createFirebaseUser(String email, String password, OnCompleteListener<AuthResult> onCompleteListener)
+    {
+        auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener((Activity) context, onCompleteListener);
+    }
+
+    /**
+     *     Send a registration confirmation email
+     *
+     *     @param onCompleteListener Callback method to manage actions for different results
+     */
+    public void sendVerificationEmail(OnCompleteListener<Void> onCompleteListener)
+    {
+        if (auth.getCurrentUser() != null)
+            auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(onCompleteListener);
+    }
+
+    /**
      *      LoginAttempt
      *
      *      Class that allows to set a callback method for a login attempt.
