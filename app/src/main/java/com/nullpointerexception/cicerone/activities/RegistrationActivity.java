@@ -2,9 +2,7 @@ package com.nullpointerexception.cicerone.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -138,7 +136,6 @@ public class RegistrationActivity extends AppCompatActivity {
                                     {
                                         if(task.isSuccessful())
                                             showDialog(true);
-
                                         else
                                             showDialog(false);
                                     }

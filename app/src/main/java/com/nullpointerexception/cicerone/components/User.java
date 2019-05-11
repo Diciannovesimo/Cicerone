@@ -16,7 +16,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class User
 {
     /** Email of account */
-    private String email,
+    String email,
     /** Formal name */
             displayName,
     /** URL of profile picture */

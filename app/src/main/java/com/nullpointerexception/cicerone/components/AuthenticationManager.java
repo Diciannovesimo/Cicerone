@@ -84,6 +84,32 @@ public class AuthenticationManager
                     currentUser = new User(Profile.getCurrentProfile());
         }
 
+        /*
+        if(currentUser != null)
+            BackEndInterface.get().storeField(BackEndInterface.Entities.user,
+                    BackEndInterface.EntityFields.user_displayName,
+                    currentUser.getDisplayName());
+        else
+            Log.i("TEST", "currentUser == null.");*/
+
+        /*
+        BackEndInterface.get().getField(BackEndInterface.Entities.user,
+                BackEndInterface.EntityFields.user_displayName,
+                new BackEndInterface.OnDataReceiveListener()
+                {
+                    @Override
+                    public void onDataReceived(String data)
+                    {
+                        Log.i("TEST", "Received: " + data);
+                    }
+
+                    @Override
+                    public void onError()
+                    {
+                        Log.i("TEST", "Error.");
+                    }
+                });*/
+
     }
 
     /**
