@@ -3,6 +3,7 @@ package com.nullpointerexception.cicerone.components;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -34,8 +35,11 @@ public class AuthenticationManager
     /*
             Singleton declaration
      */
+    /**  Instance of this class   */
     private static final AuthenticationManager ourInstance = new AuthenticationManager();
+    /**  Used to access to this class   */
     public static AuthenticationManager get() { return ourInstance; }
+    /**  Private constructor to permit a single instance of this class   */
     private AuthenticationManager() {  }
 
     /** Request code for google sign-in intent */
@@ -85,12 +89,40 @@ public class AuthenticationManager
         }
 
         /*
+                Testing
+         */
         if(currentUser != null)
+        {
+            Log.i("TEST", currentUser.getFields().toString());
+
+            //BackEndInterface.get().storeEntity(currentUser);
+
+            /*
             BackEndInterface.get().storeField(BackEndInterface.Entities.user,
                     BackEndInterface.EntityFields.user_displayName,
-                    currentUser.getDisplayName());
+                    currentUser.getDisplayName());*/
+        }
         else
-            Log.i("TEST", "currentUser == null.");*/
+        {
+            Log.i("TEST", "currentUser == null.");
+        }
+
+        /*
+        final User us = new User();
+        BackEndInterface.get().getEntity(us, new BackEndInterface.OnDataReceiveListener()
+        {
+            @Override
+            public void onDataReceived(String data)
+            {
+                Log.i("TEST", us.toString());
+            }
+
+            @Override
+            public void onError()
+            {
+                Log.i("TEST", us.toString());
+            }
+        });*/
 
         /*
         BackEndInterface.get().getField(BackEndInterface.Entities.user,
@@ -286,7 +318,7 @@ public class AuthenticationManager
      */
     public void logout()
     {
-        if(currentUser == null || auth == null || context == null)
+        if(currentUser == null || currentUser.getAccessType() == null || auth == null || context == null)
             return;
 
         switch (currentUser.getAccessType())

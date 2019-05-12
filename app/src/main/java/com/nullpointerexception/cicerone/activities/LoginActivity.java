@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity
         facebookSignInButton = findViewById(R.id.facebookSignInButton);
 
         //  TODO: Remove this after testing
-        //AuthenticationManager.get().logout();
+        AuthenticationManager.get().logout();
 
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().setAuthType("rerequest");

@@ -6,6 +6,8 @@ import com.facebook.Profile;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.lang.reflect.Field;
+
 /**
  *      User
  *
@@ -13,16 +15,18 @@ import com.google.firebase.auth.FirebaseUser;
  *
  *      @author Luca
  */
-public class User
+public class User extends StorableEntity
 {
     /** Email of account */
-    String email,
+    protected String email,
     /** Formal name */
             displayName,
     /** URL of profile picture */
             profileImageUrl;
     /** Stores the type of access done by user */
-    private AccessType accessType;
+    protected AccessType accessType;
+
+    public User() {}
 
     /** Construct object from a Firebase user and set fields from it */
     public User(@NonNull FirebaseUser user)
@@ -104,5 +108,26 @@ public class User
         GOOGLE,
         /** Access with facebook account */
         FACEBOOK
+    }
+
+    /**
+     *      Implementation customized to convert field 'accessType'.
+     *
+     *      @param field    Field to set
+     *      @param value    Value to set
+     */
+    @Override
+    protected void setComplexTypedField(Field field, String value) throws IllegalAccessException
+    {
+        if(field.getType().equals(AccessType.class))
+        {
+            if(value != null)
+                for(AccessType accessType : AccessType.values())
+                    if(accessType.name().equalsIgnoreCase(value))
+                    {
+                        field.set(this, accessType);
+                        break;
+                    }
+        }
     }
 }
