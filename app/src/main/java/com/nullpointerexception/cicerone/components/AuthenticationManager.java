@@ -95,38 +95,39 @@ public class AuthenticationManager
         {
             Log.i("TEST", currentUser.getFields().toString());
 
-            //BackEndInterface.get().storeEntity(currentUser);
+            BackEndInterface.get().storeEntity(currentUser);
 
-            /*
-            BackEndInterface.get().storeField(BackEndInterface.Entities.user,
-                    BackEndInterface.EntityFields.user_displayName,
-                    currentUser.getDisplayName());*/
+            //BackEndInterface.get().storeField(currentUser, "displayName");
         }
         else
         {
             Log.i("TEST", "currentUser == null.");
         }
 
-        /*
-        final User us = new User();
+
+        User us = new User();
+        us.setAccessType(User.AccessType.DEFAULT);
+        us.setEmail("svil@cicerone.com");
+        us.setDisplayName("Svil");
+        //BackEndInterface.get().storeEntity(us);
         BackEndInterface.get().getEntity(us, new BackEndInterface.OnDataReceiveListener()
         {
             @Override
             public void onDataReceived(String data)
             {
-                Log.i("TEST", us.toString());
+                Log.i("TEST", "User read: " + data);
             }
 
             @Override
             public void onError()
             {
-                Log.i("TEST", us.toString());
+                Log.i("TEST", "Error.");
             }
-        });*/
+        });
 
         /*
-        BackEndInterface.get().getField(BackEndInterface.Entities.user,
-                BackEndInterface.EntityFields.user_displayName,
+        BackEndInterface.get().getField(User.class,
+                "displayName",
                 new BackEndInterface.OnDataReceiveListener()
                 {
                     @Override

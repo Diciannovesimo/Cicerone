@@ -7,7 +7,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.Map;
 
@@ -22,29 +21,31 @@ import ru.bullyboo.encoder.methods.AES;
  */
 public class BackEndInterface
 {
+    /**  Encryption key   */
+    private final String ENCRYPTION_KEY = "qergSB65S15s4fb156t.ò876ò,43ò,925y5ADSfgds56gfw75FFB";
+
     /*
             Singleton setting
      */
     /**  Instance of this class   */
     private static final BackEndInterface ourInstance = new BackEndInterface();
     /**  Used to access to this class   */
-    static BackEndInterface get() { return ourInstance; }
+    public static BackEndInterface get() { return ourInstance; }
     /**  Private constructor to permit a single instance of this class   */
     private BackEndInterface() { }
 
     /**
      *      Encrypt a given string with a given key.
      *
-     *      @param key      Key of encryption
      *      @param string   String to encrypt
      *      @return String encrypted.
      */
-    private String encrypt(String key, String string)
+    private String encrypt(String string)
     {
         return Encoder.BuilderAES()
                 .message(string)
                 .method(AES.Method.AES_CBC_ISO10126PADDING)
-                .key(key)
+                .key(ENCRYPTION_KEY)
                 .keySize(AES.Key.SIZE_256)
                 .encrypt();
     }
@@ -52,16 +53,15 @@ public class BackEndInterface
     /**
      *      Decrypt a given string with a given key.
      *
-     *      @param key      Key of decryption
      *      @param string   String to decrypt
      *      @return String decrypted.
      */
-    private String decrypt(String key, String string)
+    private String decrypt(String string)
     {
         return Encoder.BuilderAES()
                 .message(string)
                 .method(AES.Method.AES_CBC_ISO10126PADDING)
-                .key(key)
+                .key(ENCRYPTION_KEY)
                 .keySize(AES.Key.SIZE_256)
                 .decrypt();
     }
@@ -91,10 +91,8 @@ public class BackEndInterface
         if(entity == null)
             return RESULT_PARAMETERS_NULL;
 
-        //  TODO: Check internet connection.
-
         // NOT CONFIRMED - Get it in some other way
-        String id = FirebaseInstanceId.getInstance().getToken();
+        String id = entity.getId();
         if(id == null)
             return RESULT_ID_ERROR;
 
@@ -105,10 +103,10 @@ public class BackEndInterface
 
         for(String fieldName : fields.keySet() )
         {
-            String fieldValue = encrypt(id, fields.get(fieldName));
+            String fieldValue = encrypt(fields.get(fieldName));
 
-            DatabaseReference ref = database.getReference(id)
-                    .child(entityName)
+            DatabaseReference ref = database.getReference(entityName)
+                    .child(id)
                     .child(fieldName);
             ref.setValue( fieldValue );
         }
@@ -130,15 +128,14 @@ public class BackEndInterface
         if(entity == null)
             return RESULT_PARAMETERS_NULL;
 
-        //  TODO: Check internet connection.
-
         // NOT CONFIRMED - Get it in some other way
-        final String id = FirebaseInstanceId.getInstance().getToken();
+        final String id = entity.getId();
         if(id == null)
             return RESULT_ID_ERROR;
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(id)
-                .child(entity.getClass().getSimpleName().toLowerCase());
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference(entity.getClass().getSimpleName().toLowerCase())
+                .child(id);
         ref.addListenerForSingleValueEvent(new ValueEventListener()
         {
             @Override
@@ -153,7 +150,7 @@ public class BackEndInterface
                     try
                     {
                         String fieldName = ds.getKey();
-                        String fieldValue = decrypt(id, ds.getValue(String.class));
+                        String fieldValue = decrypt(ds.getValue(String.class));
 
                         if(fieldName != null)
                             fields.put(fieldName, fieldValue);
@@ -182,43 +179,48 @@ public class BackEndInterface
         return RESULT_OK;
     }
 
-    public void storeField(Entities entity, EntityFields field, String fieldValue)
+    public void storeField(StorableEntity entity, String fieldName)
     {
         //  Check parameters
-        if(entity == null || field == null || fieldValue == null)
+        if(entity == null || fieldName == null)
             return;
 
+        String entityName = entity.getClass().getSimpleName().toLowerCase();
+
+        String fieldValue = entity.getFields().get(fieldName);
+
+        Log.i("TEST", fieldName);
+
         // NOT CONFIRMED - Get it in some other way
-        String id = FirebaseInstanceId.getInstance().getToken();
+        String id = entity.getId();
         if(id == null)
             return;
 
-        String fieldName = field.name().replace(entity.name() + "_", "");
-
         //  Storing
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference(id)
-                .child(entity.name()).child(fieldName);
-        ref.setValue( encrypt(id, fieldValue) );
+        DatabaseReference ref = database.getReference(entityName)
+                .child(id)
+                .child(fieldName);
+        ref.setValue( encrypt(fieldValue) );
 
         Log.i("TEST", "Stored.");
     }
 
-    public void getField(Entities entity, final EntityFields field, final OnDataReceiveListener onDataReceiveListener)
+    public void getField(StorableEntity entity, final String fieldName, final OnDataReceiveListener onDataReceiveListener)
     {
         //  Check parameters
-        if(entity == null || field == null || onDataReceiveListener == null)
+        if(entity == null || fieldName == null || onDataReceiveListener == null)
             return;
 
-        final String fieldName = field.name().replace(entity.name() + "_", "");
+        String entityName = entity.getClass().getSimpleName().toLowerCase();
 
         // NOT CONFIRMED - Get it in some other way
-        final String id = FirebaseInstanceId.getInstance().getToken();
+        final String id = entity.getId();
         if(id == null)
             return;
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(id)
-                .child(entity.name());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(entityName)
+                .child(id);
         ref.addListenerForSingleValueEvent(new ValueEventListener()
         {
             @Override
@@ -226,7 +228,7 @@ public class BackEndInterface
             {
                 Log.i("Test", dataSnapshot.child(fieldName).getValue(String.class));
                 onDataReceiveListener.onDataReceived(
-                        decrypt(id, dataSnapshot.child(fieldName).getValue(String.class)) );
+                        decrypt(dataSnapshot.child(fieldName).getValue(String.class)) );
             }
 
             @Override
@@ -239,40 +241,48 @@ public class BackEndInterface
 
     }
 
+    /**
+     *      Removes the given entity from FireBase database based on its id.
+     *
+     *      @param entity   Entity with id of node to remove from database.
+     */
+    public void removeEntity(StorableEntity entity)
+    {
+        //  Check parameters
+        if(entity == null)
+            return;
+
+        String entityName = entity.getClass().getSimpleName().toLowerCase();
+
+        // NOT CONFIRMED - Get it in some other way
+        String id = entity.getId();
+        if(id == null)
+            return;
+
+        //  Storing
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference(entityName)
+                .child(id);
+        ref.removeValue();
+
+        Log.i("TEST", "Node removed.");
+    }
+
+    //  TODO: Node deleting method
+
     /**  Interface which provides callback methods for a data-request to FireBase database.   */
     public interface OnDataReceiveListener
     {
         /**
-         *      Called when data is correctly received.
+         * Called when data is correctly received.
          *
-         *      @param data data received, as String.
+         * @param data data received, as String.
          */
         void onDataReceived(String data);
 
-        /**    Called when an error has occurred into the request */
+        /**
+         * Called when an error has occurred into the request
+         */
         void onError();
-    }
-
-    /**
-     *      Classes permitted to store on database
-     */
-    enum Entities
-    {
-        user
-    }
-
-    /**
-     *      Fields of entities.
-     *      Every field is named in the format: (class name)_(field name)
-     */
-    enum EntityFields
-    {
-        user_name,
-        user_surname,
-        user_dateBirth,
-        user_email,
-        user_displayName,
-        user_profileImageUrl,
-        user_accessType
     }
 }

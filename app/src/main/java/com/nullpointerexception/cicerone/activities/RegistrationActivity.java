@@ -17,6 +17,8 @@ import com.google.firebase.auth.AuthResult;
 import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.User;
 import com.nullpointerexception.cicerone.fragments.Fragment_register1;
 import com.nullpointerexception.cicerone.fragments.Fragment_register2;
 
@@ -140,6 +142,13 @@ public class RegistrationActivity extends AppCompatActivity {
                                             showDialog(false);
                                     }
                                 });
+
+
+                                User user = new User();
+
+                                //  TODO: Riempire l'utente con i suoi dati
+
+                                BackEndInterface.get().storeEntity(user);
 
                             }
                             else

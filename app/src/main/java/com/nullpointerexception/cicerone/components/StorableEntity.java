@@ -16,6 +16,13 @@ public abstract class StorableEntity
 {
 
     /**
+     *      Used to identify node of this entity on database.
+     *
+     *      @return Field used to identify this entity.
+     */
+    public abstract String getId();
+
+    /**
      *      Creates a map with:
      *          keys:       declared fields name, as String
      *          values:     runtime value of field in the current instance of object

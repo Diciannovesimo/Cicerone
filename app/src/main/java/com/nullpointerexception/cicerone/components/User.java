@@ -26,6 +26,8 @@ public class User extends StorableEntity
     /** Stores the type of access done by user */
     protected AccessType accessType;
 
+    //  TODO: Add other fields
+
     public User() {}
 
     /** Construct object from a Firebase user and set fields from it */
@@ -110,6 +112,12 @@ public class User extends StorableEntity
         FACEBOOK
     }
 
+    @Override
+    public String getId()
+    {
+        return email;
+    }
+
     /**
      *      Implementation customized to convert field 'accessType'.
      *
@@ -130,4 +138,6 @@ public class User extends StorableEntity
                     }
         }
     }
+
+
 }
