@@ -30,7 +30,7 @@ public class User extends StorableEntity
 
     public User() {}
 
-    /** Construct object from a Firebase user and set fields from it */
+    /** Construct object from a FireBase user and set fields from it */
     public User(@NonNull FirebaseUser user)
     {
         email = user.getEmail();
@@ -112,6 +112,12 @@ public class User extends StorableEntity
         FACEBOOK
     }
 
+    /**
+     *      Implementation of its superclass method.
+     *      Provides an id to indexing storage of this object type.
+     *
+     *      @return     Identifier of this object type on database.
+     */
     @Override
     public String getId()
     {

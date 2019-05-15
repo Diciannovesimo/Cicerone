@@ -47,8 +47,7 @@ public abstract class StorableEntity
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
-            Log.i("TEST", "Errore: " + e.toString());
+            Log.e("Error", e.toString());
         }
 
         return result;
@@ -124,8 +123,7 @@ public abstract class StorableEntity
             }
             catch (Exception e)
             {
-                e.printStackTrace();
-                Log.i("TEST", "SetFields Error: " + e.toString());
+                Log.e("Error", e.toString());
             }
         }
     }

@@ -71,13 +71,14 @@ public class BackEndInterface
      */
 
     /**    Operation successfully completed */
-    public static int RESULT_OK = 0;
+    public final static int RESULT_OK = 0;
     /**    Operation terminated for an error with parameters */
-    public static int RESULT_PARAMETERS_NULL = -1;
-    /**    Operation terminated for a problem with connection */
-    public static int RESULT_NO_CONNECYION = -1;
-    /**    Operation terminated for an error while getting id */
-    public static int RESULT_ID_ERROR = -2;
+    public final static int RESULT_PARAMETERS_NULL = -1;
+
+    /*    Operation terminated for an error while getting id */
+    //public final static int RESULT_ID_ERROR = -2;
+    /*    Operation terminated for a problem with connection */
+    //public static int RESULT_NO_CONNECTION = -3;
 
     /**
      *      Stores an object on the FireBase database, encrypting its values.
@@ -91,10 +92,7 @@ public class BackEndInterface
         if(entity == null)
             return RESULT_PARAMETERS_NULL;
 
-        // NOT CONFIRMED - Get it in some other way
-        String id = entity.getId();
-        if(id == null)
-            return RESULT_ID_ERROR;
+        String id = getIdFrom(entity);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         String entityName = entity.getClass().getSimpleName().toLowerCase();
@@ -128,10 +126,7 @@ public class BackEndInterface
         if(entity == null)
             return RESULT_PARAMETERS_NULL;
 
-        // NOT CONFIRMED - Get it in some other way
-        final String id = entity.getId();
-        if(id == null)
-            return RESULT_ID_ERROR;
+        final String id = getIdFrom(entity);
 
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference(entity.getClass().getSimpleName().toLowerCase())
@@ -179,6 +174,12 @@ public class BackEndInterface
         return RESULT_OK;
     }
 
+    /**
+     *      Stores a field on apposite location on database.
+     *
+     *      @param entity       Object with field to store.
+     *      @param fieldName    Name of the field to store.
+     */
     public void storeField(StorableEntity entity, String fieldName)
     {
         //  Check parameters
@@ -192,9 +193,7 @@ public class BackEndInterface
         Log.i("TEST", fieldName);
 
         // NOT CONFIRMED - Get it in some other way
-        String id = entity.getId();
-        if(id == null)
-            return;
+        String id = getIdFrom(entity);
 
         //  Storing
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -206,7 +205,14 @@ public class BackEndInterface
         Log.i("TEST", "Stored.");
     }
 
-    public void getField(StorableEntity entity, final String fieldName, final OnDataReceiveListener onDataReceiveListener)
+    /**
+     *      Get a field from database named as fieldName and set it on object passed with parameters.
+     *
+     *      @param entity                   Object to be set.
+     *      @param fieldName                Name of field.
+     *      @param onDataReceiveListener    Provides callback methods after reading database.
+     */
+    public void getField(final StorableEntity entity, final String fieldName, final OnDataReceiveListener onDataReceiveListener)
     {
         //  Check parameters
         if(entity == null || fieldName == null || onDataReceiveListener == null)
@@ -214,10 +220,7 @@ public class BackEndInterface
 
         String entityName = entity.getClass().getSimpleName().toLowerCase();
 
-        // NOT CONFIRMED - Get it in some other way
-        final String id = entity.getId();
-        if(id == null)
-            return;
+        final String id = getIdFrom(entity);
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(entityName)
                 .child(id);
@@ -226,9 +229,10 @@ public class BackEndInterface
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
-                Log.i("Test", dataSnapshot.child(fieldName).getValue(String.class));
-                onDataReceiveListener.onDataReceived(
-                        decrypt(dataSnapshot.child(fieldName).getValue(String.class)) );
+                String value = decrypt(dataSnapshot.child(fieldName).getValue(String.class));
+
+                Log.i("Test", value);
+                onDataReceiveListener.onDataReceived(value);
             }
 
             @Override
@@ -254,21 +258,50 @@ public class BackEndInterface
 
         String entityName = entity.getClass().getSimpleName().toLowerCase();
 
-        // NOT CONFIRMED - Get it in some other way
-        String id = entity.getId();
-        if(id == null)
-            return;
+        String id = getIdFrom(entity);
 
-        //  Storing
+        //  Removing
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference(entityName)
-                .child(id);
+                .child(id).getRef();
         ref.removeValue();
 
-        Log.i("TEST", "Node removed.");
+        Log.i("TEST", "Node removed: " + ref.getKey());
     }
 
-    //  TODO: Node deleting method
+    /**
+     *      Get id from a entity and convert it into an encrypted legal value for FireBase database.
+     *
+     *      @param entity   Entity that gives its id.
+     *      @return         An encrypted and legal value for FireBase database.
+     */
+    private String getIdFrom(StorableEntity entity)
+    {
+        if(entity == null)
+            return null;
+
+        // Firebase Database paths must not contain '.', '#', '$', '[', or ']'
+
+        /*
+        String id;
+        id = encrypt(entity.getId());*/
+
+        return entity.getId().replace(".", "~");
+    }
+
+    /**
+     *      Get decrypted id from the respective encrypted used as index on the database.
+     *
+     *      @param id   Id to be decrypted.
+     *      @return     A decrypted id used as index on the database.
+     */
+    private String getFromId(String id)
+    {
+        if(id == null)
+            return null;
+
+        return id.replace("~", ".");
+    }
 
     /**  Interface which provides callback methods for a data-request to FireBase database.   */
     public interface OnDataReceiveListener

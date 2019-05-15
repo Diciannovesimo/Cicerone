@@ -89,32 +89,32 @@ public class AuthenticationManager
         }
 
         /*
-                Testing
+                Testing --------------------------------------------------------------------------
          */
         if(currentUser != null)
         {
             Log.i("TEST", currentUser.getFields().toString());
 
             BackEndInterface.get().storeEntity(currentUser);
-
             //BackEndInterface.get().storeField(currentUser, "displayName");
+            //BackEndInterface.get().removeEntity(currentUser);
         }
         else
         {
             Log.i("TEST", "currentUser == null.");
         }
 
-
-        User us = new User();
+        /*
+        final User us = new User();
         us.setAccessType(User.AccessType.DEFAULT);
-        us.setEmail("svil@cicerone.com");
+        us.setEmail("luca.garofalo1369@gmail.com");
         us.setDisplayName("Svil");
-        //BackEndInterface.get().storeEntity(us);
         BackEndInterface.get().getEntity(us, new BackEndInterface.OnDataReceiveListener()
         {
             @Override
             public void onDataReceived(String data)
             {
+                us.toString();
                 Log.i("TEST", "User read: " + data);
             }
 
@@ -123,16 +123,18 @@ public class AuthenticationManager
             {
                 Log.i("TEST", "Error.");
             }
-        });
+        });*/
 
         /*
-        BackEndInterface.get().getField(User.class,
+        currentUser.setDisplayName("");
+        BackEndInterface.get().getField(currentUser,
                 "displayName",
                 new BackEndInterface.OnDataReceiveListener()
                 {
                     @Override
                     public void onDataReceived(String data)
                     {
+                        currentUser.setDisplayName(data);
                         Log.i("TEST", "Received: " + data);
                     }
 
@@ -269,7 +271,7 @@ public class AuthenticationManager
             }
             catch (ApiException e)
             {
-                e.printStackTrace();
+                Log.e("Error", e.toString());
 
                 if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
                     currentLoginAttempt.getOnLoginResultListener().onLoginResult(false);
