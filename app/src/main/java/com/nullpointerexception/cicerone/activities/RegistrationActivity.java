@@ -1,16 +1,16 @@
 package com.nullpointerexception.cicerone.activities;
 
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -73,7 +73,7 @@ public class RegistrationActivity extends AppCompatActivity
     {
         Fragment fragment;
 
-        if(view == findViewById(R.id.animation_next_btn))
+        if(view == findViewById(R.id.nextImageView))
         {
 
             if(fragment2 == null)

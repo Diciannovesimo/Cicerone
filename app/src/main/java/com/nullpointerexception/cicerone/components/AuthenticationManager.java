@@ -36,7 +36,7 @@ public class AuthenticationManager
      */
     private static final AuthenticationManager ourInstance = new AuthenticationManager();
     public static AuthenticationManager get() { return ourInstance; }
-    private AuthenticationManager() {  }
+    public AuthenticationManager() {  }
 
     /** Request code for google sign-in intent */
     private final int GOOGLE_SIGNIN_REQUEST = 10;
@@ -321,5 +321,13 @@ public class AuthenticationManager
         }
 
         private OnLoginResultListener getOnLoginResultListener() { return onLoginResultListener; }
+    }
+
+    public LoginAttempt getCurrentLoginAttempt() {
+        return currentLoginAttempt;
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
     }
 }

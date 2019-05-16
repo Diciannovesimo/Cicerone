@@ -24,6 +24,13 @@ public class User
     /** Stores the type of access done by user */
     private AccessType accessType;
 
+    /**Construct for test*/
+    public User(String email, String displayName, AccessType accessType) {
+        this.email=email;
+        this.displayName=displayName;
+        this.accessType=accessType;
+    }
+
     /** Construct object from a Firebase user and set fields from it */
     public User(@NonNull FirebaseUser user)
     {
@@ -52,6 +59,7 @@ public class User
             profileImageUrl = user.getProfilePictureUri(64, 64).toString();
         accessType = AccessType.FACEBOOK;
     }
+
 
     public String getEmail()
     {
