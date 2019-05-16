@@ -22,11 +22,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.kinda.alert.KAlertDialog;
@@ -84,23 +82,7 @@ public class LoginActivity extends AppCompatActivity
                     @Override
                     public void onSuccess(LoginResult loginResult)
                     {
-                        AccessToken accessToken = loginResult.getAccessToken();
-
-                        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
-                        if(isLoggedIn)
-                            if(Profile.getCurrentProfile() != null)
-                                AuthenticationManager.get().setFacebookUser(Profile.getCurrentProfile());
-
-                        runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                Toast.makeText(LoginActivity.this,
-                                        getResources().getString(R.string.loginToast1) + " " +
-                                                AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        AuthenticationManager.get().setFacebookUser(loginResult);
                     }
 
                     @Override

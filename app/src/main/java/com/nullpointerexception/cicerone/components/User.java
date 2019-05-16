@@ -2,11 +2,7 @@ package com.nullpointerexception.cicerone.components;
 
 import androidx.annotation.NonNull;
 
-import com.facebook.Profile;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.lang.reflect.Field;
 
 /**
  *      User
@@ -17,46 +13,45 @@ import java.lang.reflect.Field;
  */
 public class User extends StorableEntity
 {
+    /**  Id of account (generally provided by FireBase)   */
+    protected String id,
     /** Email of account */
-    protected String email,
+            email,
     /** Formal name */
             displayName,
     /** URL of profile picture */
-            profileImageUrl;
-    /** Stores the type of access done by user */
-    protected AccessType accessType;
-
-    //  TODO: Add other fields
+            profileImageUrl,
+    /** Name of user */
+            name,
+    /** Surname of user */
+            surname,
+    /** Birth date of user */
+            dateBirth,
+    /** Phone number of user */
+            phoneNumber;
 
     public User() {}
 
     /** Construct object from a FireBase user and set fields from it */
     public User(@NonNull FirebaseUser user)
     {
+        id = user.getUid();
         email = user.getEmail();
+        phoneNumber = user.getPhoneNumber();
         displayName = user.getDisplayName();
+        if(displayName != null)     //  TODO: Optimize these fields
+        {
+            if(displayName.contains(" "))
+            {
+                name = displayName.substring(0, displayName.indexOf(" "));
+                surname = displayName.substring(displayName.indexOf(" ")+1);
+            }
+            else
+                name = displayName;
+        }
+
         if(user.getPhotoUrl() != null)
             profileImageUrl = user.getPhotoUrl().toString();
-        accessType = AccessType.DEFAULT;
-    }
-
-    /** Construct object from a Google account and set fields from it */
-    public User(@NonNull GoogleSignInAccount user)
-    {
-        email = user.getEmail();
-        displayName = user.getDisplayName();
-        if(user.getPhotoUrl() != null)
-            profileImageUrl = user.getPhotoUrl().toString();
-        accessType = AccessType.GOOGLE;
-    }
-
-    /** Construct object from a Facebook account and set fields from it */
-    public User(@NonNull Profile user)
-    {
-        displayName = user.getName();
-        if(user.getProfilePictureUri(64, 64) != null)
-            profileImageUrl = user.getProfilePictureUri(64, 64).toString();
-        accessType = AccessType.FACEBOOK;
     }
 
     public String getEmail()
@@ -89,27 +84,28 @@ public class User extends StorableEntity
         this.profileImageUrl = profileImageUrl;
     }
 
-    public AccessType getAccessType()
-    {
-        return accessType;
+    public String getName() {
+        return name;
     }
 
-    public void setAccessType(AccessType type)
-    {
-        this.accessType = type;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    /**
-     *      Describes the type of access user done
-     */
-    public enum AccessType
-    {
-        /** Access with an email and password */
-        DEFAULT,
-        /** Access with google sign-in */
-        GOOGLE,
-        /** Access with facebook account */
-        FACEBOOK
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getDateBirth() {
+        return dateBirth;
+    }
+
+    public void setDateBirth(String dateBirth) {
+        this.dateBirth = dateBirth;
     }
 
     /**
@@ -121,28 +117,7 @@ public class User extends StorableEntity
     @Override
     public String getId()
     {
-        return email;
-    }
-
-    /**
-     *      Implementation customized to convert field 'accessType'.
-     *
-     *      @param field    Field to set
-     *      @param value    Value to set
-     */
-    @Override
-    protected void setComplexTypedField(Field field, String value) throws IllegalAccessException
-    {
-        if(field.getType().equals(AccessType.class))
-        {
-            if(value != null)
-                for(AccessType accessType : AccessType.values())
-                    if(accessType.name().equalsIgnoreCase(value))
-                    {
-                        field.set(this, accessType);
-                        break;
-                    }
-        }
+        return id;
     }
 
 
