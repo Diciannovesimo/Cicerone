@@ -19,7 +19,7 @@ import java.util.Calendar;
 public class Fragment_register2 extends Fragment
 {
 
-    private EditText nameField, surnameField, date_birthField;
+    private EditText nameField, surnameField, date_birthField, phonePicker;
 
     //Datepicker object
     Calendar calendar;
@@ -35,6 +35,7 @@ public class Fragment_register2 extends Fragment
         nameField = view.findViewById(R.id.nameTextField);
         surnameField = view.findViewById(R.id.surnameTextField);
         date_birthField = view.findViewById(R.id.dateTextField);
+        phonePicker = view.findViewById(R.id.phoneTextField);
 
         date_birthField.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,4 +74,6 @@ public class Fragment_register2 extends Fragment
     public EditText getDate_birthField() {
         return date_birthField;
     }
+
+    public EditText getPhonePicker() { return phonePicker; }
 }

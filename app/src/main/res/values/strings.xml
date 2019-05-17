@@ -25,6 +25,7 @@
     <string name="cognome">Cognome</string>
     <string name="conferma_password">Conferma Password</string>
     <string name="data_di_nascita">Data di nascita</string>
+    <string name="Numero_di_telefono">Numero di telefono</string>
 
     <!-- RegisterActivity -->
     <string name="registrationDialogErrorText1">Impossibile registrarsi!</string>
@@ -38,5 +39,6 @@
     <string name="nameError">Nome non valido</string>
     <string name="surnameError">Cognome non valido</string>
     <string name="dateError">Il campo è obbligatorio</string>
+    <string name="phoneError">Numero telefonico non valido</string>
 
 </resources>

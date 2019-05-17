@@ -108,6 +108,14 @@ public class User extends StorableEntity
         this.dateBirth = dateBirth;
     }
 
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
     /**
      *      Implementation of its superclass method.
      *      Provides an id to indexing storage of this object type.

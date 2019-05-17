@@ -1,5 +1,6 @@
 package com.nullpointerexception.cicerone.activities;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -11,6 +12,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.credentials.Credential;
+import com.google.android.gms.auth.api.credentials.HintRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -121,6 +125,16 @@ public class RegistrationActivity extends AppCompatActivity {
 
         if(checkFields())
         {
+            User user = new User();
+            user.setName(fragment2.getNameField().getText().toString());
+            user.setDateBirth(fragment2.getBirthdayString());
+            user.setSurname(fragment2.getSurnameField().getText().toString());
+            user.setPhoneNumber(fragment2.getPhonePicker().getText().toString());
+            user.setEmail(fragment1.getEmailField().getText().toString());
+
+            //Carico i dati dell'utente sul DB
+            BackEndInterface.get().storeEntity(user);
+
             AuthenticationManager.get().createFirebaseUser(fragment1.getEmailField().getText().toString(),
                     fragment1.getPasswordField().getText().toString(), new OnCompleteListener<AuthResult>()
                     {
@@ -142,14 +156,6 @@ public class RegistrationActivity extends AppCompatActivity {
                                             showDialog(false);
                                     }
                                 });
-
-
-                                User user = new User();
-
-                                //  TODO: Riempire l'utente con i suoi dati
-
-                                BackEndInterface.get().storeEntity(user);
-
                             }
                             else
                             {
@@ -208,6 +214,12 @@ public class RegistrationActivity extends AppCompatActivity {
         {
             fragment2.getDate_birthField().setError(getResources().getString(R.string.dateError));
             alright = false;
+        }
+
+        //check phone number
+        if(fragment2.getPhonePicker().getText().toString().length() == 10)
+        {
+            fragment2.getPhonePicker().setError(getResources().getString(R.string.phoneError));
         }
 
         return alright;
