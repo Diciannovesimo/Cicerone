@@ -18,22 +18,22 @@
             <set />
           </value>
         </entry>
-        <entry key="$PROJECT_DIR$/app/src/androidTest/java/com/nullpointerexception/cicerone/activities/LoginActivityTest.java">
-          <value>
-            <set />
-          </value>
-        </entry>
         <entry key="$PROJECT_DIR$/app/src/androidTest/java/com/nullpointerexception/cicerone/activities/RegistrationActivityTest.java">
           <value>
             <set />
           </value>
         </entry>
-        <entry key="$PROJECT_DIR$/app/src/androidTest/java/com/nullpointerexception/cicerone/activities/SplashScreenTest2.java">
+        <entry key="$PROJECT_DIR$/app/src/androidTest/java/com/nullpointerexception/cicerone/activities/SplashScreenTest.java">
           <value>
             <set />
           </value>
         </entry>
-        <entry key="$PROJECT_DIR$/app/src/androidTest/java/com/nullpointerexception/cicerone/components/UserTest.java">
+        <entry key="$PROJECT_DIR$/app/src/androidTest/java/com/nullpointerexception/cicerone/activities/SplashScreenTest3.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/activities/LoginActivity.java">
           <value>
             <set />
           </value>
@@ -48,17 +48,27 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/components/BackEndInterface.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/components/StorableClass.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/components/StorableEntity.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/components/User.java">
           <value>
             <set />
           </value>
         </entry>
-        <entry key="$PROJECT_DIR$/app/src/test/java/com/nullpointerexception/cicerone/components/AuthenticationManagerTest.java">
-          <value>
-            <set />
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/app/src/test/java/com/nullpointerexception/cicerone/components/UserTest.java">
+        <entry key="$PROJECT_DIR$/app/src/main/res/values/strings.xml">
           <value>
             <set />
           </value>

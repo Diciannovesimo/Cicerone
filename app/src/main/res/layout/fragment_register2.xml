@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment_register2">
+    tools:context=".fragments.Fragment_register2">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -59,27 +59,66 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="32dp"
             android:background="@color/black_overlay"
-            android:drawableLeft="@drawable/ic_identity"
+            android:drawableLeft="@drawable/ic_calendar"
             android:drawablePadding="10sp"
             android:ems="10"
             android:hint="@string/data_di_nascita"
-            android:inputType="datetime"
+            android:inputType="none"
             android:textColor="#fff"
             android:textColorHint="#ffffffff"
+            android:editable="false"
+            android:focusable="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/surnameTextField" />
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:id="@+id/imageView3"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_marginTop="32dp"
-            android:src="@drawable/ic_chevron_left_black_24dp"
+            android:padding="7.5dp"
+            android:src="@drawable/ic_full_circle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dateTextField" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/animation_prev_btn"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="32dp"
+            android:onClick="switchRegisterFragment"
+            android:rotation="90"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dateTextField"
-            android:clickable="true"
-            android:onClick="switchRegisterFragment"/>
+            app:lottie_autoPlay="true"
+            app:lottie_rawRes="@raw/arrow"
+            tools:ignore="OnClick" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="32dp"
+            android:onClick="startRegistration"
+            android:padding="7dp"
+            android:src="@drawable/ic_full_circle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dateTextField"
+            tools:ignore="OnClick" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/animation_confirm_btn"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="32dp"
+            android:padding="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dateTextField"
+            app:lottie_autoPlay="false"
+            app:lottie_progress="100"
+            app:lottie_rawRes="@raw/check"
+            tools:ignore="OnClick" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

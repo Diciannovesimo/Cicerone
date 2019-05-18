@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -33,6 +34,7 @@ public class RegistrationActivityTest {
 
     @Rule
     public ActivityTestRule<RegistrationActivity> mActivityTestRule = new ActivityTestRule<>(RegistrationActivity.class);
+
 
     @Test
     public void existTestEmail() {
@@ -88,14 +90,14 @@ public class RegistrationActivityTest {
     @Test
     public void ButtonTest() {
         ViewInteraction imageView = onView(
-                allOf(withId(R.id.nextImageView),
+                allOf(withId(R.id.animation_next_btn),
                         childAtPosition(
                                 childAtPosition(
                                         IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class),
                                         0),
                                 3),
                         isDisplayed()));
-        Assert.assertNotNull(imageView.check(matches(isDisplayed())));
+        Assert.assertNotNull( imageView.check(doesNotExist()));
     }
 
     private static Matcher<View> childAtPosition(

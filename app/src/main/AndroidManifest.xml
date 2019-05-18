@@ -18,7 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.RegistrationActivity"></activity>
+        <activity
+            android:name=".activities.RegistrationActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:fitsSystemWindows="true"
+            android:theme="@style/FullscreenTheme" />
         <activity
             android:name=".activities.LoginActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

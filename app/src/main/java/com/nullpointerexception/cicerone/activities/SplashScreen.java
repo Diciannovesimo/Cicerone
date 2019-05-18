@@ -1,10 +1,10 @@
 package com.nullpointerexception.cicerone.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
