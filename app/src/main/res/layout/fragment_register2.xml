@@ -60,17 +60,36 @@
             android:layout_marginTop="32dp"
             android:background="@color/black_overlay"
             android:drawableLeft="@drawable/ic_calendar"
-            android:drawablePadding="10sp"
+            android:drawablePadding="15sp"
+            android:editable="false"
             android:ems="10"
+            android:focusable="false"
             android:hint="@string/data_di_nascita"
             android:inputType="none"
             android:textColor="#fff"
             android:textColorHint="#ffffffff"
-            android:editable="false"
-            android:focusable="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/surnameTextField" />
+
+        <EditText
+            android:id="@+id/phoneTextField"
+            android:layout_width="0dp"
+            android:layout_height="35sp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
+            android:background="@color/black_overlay"
+            android:drawableLeft="@android:drawable/ic_menu_call"
+            android:drawablePadding="10sp"
+            android:ems="10"
+            android:hint="@string/Numero_di_telefono"
+            android:inputType="none|phone"
+            android:textColor="#fff"
+            android:textColorHint="#ffffffff"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dateTextField" />
 
         <ImageView
             android:id="@+id/imageView3"
@@ -80,7 +99,7 @@
             android:padding="7.5dp"
             android:src="@drawable/ic_full_circle"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dateTextField" />
+            app:layout_constraintTop_toBottomOf="@+id/phoneTextField" />
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/animation_prev_btn"
@@ -90,7 +109,7 @@
             android:onClick="switchRegisterFragment"
             android:rotation="90"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dateTextField"
+            app:layout_constraintTop_toBottomOf="@+id/phoneTextField"
             app:lottie_autoPlay="true"
             app:lottie_rawRes="@raw/arrow"
             tools:ignore="OnClick" />
@@ -104,7 +123,7 @@
             android:padding="7dp"
             android:src="@drawable/ic_full_circle"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dateTextField"
+            app:layout_constraintTop_toBottomOf="@+id/phoneTextField"
             tools:ignore="OnClick" />
 
         <com.airbnb.lottie.LottieAnimationView
@@ -114,7 +133,7 @@
             android:layout_marginTop="32dp"
             android:padding="6dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dateTextField"
+            app:layout_constraintTop_toBottomOf="@+id/phoneTextField"
             app:lottie_autoPlay="false"
             app:lottie_progress="100"
             app:lottie_rawRes="@raw/check"

@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  *      User
  *
@@ -17,8 +20,6 @@ public class User extends StorableEntity
     protected String id,
     /** Email of account */
             email,
-    /** Formal name */
-            displayName,
     /** URL of profile picture */
             profileImageUrl,
     /** Name of user */
@@ -38,16 +39,18 @@ public class User extends StorableEntity
         id = user.getUid();
         email = user.getEmail();
         phoneNumber = user.getPhoneNumber();
-        displayName = user.getDisplayName();
-        if(displayName != null)     //  TODO: Optimize these fields
+        if(user.getDisplayName() != null)
         {
-            if(displayName.contains(" "))
+            if(user.getDisplayName().contains(" "))
             {
-                name = displayName.substring(0, displayName.indexOf(" "));
-                surname = displayName.substring(displayName.indexOf(" ")+1);
+                name = user.getDisplayName().substring(0, user.getDisplayName().indexOf(" "));
+                surname = user.getDisplayName().substring(user.getDisplayName().indexOf(" ")+1);
             }
             else
-                name = displayName;
+            {
+                name = user.getDisplayName();
+                surname = "";
+            }
         }
 
         if(user.getPhotoUrl() != null)
@@ -64,14 +67,12 @@ public class User extends StorableEntity
         this.email = email;
     }
 
+    /**
+     *      @return Return name and surname concatenated
+     */
     public String getDisplayName()
     {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName)
-    {
-        this.displayName = displayName;
+        return name + " " + surname;
     }
 
     public String getProfileImageUrl()
@@ -108,6 +109,18 @@ public class User extends StorableEntity
         this.dateBirth = dateBirth;
     }
 
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     /**
      *      Implementation of its superclass method.
      *      Provides an id to indexing storage of this object type.
@@ -120,5 +133,14 @@ public class User extends StorableEntity
         return id;
     }
 
-
+    /**
+     *      Implementation of its superclass method.
+     *
+     *      @return A list of ignored fields
+     */
+    @Override
+    public List<String> getIgnoredFields()
+    {
+        return Collections.singletonList("id");
+    }
 }

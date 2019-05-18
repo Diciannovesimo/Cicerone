@@ -7,25 +7,10 @@ import static org.junit.Assert.assertEquals;
 public class UserTest {
 
 
-    public User user = new User("william","willy", User.AccessType.DEFAULT);
+    public User user = new User();
 
     /*
-        Test on get function
-     */
-    @Test
-    public void getEmailTest(){
-        assertEquals("william",user.getEmail());
-    }
-
-    @Test
-    public void getDisplayNameTest()
-    {
-        assertEquals("willy",user.getDisplayName());
-    }
-
-
-    /*
-        Test on set function
+        Test on set and get function
      */
     @Test
     public void setEmailTest(){
@@ -36,8 +21,8 @@ public class UserTest {
     @Test
     public void setDisplayNameTest()
     {
-        user.setDisplayName("willy2");
-        assertEquals("willy2",user.getDisplayName());
+        user.setName("willy2");
+        assertEquals("willy2",user.getName());
     }
 
 }
