@@ -139,6 +139,60 @@ public class AuthenticationManager
     }
 
     /**
+     *      Tries to get Uid of an account with specified credentials.
+     *
+     *      @param email    User's Email
+     *      @param password User's Password
+     *
+     *      @return An instance of LoginAttempt with allows to add
+     *      a callback method for this given attempt.
+     */
+    public LoginAttempt getUIdOf(String email, String password)
+    {
+        final LoginAttempt loginAttempt = new LoginAttempt();
+
+        //  Don't allow to login if before signed out with current account.
+        if(auth.getCurrentUser() != null)
+            return loginAttempt;
+
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task)
+                    {
+                        if (task.isSuccessful())
+                        {
+                            //  Check if user exists and if it's verified
+                            if(auth.getCurrentUser() != null)
+                            {
+                                String uid = auth.getUid();
+
+                                //  Call the callback method, if set, with positive result
+                                if(loginAttempt.getOnUidListener() != null)
+                                    loginAttempt.getOnUidListener().onIdObtained(uid);
+                            }
+                            else
+                                //  Call the callback method, if set, with negative result
+                                if(loginAttempt.getOnUidListener() != null)
+                                    loginAttempt.getOnUidListener().onError();
+                        }
+                        else
+                        {
+                            //  Call the callback method, if set, with negative result
+                            if(loginAttempt.getOnUidListener() != null)
+                                loginAttempt.getOnUidListener().onError();
+                        }
+
+                        auth.signOut();
+
+                    }
+                });
+
+        return loginAttempt;
+    }
+
+    /**
      *      Show dialog of Google sign-in.
      *
      *      NOTE: Calling this method requires call also loginWithGoogle(...) in
@@ -298,7 +352,8 @@ public class AuthenticationManager
      */
     public void logout()
     {
-        LoginManager.getInstance().logOut();
+        auth.signOut();
+        currentUser = null;
     }
 
     /**
@@ -329,7 +384,7 @@ public class AuthenticationManager
     /**
      *      LoginAttempt
      *
-     *      Class that allows to set a callback method for a login attempt.
+     *      Class that allows to set callback methods for a login attempt.
      */
     public static class LoginAttempt
     {
@@ -343,8 +398,24 @@ public class AuthenticationManager
             void onLoginResult(boolean result);
         }
 
-        /** Stores the implementation provided */
+        /** Interface with the mentioned callback method */
+        public interface OnUIDListener
+        {
+            /**
+             *      Callback method called after a login attempt.
+             *      @param uid User Id provided by FireBase
+             */
+            void onIdObtained(String uid);
+
+            /**     Callback method called after a failed login attempt. */
+            void onError();
+        }
+
+        /** Stores the implementation provided of OnLoginResultListener */
         private OnLoginResultListener onLoginResultListener;
+
+        /** Stores the implementation provided of OnUIDListener */
+        private OnUIDListener onUidListener;
 
         /**
          *      Add an implementation for the method called after a login result.
@@ -356,5 +427,17 @@ public class AuthenticationManager
         }
 
         private OnLoginResultListener getOnLoginResultListener() { return onLoginResultListener; }
+
+        /**
+         *      Add an implementation for the method called after a login result.
+         *      @param onUidListener implementation to provide.
+         * */
+        public void addOnUidListener(OnUIDListener onUidListener)
+        {
+            this.onUidListener = onUidListener;
+        }
+
+        public OnUIDListener getOnUidListener() { return onUidListener; }
+
     }
 }

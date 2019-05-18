@@ -4,7 +4,9 @@ import android.util.Log;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  *      Class that defines operations needed to store an object.
@@ -21,6 +23,13 @@ public abstract class StorableEntity
      *      @return Field used to identify this entity.
      */
     public abstract String getId();
+
+    /**
+     *      Gives field names that will be ignored when writing entity on database
+     *
+     *      @return A list of field names ignored.
+     */
+    public List<String> getIgnoredFields() { return new Vector<>(); }
 
     /**
      *      Creates a map with:
@@ -42,6 +51,18 @@ public abstract class StorableEntity
             for(Field field : this.getClass().getDeclaredFields())
             {
                 Object value = field.get(this);
+
+                boolean ignore = false;
+                for(String name : getIgnoredFields())
+                    if(name.equalsIgnoreCase(field.getName()))
+                    {
+                        ignore = true;
+                        break;
+                    }
+
+                if(ignore)
+                    continue;
+
                 result.put(field.getName(), value != null ? value.toString() : "");
             }
         }

@@ -156,6 +156,7 @@ public class BackEndInterface
                     }
                 }
 
+                //  TODO: Set fields of entity
                 entity.setFields(fields);
 
                 if(onDataReceiveListener != null)
