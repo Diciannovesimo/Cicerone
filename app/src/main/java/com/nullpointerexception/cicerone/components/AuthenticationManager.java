@@ -3,12 +3,13 @@ package com.nullpointerexception.cicerone.components;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.facebook.AccessToken;
-import com.facebook.Profile;
 import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -17,8 +18,12 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.nullpointerexception.cicerone.R;
 
 import java.util.Arrays;
 
@@ -34,8 +39,11 @@ public class AuthenticationManager
     /*
             Singleton declaration
      */
+    /**  Instance of this class   */
     private static final AuthenticationManager ourInstance = new AuthenticationManager();
+    /**  Used to access to this class   */
     public static AuthenticationManager get() { return ourInstance; }
+    /**  Private constructor to permit a single instance of this class   */
     private AuthenticationManager() {  }
 
     /** Request code for google sign-in intent */
@@ -61,30 +69,20 @@ public class AuthenticationManager
     {
         this.context = context;
         FirebaseApp.initializeApp(context);
-
-        /*
-                NOTE: The problem of multiple accounts logged will be resolved when will be
-                implemented the local storage of user in shared prefs.
-         */
-
-        // Check if already logged with Google
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount( context );
-        if(account != null)
-            currentUser = new User(account);
-
-        //  Check if already logged with facebook
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if(accessToken != null)
-        {
-            LoginManager.getInstance().logInWithReadPermissions(context, Arrays.asList("public_profile"));
-            boolean isLoggedIn = !accessToken.isExpired();
-            if (isLoggedIn)
-                if (Profile.getCurrentProfile() != null)
-                    currentUser = new User(Profile.getCurrentProfile());
-        }
-
-        // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
+
+        if(auth.getCurrentUser() != null)
+            currentUser = new User(auth.getCurrentUser());
+
+        auth.addAuthStateListener(new FirebaseAuth.AuthStateListener()
+        {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
+            {
+                if(firebaseAuth.getCurrentUser() != null)
+                    currentUser = new User(firebaseAuth.getCurrentUser());
+            }
+        });
 
     }
 
@@ -141,6 +139,108 @@ public class AuthenticationManager
     }
 
     /**
+     *      Tries to get Uid of an account with specified credentials.
+     *
+     *      @param email    User's Email
+     *      @param password User's Password
+     *
+     *      @return An instance of LoginAttempt with allows to add
+     *      a callback method for this given attempt.
+     */
+    public LoginAttempt getUIdOf(String email, String password)
+    {
+        final LoginAttempt loginAttempt = new LoginAttempt();
+
+        //  Don't allow to login if before signed out with current account.
+        if(auth.getCurrentUser() != null)
+            return loginAttempt;
+
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task)
+                    {
+                        if (task.isSuccessful())
+                        {
+                            //  Check if user exists and if it's verified
+                            if(auth.getCurrentUser() != null)
+                            {
+                                String uid = auth.getUid();
+
+                                //  Call the callback method, if set, with positive result
+                                if(loginAttempt.getOnUidListener() != null)
+                                    loginAttempt.getOnUidListener().onIdObtained(uid);
+                            }
+                            else
+                                //  Call the callback method, if set, with negative result
+                                if(loginAttempt.getOnUidListener() != null)
+                                    loginAttempt.getOnUidListener().onError();
+                        }
+                        else
+                        {
+                            //  Call the callback method, if set, with negative result
+                            if(loginAttempt.getOnUidListener() != null)
+                                loginAttempt.getOnUidListener().onError();
+                        }
+
+                        auth.signOut();
+
+                    }
+                });
+
+        return loginAttempt;
+    }
+
+    /**
+     *      Tries to delete an account sending requests until work is done successfully.
+     *
+     *      @param email        Email of account to delete
+     *      @param password     Password of account to delete
+     */
+    public void deleteUser(final String email, final String password)
+    {
+        if(email == null || password == null)
+            return;
+
+        if(auth.getCurrentUser() != null)
+        {
+            if(auth.getCurrentUser().getEmail() == null)
+                return;
+            else if(auth.getCurrentUser().getEmail().equals(email))
+            {
+                auth.getCurrentUser().delete().addOnCompleteListener(new OnCompleteListener<Void>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task)
+                    {
+                        if( ! task.isSuccessful())
+                        {
+                            deleteUser(email, password);
+                        }
+                        else
+                            logout();
+                    }
+                });
+            }
+            else
+            {
+                logout();
+                deleteUser(email, password);
+            }
+        }
+
+        login(email, password).addOnLoginResultListener(new LoginAttempt.OnLoginResultListener()
+        {
+            @Override
+            public void onLoginResult(boolean result)
+            {
+                deleteUser(email, password);
+            }
+        });
+    }
+
+    /**
      *      Show dialog of Google sign-in.
      *
      *      NOTE: Calling this method requires call also loginWithGoogle(...) in
@@ -157,6 +257,7 @@ public class AuthenticationManager
         currentLoginAttempt = new LoginAttempt();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(context.getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         GoogleSignInClient mGoogleSignInClient;
@@ -193,14 +294,35 @@ public class AuthenticationManager
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 if(account != null)
                 {
-                    // Set current user
-                    currentUser = new User(account);
+                    AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+                    auth.signInWithCredential(credential)
+                            .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>()
+                            {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task)
+                                {
+                                    if (task.isSuccessful())
+                                    {
+                                        if(auth.getCurrentUser() != null)
+                                            currentUser = new User(auth.getCurrentUser());
 
-                    // Call the callback method, if set, with positive result
-                    if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
-                        currentLoginAttempt.getOnLoginResultListener().onLoginResult(true);
+                                        // Call the callback method, if set, with positive result
+                                        if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
+                                            currentLoginAttempt.getOnLoginResultListener().onLoginResult(true);
 
-                    currentLoginAttempt = null;
+                                        currentLoginAttempt = null;
+                                    }
+                                    else
+                                    {
+                                        if (currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
+                                            currentLoginAttempt.getOnLoginResultListener().onLoginResult(false);
+
+                                        currentLoginAttempt = null;
+                                    }
+                                }
+                            });
+
+
                 }
                 else
                 {
@@ -212,7 +334,7 @@ public class AuthenticationManager
             }
             catch (ApiException e)
             {
-                e.printStackTrace();
+                Log.e("Error", e.toString());
 
                 if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
                     currentLoginAttempt.getOnLoginResultListener().onLoginResult(false);
@@ -223,14 +345,66 @@ public class AuthenticationManager
     }
 
     /**
-     *      Set current user as the profile passed with parameters.
+     *      Sign in with facebook account
      *
-     *      @param profile Account to be set as current user
+     *      @param loginResult  Result of Login Sign-in callback success method
      */
-    public void setFacebookUser(Profile profile)
+    public void setFacebookUser(LoginResult loginResult)
     {
-        if(profile != null)
-            currentUser = new User(Profile.getCurrentProfile());
+        AuthCredential credential = FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken());
+        auth.signInWithCredential(credential)
+                .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task)
+                    {
+                        if (task.isSuccessful())
+                        {
+                            if(auth.getCurrentUser() != null)
+                                currentUser = new User(auth.getCurrentUser());
+
+                            BackEndInterface.get().getEntity(currentUser, new BackEndInterface.OnDataReceiveListener()
+                            {
+                                @Override
+                                public void onDataReceived(String data)
+                                {
+                                    BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
+
+                                    ((Activity) context).runOnUiThread(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            Toast.makeText(context, context.getResources().getString(R.string.loginToast1) + " " +
+                                                    AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
+                                }
+
+                                @Override
+                                public void onError()
+                                {
+                                    ((Activity) context).runOnUiThread(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            Toast.makeText(context, context.getResources().getString(R.string.generic_error),
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        else
+                        {
+                            Toast.makeText(context, context.getResources().getString(R.string.generic_error),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
     }
 
     /**
@@ -242,11 +416,6 @@ public class AuthenticationManager
     public void loginWithFacebook(Activity activity)
     {
         LoginManager.getInstance().logInWithReadPermissions(activity, Arrays.asList("public_profile"));
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
-        if(isLoggedIn)
-            if(Profile.getCurrentProfile() != null)
-                currentUser = new User(Profile.getCurrentProfile());
     }
 
     /**
@@ -262,39 +431,39 @@ public class AuthenticationManager
      */
     public void logout()
     {
-        if(currentUser == null || auth == null || context == null)
-            return;
+        auth.signOut();
+        currentUser = null;
+    }
 
-        switch (currentUser.getAccessType())
-        {
-            case FACEBOOK:
-                LoginManager.getInstance().logOut();
-                break;
+    /**
+     *  Create a new createAccount method which takes in an email address and password,
+     *  validates them and then creates a new user
+     *
+     *  @param email of the user who has registered
+     *  @param password of the user who has registered
+     *  @param onCompleteListener Callback method to manage actions for different results
+     */
+    public void createFirebaseUser(String email, String password, OnCompleteListener<AuthResult> onCompleteListener)
+    {
+        auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener((Activity) context, onCompleteListener);
+    }
 
-            case GOOGLE:
-                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestEmail()
-                        .build();
-                GoogleSignInClient mGoogleSignInClient;
-                mGoogleSignInClient = GoogleSignIn.getClient(((Activity) context), gso);
-
-                /*
-                        NOTE: Google sign out is ASYNCHRONOUS!
-                        If needed insert a callback method (there's one default of google)
-                 */
-                mGoogleSignInClient.signOut();
-                break;
-
-            case DEFAULT:
-            default:
-                auth.signOut();
-        }
+    /**
+     *     Send a registration confirmation email
+     *
+     *     @param onCompleteListener Callback method to manage actions for different results
+     */
+    public void sendVerificationEmail(OnCompleteListener<Void> onCompleteListener)
+    {
+        if (auth.getCurrentUser() != null)
+            auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(onCompleteListener);
     }
 
     /**
      *      LoginAttempt
      *
-     *      Class that allows to set a callback method for a login attempt.
+     *      Class that allows to set callback methods for a login attempt.
      */
     public static class LoginAttempt
     {
@@ -308,8 +477,24 @@ public class AuthenticationManager
             void onLoginResult(boolean result);
         }
 
-        /** Stores the implementation provided */
+        /** Interface with the mentioned callback method */
+        public interface OnUIDListener
+        {
+            /**
+             *      Callback method called after a login attempt.
+             *      @param uid User Id provided by FireBase
+             */
+            void onIdObtained(String uid);
+
+            /**     Callback method called after a failed login attempt. */
+            void onError();
+        }
+
+        /** Stores the implementation provided of OnLoginResultListener */
         private OnLoginResultListener onLoginResultListener;
+
+        /** Stores the implementation provided of OnUIDListener */
+        private OnUIDListener onUidListener;
 
         /**
          *      Add an implementation for the method called after a login result.
@@ -321,5 +506,17 @@ public class AuthenticationManager
         }
 
         private OnLoginResultListener getOnLoginResultListener() { return onLoginResultListener; }
+
+        /**
+         *      Add an implementation for the method called after a login result.
+         *      @param onUidListener implementation to provide.
+         * */
+        public void addOnUidListener(OnUIDListener onUidListener)
+        {
+            this.onUidListener = onUidListener;
+        }
+
+        public OnUIDListener getOnUidListener() { return onUidListener; }
+
     }
 }

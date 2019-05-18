@@ -25,57 +25,77 @@ dependencies
             implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
             implementation 'androidx.legacy:legacy-support-v4:1.0.0-beta01'
             implementation 'com.android.support:design:28.0.0'
+            implementation 'com.google.firebase:firebase-database:16.0.4'
             testImplementation 'junit:junit:4.12'
             androidTestImplementation 'androidx.test:runner:1.1.1'
             androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-
             implementation 'com.google.android.gms:play-services-auth:16.0.1'
 
             /*
-            FireBase
-     */
+                FireBase
+            */
             implementation 'com.google.firebase:firebase-core:16.0.8'
             implementation 'com.google.firebase:firebase-auth:16.2.1'
 
             /*
-            Facebook login
-            https://firebase.google.com/docs/auth/android/facebook-login
-            https://developers.facebook.com/docs/facebook-login/android
-     */
+                Facebook login
+                https://firebase.google.com/docs/auth/android/facebook-login
+                https://developers.facebook.com/docs/facebook-login/android
+            */
             implementation 'com.facebook.android:facebook-login:[4,5)'
 
             /*
-            QButton
-            https://android-arsenal.com/details/1/7506
-     */
+                QButton
+                https://android-arsenal.com/details/1/7506
+            */
             implementation 'com.github.manojbhadane:QButton:v1.3'
 
             /*
-            LoginButtons
-            https://android-arsenal.com/details/1/4194
-     */
+                LoginButtons
+                https://android-arsenal.com/details/1/4194
+            */
             implementation 'com.shaishavgandhi:login-buttons:1.0.0'
 
             /*
-            ContinuousScrollableImageView
-            https://android-arsenal.com/details/1/6094
-     */
+                ContinuousScrollableImageView
+                https://android-arsenal.com/details/1/6094
+            */
             implementation 'com.github.Cutta:ContinuousScrollableImageView:1.0'
 
             /*
-            Lottie
-            https://github.com/airbnb/lottie-android
-     */
+                Lottie
+                https://github.com/airbnb/lottie-android
+            */
             implementation 'com.airbnb.android:lottie:3.0.1'
 
             /*
-            KAlertDiaog
-            https://android-arsenal.com/details/1/7588
-     */
+                KAlertDiaog
+                https://android-arsenal.com/details/1/7588
+            */
             implementation 'com.github.TutorialsAndroid:KAlertDialog:v4.1'
             implementation 'com.google.android.material:material:1.0.0'
             implementation 'com.android.support:design:28.0.0'
 
+            /*
+                Encryption
+                https://android-arsenal.com/details/1/5529
+             */
+            implementation 'ru.bullyboo.ecryption:encoder:1.0.3'
+
         }
 
 apply plugin: 'com.google.gms.google-services'
+
+apply plugin: "org.sonarqube"
+
+sonarqube {
+    properties {
+        property "sonar.projectName", "Cicerone"
+        property "sonar.projectKey", "com.nullpointerexception.cicerone"
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.language", "java"
+        property "sonar.sources", "src/main/java"
+        property "sonar.login", "root"
+        property "sonar.password", "root"
+    }
+}

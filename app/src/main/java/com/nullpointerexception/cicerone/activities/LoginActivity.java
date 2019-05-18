@@ -1,7 +1,5 @@
 package com.nullpointerexception.cicerone.activities;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
@@ -19,17 +17,20 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.airbnb.lottie.LottieAnimationView;
-import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.BackEndInterface;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -71,9 +72,6 @@ public class LoginActivity extends AppCompatActivity
         googleSignInButton = findViewById(R.id.googleSignInButton);
         facebookSignInButton = findViewById(R.id.facebookSignInButton);
 
-        //  TODO: Remove this after testing
-        AuthenticationManager.get().logout();
-
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().setAuthType("rerequest");
         LoginManager.getInstance().registerCallback(callbackManager,
@@ -82,23 +80,7 @@ public class LoginActivity extends AppCompatActivity
                     @Override
                     public void onSuccess(LoginResult loginResult)
                     {
-                        AccessToken accessToken = loginResult.getAccessToken();
-
-                        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
-                        if(isLoggedIn)
-                            if(Profile.getCurrentProfile() != null)
-                                AuthenticationManager.get().setFacebookUser(Profile.getCurrentProfile());
-
-                        runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                Toast.makeText(LoginActivity.this,
-                                        getResources().getString(R.string.loginToast1) + " " +
-                                                AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        AuthenticationManager.get().setFacebookUser(loginResult);
                     }
 
                     @Override
@@ -231,16 +213,40 @@ public class LoginActivity extends AppCompatActivity
                             {
                                 if(result)  //  Login successful
                                 {
-                                    runOnUiThread(new Runnable()
-                                    {
-                                        @Override
-                                        public void run()
-                                        {
-                                            Toast.makeText(LoginActivity.this,
-                                                    getResources().getString(R.string.loginToast1) + " " +
-                                                            AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                    BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
+                                            new BackEndInterface.OnDataReceiveListener()
+                                            {
+                                                @Override
+                                                public void onDataReceived(String data)
+                                                {
+                                                    BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
+
+                                                    runOnUiThread(new Runnable()
+                                                    {
+                                                        @Override
+                                                        public void run()
+                                                        {
+                                                            Toast.makeText(getApplicationContext(),
+                                                                    getApplicationContext().getResources().getString(R.string.loginToast1) + " " +
+                                                                            AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+                                                }
+
+                                                @Override
+                                                public void onError()
+                                                {
+                                                    runOnUiThread(new Runnable()
+                                                    {
+                                                        @Override
+                                                        public void run()
+                                                        {
+                                                            Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.generic_error),
+                                                                    Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+                                                }
+                                            });
                                 }
                             }
                         });
@@ -344,20 +350,47 @@ public class LoginActivity extends AppCompatActivity
                                     root.removeView(target);
                             }
                         });
+
                         loginTimer.cancel();
 
                         if(result)  //  Login successful
                         {
-                            runOnUiThread(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    Toast.makeText(LoginActivity.this,
-                                            getResources().getString(R.string.loginToast1) + " " +
-                                     AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
+                                    new BackEndInterface.OnDataReceiveListener()
+                                    {
+                                        @Override
+                                        public void onDataReceived(String data)
+                                        {
+                                            BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
+
+                                            LoginActivity.this.runOnUiThread(new Runnable()
+                                            {
+                                                @Override
+                                                public void run()
+                                                {
+                                                    Toast.makeText(getApplicationContext(),
+                                                            getApplicationContext().getResources().getString(R.string.loginToast1) + " " +
+                                                                    AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+                                        }
+
+                                        @Override
+                                        public void onError()
+                                        {
+                                            LoginActivity.this.runOnUiThread(new Runnable()
+                                            {
+                                                @Override
+                                                public void run()
+                                                {
+                                                    Toast.makeText(getApplicationContext(),
+                                                            getApplicationContext().getResources().getString(R.string.generic_error),
+                                                            Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        }
+                                    });
                         }
                         else        // Login failed
                         {
@@ -368,10 +401,10 @@ public class LoginActivity extends AppCompatActivity
                                 {
                                     // Show error message
                                     new KAlertDialog(LoginActivity.this, KAlertDialog.ERROR_TYPE)
-                                        .setTitleText(getResources().getString(R.string.loginDialogText1))
-                                        .setContentText(getResources().getString(R.string.loginDialogText2))
-                                        .setConfirmText("OK")
-                                        .show();
+                                            .setTitleText(getResources().getString(R.string.loginDialogText1))
+                                            .setContentText(getResources().getString(R.string.loginDialogText2))
+                                            .setConfirmText("OK")
+                                            .show();
                                 }
                             });
                         }

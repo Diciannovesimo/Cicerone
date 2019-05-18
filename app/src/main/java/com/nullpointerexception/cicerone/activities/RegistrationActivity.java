@@ -1,35 +1,38 @@
 package com.nullpointerexception.cicerone.activities;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.User;
 import com.nullpointerexception.cicerone.fragments.Fragment_register1;
 import com.nullpointerexception.cicerone.fragments.Fragment_register2;
 
-public class RegistrationActivity extends AppCompatActivity
-{
+public class RegistrationActivity extends AppCompatActivity {
+
+    //Universal tag for RegistrationActivity
+    private final static String TAG = "registration_activity";
+    /** Regular expression to validate email addresses. */
+    private final static String EMAIL_REGEX = "(?:(?:\\r\\n)?[ \\t])*(?:(?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?:\\r\\n)?[ \\t])*)|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*:(?:(?:\\r\\n)?[ \\t])*(?:(?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?:\\r\\n)?[ \\t])*)(?:,\\s*(?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?:\\r\\n)?[ \\t])*))*)?;\\s*)";
 
 
-    EditText emailField, passwordField, confpassField, nameField, surnameField, date_birthField;
-    Fragment fragment1, fragment2;
-
-    private FirebaseAuth mAuth;
-
+    private Fragment_register1 fragment1;
+    private Fragment_register2 fragment2;
+    private LottieAnimationView animationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -39,30 +42,9 @@ public class RegistrationActivity extends AppCompatActivity
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        Fragment_register1 fragment_register11 = new Fragment_register1();
-        fragmentTransaction.add(R.id.frameview, fragment_register11);
+        fragment1 = new Fragment_register1();
+        fragmentTransaction.add(R.id.frameview, fragment1);
         fragmentTransaction.commit();
-
-        emailField = findViewById(R.id.emailTextField);
-        passwordField = findViewById(R.id.passwordTextField);
-        confpassField = findViewById(R.id.confirmTextField);
-        nameField = findViewById(R.id.nameTextField);
-        surnameField = findViewById(R.id.surnameTextField);
-        date_birthField = findViewById(R.id.dateTextField);
-
-
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
-    }
-
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        //updateUI(currentUser);
     }
 
     /**
@@ -71,160 +53,241 @@ public class RegistrationActivity extends AppCompatActivity
      */
     public void switchRegisterFragment(View view)
     {
-        Fragment fragment;
+        boolean alright = true;
 
-        if(view == findViewById(R.id.animation_next_btn))
+        //Check email
+        if(!fragment1.getEmailField().getText().toString().trim().matches(EMAIL_REGEX))
         {
-
-            if(fragment2 == null)
-                fragment2 = new Fragment_register2();
-            fragment = fragment2;
-
-        }
-        else
-        {
-            if(fragment1 == null)
-                fragment1 = new Fragment_register1();
-            fragment = fragment1;
-
+            fragment1.getEmailField().setError(getResources().getString(R.string.emailError));
+            alright = false;
         }
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        //Check password
+        if(fragment1.getPasswordField().getText().toString().length() < 8)
+        {
+            fragment1.getPasswordField().setError(getResources().getString(R.string.pswLenghtError));
+            alright = false;
+        }
 
-        //  Remove last attached fragment
-        fragmentTransaction.setCustomAnimations(R.anim.modal_in, R.anim.modal_out);
-        fragmentTransaction.remove( fragmentManager.getFragments()
-                .get(fragmentManager.getFragments().size() -1 ));
+        if((!fragment1.getPasswordField().getText().toString().equals(fragment1.getConfpassField().getText().toString())) ||
+                (fragment1.getPasswordField().getText().toString().isEmpty() && fragment1.getConfpassField().getText().toString().isEmpty()))
+        {
+            fragment1.getConfpassField().setError(getResources().getString(R.string.pswConfError));
+            alright = false;
+        }
 
-        // Add new fragment
-        fragmentTransaction.add(R.id.frameview, fragment);
+        if(alright) {
+            Fragment fragment;
 
-        fragmentTransaction.commit();
+            if (view == findViewById(R.id.animation_next_btn)) {
 
+                if (fragment2 == null)
+                    fragment2 = new Fragment_register2();
+                fragment = fragment2;
 
+            } else {
+                if (fragment1 == null)
+                    fragment1 = new Fragment_register1();
+                fragment = fragment1;
+
+            }
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+            //  Remove last attached fragment
+            fragmentTransaction.setCustomAnimations(R.anim.modal_in, R.anim.modal_out);
+
+            for (Fragment fragment_index : getSupportFragmentManager().getFragments())
+                getSupportFragmentManager().beginTransaction().remove(fragment_index).commit();
+
+            // Add new fragment
+            fragmentTransaction.add(R.id.frameview, fragment);
+            fragmentTransaction.commit();
+        }
     }
-
-
-
 
     /**
      *
-     * @param view
+     *
+     *      @param view
      */
-    public void startRegistration(View view) {
+    public void startRegistration(View view)
+    {
+
+        animationView = findViewById(R.id.animation_confirm_btn);
+        animationView.setSpeed(1.5f);
+        animationView.playAnimation();
 
         if(checkFields())
-            createFirebaseUser("ilmatty98s@gmail.com", "vitovito");
+        {
+            final User user = new User();
+            user.setName(fragment2.getNameField().getText().toString());
+            user.setDateBirth(fragment2.getBirthdayString());
+            user.setSurname(fragment2.getSurnameField().getText().toString());
+            user.setPhoneNumber(fragment2.getPhonePicker().getText().toString());
+            user.setEmail(fragment1.getEmailField().getText().toString());
 
+            AuthenticationManager.get().createFirebaseUser(fragment1.getEmailField().getText().toString(),
+                    fragment1.getPasswordField().getText().toString(), new OnCompleteListener<AuthResult>()
+                    {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task)
+                        {
+                            if (task.isSuccessful())
+                            {
+
+                                // It call the method for send the verification email
+                                AuthenticationManager.get().sendVerificationEmail(new OnCompleteListener<Void>()
+                                {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task)
+                                    {
+                                        if(task.isSuccessful())
+                                        {
+
+                                            AuthenticationManager.get().logout();
+
+                                            AuthenticationManager.get().getUIdOf(user.getEmail(),
+                                                    fragment1.getPasswordField().getText().toString())
+                                                    .addOnUidListener(new AuthenticationManager.LoginAttempt.OnUIDListener()
+                                                    {
+                                                        @Override
+                                                        public void onIdObtained(String uid)
+                                                        {
+                                                            user.setId(uid);
+                                                            BackEndInterface.get().storeEntity(user);
+                                                            showDialog(true);
+                                                        }
+
+                                                        @Override
+                                                        public void onError()
+                                                        {
+                                                            AuthenticationManager.get().deleteUser(user.getEmail(),
+                                                                    fragment1.getPasswordField().getText().toString());
+                                                            showDialog(false);
+                                                        }
+                                                    });
+                                        }
+                                        else
+                                            showDialog(false);
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                // If user is already register
+                                runOnUiThread(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        // Show error message
+                                        new KAlertDialog(RegistrationActivity.this, KAlertDialog.ERROR_TYPE)
+                                                .setTitleText(getResources().getString(R.string.registrationDialogErrorText3))
+                                                .setConfirmText("OK")
+                                                .show();
+                                    }
+                                });
+                            }
+                        }
+                    });
+        }
+        else
+        {
+            showDialog(false);
+        }
     }
-
-
 
 
     /**
      *      Check if fields are correctly inserted by user,
      *      provides errors else.
+     *
+     *      @return A value of "true" if the control has not encountered any errors, otherwise "false"
      */
     private boolean checkFields()
     {
         boolean alright = true;
 
+        //Check name
+        if(fragment2.getNameField().getText().toString().length() < 3)
+        {
+            fragment2.getNameField().setError(getResources().getString(R.string.nameError));
+            alright = false;
+        }
+
+
+        //Check surname
+        if(fragment2.getSurnameField().getText().toString().length() < 3)
+        {
+            fragment2.getSurnameField().setError(getResources().getString(R.string.surnameError));
+            alright = false;
+        }
+
+
+        //Check date
+        if(fragment2.getDate_birthField().getText().toString().length() == 0)
+        {
+            fragment2.getDate_birthField().setError(getResources().getString(R.string.dateError));
+            alright = false;
+        }
+
+        //check phone number
+        if(fragment2.getPhonePicker().getText().toString().length() != 10)
+        {
+            fragment2.getPhonePicker().setError(getResources().getString(R.string.phoneError));
+            alright = false;
+        }
 
         return alright;
     }
 
-
     /**
-     *
-     * @param email
-     * @param password
+     *  Shows an error message if the registration has not occurred,
+     *  otherwise shows an message confirming
+     *  @param result
      */
-    private void createFirebaseUser(String email, String password) {
+    private void showDialog(Boolean result) {
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            showDialog("Registrazione effettuata con successo!", "Successo", android.R.drawable.ic_dialog_info);
-
-                            // It call the method for send the verification email
-                            sendVerificationEmail();
-
-
-                        } else {
-                            // If sign in fails, display a message to the user.
-
-                            showDialog("Errore nella registrazione!", "Errore", android.R.drawable.ic_dialog_alert);
-                        }
-                    }
-                });
-    }
-
-
-    /**
-     *
-     * @param message
-     * @param title
-     * @param icon
-     */
-    private void showDialog(String message, String title, int icon) {
-
-        new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //updateUI();
-                    }
-                })
-                .setIcon(icon)
-                .show();
-    }
-
-    /**
-     *
-     */
-    public void sendVerificationEmail() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (user != null) {
-            user.sendEmailVerification()
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                //Toast.makeText(SignUpActivity.this, "Signup successful. Verification email sent", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+        if(!result) {
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    // Show error message
+                    new KAlertDialog(RegistrationActivity.this, KAlertDialog.ERROR_TYPE)
+                            .setTitleText(getResources().getString(R.string.registrationDialogErrorText1))
+                            .setContentText(getResources().getString(R.string.registrationDialogErrorText2))
+                            .setConfirmText("OK")
+                            .show();
+                }
+            });
+        }else {
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    // Show message confirming
+                    new KAlertDialog(RegistrationActivity.this, KAlertDialog.SUCCESS_TYPE)
+                            .setTitleText(getResources().getString(R.string.registrationDialogSuccessText1))
+                            .setContentText(getResources().getString(R.string.registrationDialogSuccessText2))
+                            .setConfirmText("OK")
+                            .setConfirmClickListener(new KAlertDialog.OnSweetClickListener() {
+                                @Override
+                                public void onClick(KAlertDialog kAlertDialog) {
+                                    //Go to LoginActivity
+                                    Intent go_login = new Intent(RegistrationActivity.this, LoginActivity.class);
+                                    startActivity(go_login);
+                                    finish();
+                                }
+                            })
+                            .show();
+                }
+            });
         }
-
     }
-
-
-
-
-    /*
-    È quindi possibile controllare se l'utente abbia verificato la loro e-mail in qualsiasi punto della app chiamando:
-
-
-    mAuthListener = new FirebaseAuth.AuthStateListener() {
-        @Override
-        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-          firebaseUser = firebaseAuth.getCurrentUser();
-            if (firebaseUser != null ) {
-                Log.e(TAG, firebaseUser.isEmailVerified() ? "User is signed in and email is verified" : "Email is not verified");
-            } else {
-                Log.e(TAG, "onAuthStateChanged:signed_out");
-            }
-        }
-    };
-     */
-
-
-
 
 }

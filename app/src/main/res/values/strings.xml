@@ -25,8 +25,20 @@
     <string name="cognome">Cognome</string>
     <string name="conferma_password">Conferma Password</string>
     <string name="data_di_nascita">Data di nascita</string>
+    <string name="Numero_di_telefono">Numero di telefono</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- RegisterActivity -->
+    <string name="registrationDialogErrorText1">Impossibile registrarsi!</string>
+    <string name="registrationDialogErrorText2">Controlla i dati inseriti e riprova.</string>
+    <string name="registrationDialogErrorText3">Email già registrata</string>
+    <string name="registrationDialogSuccessText1">Registrazione effettuata!</string>
+    <string name="registrationDialogSuccessText2">Controllare la casella di posta per confermare la registrazione</string>
+    <string name="emailError">Campo non valido</string>
+    <string name="pswLenghtError">Password troppo corta</string>
+    <string name="pswConfError">Password differenti</string>
+    <string name="nameError">Nome non valido</string>
+    <string name="surnameError">Cognome non valido</string>
+    <string name="dateError">Il campo è obbligatorio</string>
+    <string name="phoneError">Numero telefonico non valido</string>
 
 </resources>
