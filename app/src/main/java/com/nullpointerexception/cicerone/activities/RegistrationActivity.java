@@ -163,8 +163,8 @@ public class RegistrationActivity extends AppCompatActivity {
                                                         @Override
                                                         public void onError()
                                                         {
-                                                            //  TODO: Delete user from FireBase
-
+                                                            AuthenticationManager.get().deleteUser(user.getEmail(),
+                                                                    fragment1.getPasswordField().getText().toString());
                                                             showDialog(false);
                                                         }
                                                     });
