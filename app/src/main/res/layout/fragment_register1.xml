@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment_register1">
+    tools:context=".fragments.Fragment_register1">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -70,14 +70,26 @@
             app:layout_constraintTop_toBottomOf="@+id/passwordTextField" />
 
         <ImageView
-            android:id="@+id/nextImageView"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:id="@+id/imageView2"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_marginTop="32dp"
+            android:padding="7.5dp"
+            android:src="@drawable/ic_full_circle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/confirmTextField" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/animation_next_btn"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="32dp"
+            android:onClick="switchRegisterFragment"
+            android:rotation="-90"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/confirmTextField"
-            app:srcCompat="@drawable/ic_chevron_right_black_24dp"
-            android:clickable="true"
-            android:onClick="switchRegisterFragment"/>
+            app:lottie_autoPlay="true"
+            app:lottie_rawRes="@raw/arrow" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

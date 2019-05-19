@@ -1,3 +1,4 @@
+
 package com.nullpointerexception.cicerone.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
