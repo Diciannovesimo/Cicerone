@@ -214,10 +214,10 @@ public class LoginActivity extends AppCompatActivity
                                 if(result)  //  Login successful
                                 {
                                     BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
-                                            new BackEndInterface.OnDataReceiveListener()
+                                            new BackEndInterface.OnDataReceivedListener()
                                             {
                                                 @Override
-                                                public void onDataReceived(String data)
+                                                public void onDataReceived()
                                                 {
                                                     BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
 
@@ -356,10 +356,10 @@ public class LoginActivity extends AppCompatActivity
                         if(result)  //  Login successful
                         {
                             BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
-                                    new BackEndInterface.OnDataReceiveListener()
+                                    new BackEndInterface.OnDataReceivedListener()
                                     {
                                         @Override
-                                        public void onDataReceived(String data)
+                                        public void onDataReceived()
                                         {
                                             BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
 

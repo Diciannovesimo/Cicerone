@@ -2,12 +2,17 @@ package com.nullpointerexception.cicerone.components;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 import ru.bullyboo.encoder.Encoder;
@@ -23,6 +28,8 @@ public class BackEndInterface
 {
     /**  Encryption key   */
     private final String ENCRYPTION_KEY = "qergSB65S15s4fb156t.ò876ò,43ò,925y5ADSfgds56gfw75FFB";
+
+    private final String TAG = "BackEndInterface";
 
     /*
             Singleton setting
@@ -42,6 +49,9 @@ public class BackEndInterface
      */
     private String encrypt(String string)
     {
+        if(string == null)
+            string = "";
+
         return Encoder.BuilderAES()
                 .message(string)
                 .method(AES.Method.AES_CBC_ISO10126PADDING)
@@ -58,6 +68,9 @@ public class BackEndInterface
      */
     private String decrypt(String string)
     {
+        if(string == null)
+            string = "";
+
         return Encoder.BuilderAES()
                 .message(string)
                 .method(AES.Method.AES_CBC_ISO10126PADDING)
@@ -86,11 +99,13 @@ public class BackEndInterface
      *      @param entity   Object to store on the database.
      *      @return The result of operation.
      */
-    public int storeEntity(StorableEntity entity)
+    public int storeEntity(final StorableEntity entity)
     {
         //  Check parameter
         if(entity == null)
             return RESULT_PARAMETERS_NULL;
+
+        final long cTime = System.currentTimeMillis();
 
         String id = getIdFrom(entity);
 
@@ -106,7 +121,17 @@ public class BackEndInterface
             DatabaseReference ref = database.getReference(entityName)
                     .child(id)
                     .child(fieldName);
-            ref.setValue( fieldValue );
+            ref.setValue( fieldValue )
+                    .addOnCompleteListener(new OnCompleteListener<Void>()
+                    {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task)
+                        {
+                            long delay = System.currentTimeMillis() - cTime;
+                            Log.i(TAG, "Operation storeEntity(" + entity.getClass().getSimpleName() +
+                                    "): stored a field in " + delay + " ms.");
+                        }
+                    });
         }
 
         Log.i("TEST", "Object stored.");
@@ -117,14 +142,16 @@ public class BackEndInterface
      *      Get data from FireBase database fro the given object, and set it with values obtained.
      *
      *      @param entity                   Entity where will be written data.
-     *      @param onDataReceiveListener    Callback methods implementations.
+     *      @param onDataReceivedListener    Callback methods implementations.
      *      @return The result of operation.
      */
-    public int getEntity(final StorableEntity entity, final OnDataReceiveListener onDataReceiveListener)
+    public int getEntity(final StorableEntity entity, final OnDataReceivedListener onDataReceivedListener)
     {
         //  Check parameter
         if(entity == null)
             return RESULT_PARAMETERS_NULL;
+
+        final long cTime = System.currentTimeMillis();
 
         final String id = getIdFrom(entity);
 
@@ -156,19 +183,23 @@ public class BackEndInterface
                     }
                 }
 
-                //  TODO: Set fields of entity
                 entity.setFields(fields);
 
-                if(onDataReceiveListener != null)
-                    onDataReceiveListener.onDataReceived(dataSnapshot.toString());
+                long delay = System.currentTimeMillis() - cTime;
+                int bytes = dataSnapshot.toString().getBytes().length;
+                Log.i(TAG, "Operation getEntity(" + entity.getClass().getSimpleName() +
+                        "): retrieved " + bytes + " bytes in " + delay + " ms.");
+
+                if(onDataReceivedListener != null)
+                    onDataReceivedListener.onDataReceived();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError)
             {
                 Log.i("TEST", "Error: " + databaseError.toString());
-                if(onDataReceiveListener != null)
-                    onDataReceiveListener.onError();
+                if(onDataReceivedListener != null)
+                    onDataReceivedListener.onError();
             }
         });
 
@@ -181,11 +212,13 @@ public class BackEndInterface
      *      @param entity       Object with field to store.
      *      @param fieldName    Name of the field to store.
      */
-    public void storeField(StorableEntity entity, String fieldName)
+    public void storeField(StorableEntity entity, final String fieldName)
     {
         //  Check parameters
         if(entity == null || fieldName == null)
             return;
+
+        final long cTime = System.currentTimeMillis();
 
         String entityName = entity.getClass().getSimpleName().toLowerCase();
 
@@ -196,12 +229,25 @@ public class BackEndInterface
         // NOT CONFIRMED - Get it in some other way
         String id = getIdFrom(entity);
 
+        final String encryptedValue = encrypt(fieldValue);
+
         //  Storing
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference(entityName)
                 .child(id)
                 .child(fieldName);
-        ref.setValue( encrypt(fieldValue) );
+        ref.setValue( encryptedValue )
+                .addOnCompleteListener(new OnCompleteListener<Void>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task)
+                    {
+                        long delay = System.currentTimeMillis() - cTime;
+                        int bytes = encryptedValue.getBytes().length;
+                        Log.i(TAG, "Operation storeField(" + fieldName +
+                                "): uploaded " + bytes + " bytes in " + delay + " ms.");
+                    }
+                });
 
         Log.i("TEST", "Stored.");
     }
@@ -211,13 +257,15 @@ public class BackEndInterface
      *
      *      @param entity                   Object to be set.
      *      @param fieldName                Name of field.
-     *      @param onDataReceiveListener    Provides callback methods after reading database.
+     *      @param onDataReceivedListener    Provides callback methods after reading database.
      */
-    public void getField(final StorableEntity entity, final String fieldName, final OnDataReceiveListener onDataReceiveListener)
+    public void getField(final StorableEntity entity, final String fieldName, final OnDataReceivedListener onDataReceivedListener)
     {
         //  Check parameters
-        if(entity == null || fieldName == null || onDataReceiveListener == null)
+        if(entity == null || fieldName == null || onDataReceivedListener == null)
             return;
+
+        final long cTime = System.currentTimeMillis();
 
         String entityName = entity.getClass().getSimpleName().toLowerCase();
 
@@ -230,16 +278,31 @@ public class BackEndInterface
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
+                long delay = System.currentTimeMillis() - cTime;
+                int bytes = dataSnapshot.toString().getBytes().length;
+                Log.i(TAG, "Operation getEntity(" + fieldName +
+                        "): retrieved " + bytes + " bytes in " + delay + " ms.");
+
                 String value = decrypt(dataSnapshot.child(fieldName).getValue(String.class));
 
-                Log.i("Test", value);
-                onDataReceiveListener.onDataReceived(value);
+                try
+                {
+                    Field field = entity.getClass().getDeclaredField(fieldName);
+                    field.set(entity, value);
+                }
+                catch (Exception e)
+                {
+                    Log.e(TAG, e.toString());
+                    onDataReceivedListener.onError();
+                }
+
+                onDataReceivedListener.onDataReceived();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError)
             {
-                onDataReceiveListener.onError();
+                onDataReceivedListener.onError();
                 Log.i("TEST", "Error: " + databaseError.toString());
             }
         });
@@ -251,11 +314,13 @@ public class BackEndInterface
      *
      *      @param entity   Entity with id of node to remove from database.
      */
-    public void removeEntity(StorableEntity entity)
+    public void removeEntity(final StorableEntity entity)
     {
         //  Check parameters
         if(entity == null)
             return;
+
+        final long cTime = System.currentTimeMillis();
 
         String entityName = entity.getClass().getSimpleName().toLowerCase();
 
@@ -263,9 +328,21 @@ public class BackEndInterface
 
         //  Removing
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference(entityName)
+        final DatabaseReference ref = database.getReference(entityName)
                 .child(id).getRef();
-        ref.removeValue();
+        ref.removeValue()
+                .addOnCompleteListener(new OnCompleteListener<Void>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task)
+                    {
+                        Log.i("TEST", "Node removed: " + ref.getKey());
+
+                        long delay = System.currentTimeMillis() - cTime;
+                        Log.i(TAG, "Operation removeEntity(" + entity.getClass().getSimpleName() +
+                                ") terminated in " + delay + " ms.");
+                    }
+                });
 
         Log.i("TEST", "Node removed: " + ref.getKey());
     }
@@ -305,14 +382,12 @@ public class BackEndInterface
     }
 
     /**  Interface which provides callback methods for a data-request to FireBase database.   */
-    public interface OnDataReceiveListener
+    public interface OnDataReceivedListener
     {
         /**
          * Called when data is correctly received.
-         *
-         * @param data data received, as String.
          */
-        void onDataReceived(String data);
+        void onDataReceived();
 
         /**
          * Called when an error has occurred into the request
