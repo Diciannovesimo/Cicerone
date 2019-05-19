@@ -231,6 +231,8 @@ public class LoginActivity extends AppCompatActivity
                                                                             AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
                                                         }
                                                     });
+
+                                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                                 }
 
                                                 @Override
@@ -373,6 +375,8 @@ public class LoginActivity extends AppCompatActivity
                                                                     AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
                                                 }
                                             });
+
+                                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
 
                                         }
 

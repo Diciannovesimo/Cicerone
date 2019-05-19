@@ -24,6 +24,7 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.activities.MainActivity;
 
 import java.util.Arrays;
 
@@ -402,6 +403,8 @@ public class AuthenticationManager
                                         }
                                     });
 
+                                    context.startActivity(new Intent(context, MainActivity.class));
+
                                 }
 
                                 @Override
@@ -446,6 +449,17 @@ public class AuthenticationManager
     public User getUserLogged()
     {
         return currentUser;
+    }
+
+    /**
+     *      @return true: if user is logged, false otherwise
+     */
+    public boolean isUserLogged()
+    {
+        if(auth == null)
+            return false;
+
+        return auth.getCurrentUser() != null;
     }
 
     /**

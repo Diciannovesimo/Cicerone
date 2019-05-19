@@ -40,5 +40,20 @@
     <string name="surnameError">Cognome non valido</string>
     <string name="dateError">Il campo è obbligatorio</string>
     <string name="phoneError">Numero telefonico non valido</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_itineraries_list">I tuoi itinerari</string>
+    <string name="menu_trips_list">I tuoi viaggi</string>
+    <string name="menu_profile">Profilo</string>
+
+    <!-- Itineraries List fragment -->
+    <string name="noItineraries">Non ci sono itinerari.</string>
 
 </resources>

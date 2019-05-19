@@ -90,6 +90,27 @@ dependencies
              */
             implementation 'ru.bullyboo.ecryption:encoder:1.0.3'
 
+            /*
+                    Bottom-Nav-Bar
+                    https://android-arsenal.com/details/1/5590
+             */
+            implementation 'me.riddhimanadib.bottom-nav-bar:bottom-nav-bar:1.0.1'
+            implementation 'androidx.recyclerview:recyclerview:1.0.0'
+
+            /*
+                    BubbleNavigation
+                    https://android-arsenal.com/details/1/7544
+             */
+            implementation 'com.gauravk.bubblenavigation:bubblenavigation:1.0.7'
+
+            /*
+                    MaterialDrawer
+                    https://github.com/mikepenz/MaterialDrawer
+             */
+            implementation "com.mikepenz:materialdrawer:6.1.2"
+            implementation "androidx.annotation:annotation:1.0.2"
+            implementation "com.google.android.material:material:1.0.0"
+
         }
 
 apply plugin: 'com.google.gms.google-services'

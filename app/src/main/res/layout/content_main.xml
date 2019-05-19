@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activities.MainActivity"
+    tools:showIn="@layout/app_bar_main">
+
+    <FrameLayout
+        android:id="@+id/fragmentsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomNavigationContainer"/>
+
+    <com.gauravk.bubblenavigation.BubbleNavigationConstraintView
+        android:id="@+id/bottomNavigationContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#f8f8f8"
+        android:elevation="4dp"
+        android:padding="12dp"
+        app:bnc_mode="spread"
+        android:layout_alignParentBottom="true">
+
+        <com.gauravk.bubblenavigation.BubbleToggleView
+            android:id="@+id/item_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:bt_active="true"
+            app:bt_colorActive="@color/colorPrimary"
+            app:bt_colorInactive="#777"
+            app:bt_icon="@drawable/ic_home"
+            app:bt_title="@string/menu_home"
+            app:bt_padding="5sp"
+            app:bt_titlePadding="5sp" />
+
+        <com.gauravk.bubblenavigation.BubbleToggleView
+            android:id="@+id/item_trips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:bt_colorActive="@color/colorPrimary"
+            app:bt_colorInactive="#777"
+            app:bt_icon="@drawable/ic_trips"
+            app:bt_title="@string/menu_trips_list"
+            app:bt_padding="5sp"
+            app:bt_titlePadding="5sp" />
+
+        <com.gauravk.bubblenavigation.BubbleToggleView
+            android:id="@+id/item_itineraries"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:bt_colorActive="@color/colorPrimary"
+            app:bt_colorInactive="#777"
+            app:bt_icon="@drawable/ic_location"
+            app:bt_title="@string/menu_itineraries_list"
+            app:bt_padding="10sp"
+            app:bt_titlePadding="5sp" />
+
+        <com.gauravk.bubblenavigation.BubbleToggleView
+            android:id="@+id/item_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:bt_colorActive="@color/colorPrimary"
+            app:bt_colorInactive="#777"
+            app:bt_icon="@drawable/ic_profile"
+            app:bt_title="@string/menu_profile"
+            app:bt_padding="5sp"
+            app:bt_titlePadding="5sp" />
+
+    </com.gauravk.bubblenavigation.BubbleNavigationConstraintView>
+
+</RelativeLayout>
