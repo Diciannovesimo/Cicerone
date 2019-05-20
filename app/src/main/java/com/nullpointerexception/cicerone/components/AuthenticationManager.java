@@ -122,8 +122,8 @@ public class AuthenticationManager
                                     loginAttempt.getOnLoginResultListener().onLoginResult(true);
                             }
                             else
-                                if(loginAttempt.getOnLoginResultListener() != null)
-                                    loginAttempt.getOnLoginResultListener().onLoginResult(false);
+                            if(loginAttempt.getOnLoginResultListener() != null)
+                                loginAttempt.getOnLoginResultListener().onLoginResult(false);
                         }
                         else
                         {
@@ -190,6 +190,54 @@ public class AuthenticationManager
                 });
 
         return loginAttempt;
+    }
+
+    /**
+     *      Tries to delete an account sending requests until work is done successfully.
+     *
+     *      @param email        Email of account to delete
+     *      @param password     Password of account to delete
+     */
+    public void deleteUser(final String email, final String password)
+    {
+        if(email == null || password == null)
+            return;
+
+        if(auth.getCurrentUser() != null)
+        {
+            if(auth.getCurrentUser().getEmail() == null)
+                return;
+            else if(auth.getCurrentUser().getEmail().equals(email))
+            {
+                auth.getCurrentUser().delete().addOnCompleteListener(new OnCompleteListener<Void>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task)
+                    {
+                        if( ! task.isSuccessful())
+                        {
+                            deleteUser(email, password);
+                        }
+                        else
+                            logout();
+                    }
+                });
+            }
+            else
+            {
+                logout();
+                deleteUser(email, password);
+            }
+        }
+
+        login(email, password).addOnLoginResultListener(new LoginAttempt.OnLoginResultListener()
+        {
+            @Override
+            public void onLoginResult(boolean result)
+            {
+                deleteUser(email, password);
+            }
+        });
     }
 
     /**
@@ -315,8 +363,39 @@ public class AuthenticationManager
                             if(auth.getCurrentUser() != null)
                                 currentUser = new User(auth.getCurrentUser());
 
-                            Toast.makeText(context, context.getResources().getString(R.string.loginToast1) + " " +
-                                            AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
+                            BackEndInterface.get().getEntity(currentUser, new BackEndInterface.OnDataReceiveListener()
+                            {
+                                @Override
+                                public void onDataReceived(String data)
+                                {
+                                    BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
+
+                                    ((Activity) context).runOnUiThread(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            Toast.makeText(context, context.getResources().getString(R.string.loginToast1) + " " +
+                                                    AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
+                                }
+
+                                @Override
+                                public void onError()
+                                {
+                                    ((Activity) context).runOnUiThread(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            Toast.makeText(context, context.getResources().getString(R.string.generic_error),
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            });
                         }
                         else
                         {

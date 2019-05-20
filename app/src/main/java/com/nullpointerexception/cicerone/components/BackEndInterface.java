@@ -99,6 +99,8 @@ public class BackEndInterface
 
         Map<String, String> fields = entity.getFields();
 
+
+        Log.d("Crash", id);
         for(String fieldName : fields.keySet() )
         {
             String fieldValue = encrypt(fields.get(fieldName));
@@ -108,6 +110,7 @@ public class BackEndInterface
                     .child(fieldName);
             ref.setValue( fieldValue );
         }
+
 
         Log.i("TEST", "Object stored.");
         return RESULT_OK;

@@ -19,17 +19,17 @@ public class User extends StorableEntity
     /**  Id of account (generally provided by FireBase)   */
     protected String id,
     /** Email of account */
-            email,
+    email,
     /** URL of profile picture */
-            profileImageUrl,
+    profileImageUrl,
     /** Name of user */
-            name,
+    name,
     /** Surname of user */
-            surname,
+    surname,
     /** Birth date of user */
-            dateBirth,
+    dateBirth,
     /** Phone number of user */
-            phoneNumber;
+    phoneNumber;
 
     public User() {}
 
