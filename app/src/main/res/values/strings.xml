@@ -55,5 +55,6 @@
 
     <!-- Itineraries List fragment -->
     <string name="noItineraries">Non ci sono itinerari.</string>
+    <string name="noTrips">Non ci sono viaggi.</string>
 
 </resources>

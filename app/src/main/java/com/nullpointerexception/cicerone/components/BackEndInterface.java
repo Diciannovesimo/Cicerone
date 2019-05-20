@@ -15,9 +15,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import ru.bullyboo.encoder.Encoder;
-import ru.bullyboo.encoder.methods.AES;
-
 /**
  *      Interfaces components to FireBase Database,
  *      encrypting/decrypting data, giving a clear output.
@@ -52,12 +49,14 @@ public class BackEndInterface
         if(string == null)
             string = "";
 
+        /*
         return Encoder.BuilderAES()
                 .message(string)
                 .method(AES.Method.AES_CBC_ISO10126PADDING)
                 .key(ENCRYPTION_KEY)
                 .keySize(AES.Key.SIZE_256)
-                .encrypt();
+                .encrypt();*/
+        return string;
     }
 
     /**
@@ -71,12 +70,15 @@ public class BackEndInterface
         if(string == null)
             string = "";
 
+        /*
         return Encoder.BuilderAES()
                 .message(string)
                 .method(AES.Method.AES_CBC_ISO10126PADDING)
                 .key(ENCRYPTION_KEY)
                 .keySize(AES.Key.SIZE_256)
-                .decrypt();
+                .decrypt();*/
+
+        return string;
     }
 
     /*
@@ -364,7 +366,7 @@ public class BackEndInterface
         String id;
         id = encrypt(entity.getId());*/
 
-        return entity.getId().replace(".", "~");
+        return entity.getId();//.replace(".", "~");
     }
 
     /**
@@ -378,7 +380,7 @@ public class BackEndInterface
         if(id == null)
             return null;
 
-        return id.replace("~", ".");
+        return id;//.replace("~", ".");
     }
 
     /**  Interface which provides callback methods for a data-request to FireBase database.   */

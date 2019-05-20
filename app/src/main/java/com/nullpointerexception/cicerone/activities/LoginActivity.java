@@ -188,6 +188,7 @@ public class LoginActivity extends AppCompatActivity
             {
                 Intent register_activity = new Intent(getApplicationContext(), RegistrationActivity.class);
                 startActivity(register_activity);
+                finish();
             }
         });
 
@@ -233,6 +234,7 @@ public class LoginActivity extends AppCompatActivity
                                                     });
 
                                                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                                    finish();
                                                 }
 
                                                 @Override
@@ -377,7 +379,7 @@ public class LoginActivity extends AppCompatActivity
                                             });
 
                                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
-
+                                            finish();
                                         }
 
                                         @Override
