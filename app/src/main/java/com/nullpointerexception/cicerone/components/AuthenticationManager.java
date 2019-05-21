@@ -24,6 +24,7 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.activities.MainActivity;
 
 import java.util.Arrays;
 
@@ -81,6 +82,28 @@ public class AuthenticationManager
             {
                 if(firebaseAuth.getCurrentUser() != null)
                     currentUser = new User(firebaseAuth.getCurrentUser());
+
+                if(currentUser != null)
+                {
+                    final User user = new User();
+                    user.setId(currentUser.getId());
+
+                    BackEndInterface.get().getField(user, "name", new BackEndInterface.OnDataReceivedListener()
+                    {
+                        @Override
+                        public void onDataReceived()
+                        {
+                            Log.i("Test", "Obtained " + user.getName());
+                        }
+
+                        @Override
+                        public void onError()
+                        {
+                            Log.i("Test", "Error.");
+                        }
+                    });
+                }
+
             }
         });
 
@@ -363,10 +386,10 @@ public class AuthenticationManager
                             if(auth.getCurrentUser() != null)
                                 currentUser = new User(auth.getCurrentUser());
 
-                            BackEndInterface.get().getEntity(currentUser, new BackEndInterface.OnDataReceiveListener()
+                            BackEndInterface.get().getEntity(currentUser, new BackEndInterface.OnDataReceivedListener()
                             {
                                 @Override
-                                public void onDataReceived(String data)
+                                public void onDataReceived()
                                 {
                                     BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
 
@@ -379,6 +402,8 @@ public class AuthenticationManager
                                                     AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
                                         }
                                     });
+
+                                    context.startActivity(new Intent(context, MainActivity.class));
 
                                 }
 
@@ -424,6 +449,17 @@ public class AuthenticationManager
     public User getUserLogged()
     {
         return currentUser;
+    }
+
+    /**
+     *      @return true: if user is logged, false otherwise
+     */
+    public boolean isUserLogged()
+    {
+        if(auth == null)
+            return false;
+
+        return auth.getCurrentUser() != null;
     }
 
     /**

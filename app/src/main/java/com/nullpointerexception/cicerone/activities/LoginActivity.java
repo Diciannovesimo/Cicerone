@@ -188,6 +188,7 @@ public class LoginActivity extends AppCompatActivity
             {
                 Intent register_activity = new Intent(getApplicationContext(), RegistrationActivity.class);
                 startActivity(register_activity);
+                finish();
             }
         });
 
@@ -214,10 +215,10 @@ public class LoginActivity extends AppCompatActivity
                                 if(result)  //  Login successful
                                 {
                                     BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
-                                            new BackEndInterface.OnDataReceiveListener()
+                                            new BackEndInterface.OnDataReceivedListener()
                                             {
                                                 @Override
-                                                public void onDataReceived(String data)
+                                                public void onDataReceived()
                                                 {
                                                     BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
 
@@ -231,6 +232,9 @@ public class LoginActivity extends AppCompatActivity
                                                                             AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
                                                         }
                                                     });
+
+                                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                                    finish();
                                                 }
 
                                                 @Override
@@ -356,10 +360,10 @@ public class LoginActivity extends AppCompatActivity
                         if(result)  //  Login successful
                         {
                             BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
-                                    new BackEndInterface.OnDataReceiveListener()
+                                    new BackEndInterface.OnDataReceivedListener()
                                     {
                                         @Override
-                                        public void onDataReceived(String data)
+                                        public void onDataReceived()
                                         {
                                             BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
 
@@ -374,6 +378,8 @@ public class LoginActivity extends AppCompatActivity
                                                 }
                                             });
 
+                                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                            finish();
                                         }
 
                                         @Override

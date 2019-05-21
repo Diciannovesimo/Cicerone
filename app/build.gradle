@@ -37,6 +37,14 @@ dependencies
             androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
             /*
+                    Test
+             */
+            testImplementation 'junit:junit:4.12'
+            androidTestImplementation 'androidx.test:runner:1.1.1'
+            androidTestImplementation 'androidx.test:rules:1.1.1'
+            androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+
+            /*
                 FireBase
             */
             implementation 'com.google.firebase:firebase-core:16.0.8'
@@ -86,6 +94,27 @@ dependencies
                 https://android-arsenal.com/details/1/5529
              */
             implementation 'ru.bullyboo.ecryption:encoder:1.0.3'
+
+            /*
+                    Bottom-Nav-Bar
+                    https://android-arsenal.com/details/1/5590
+             */
+            implementation 'me.riddhimanadib.bottom-nav-bar:bottom-nav-bar:1.0.1'
+            implementation 'androidx.recyclerview:recyclerview:1.0.0'
+
+            /*
+                    BubbleNavigation
+                    https://android-arsenal.com/details/1/7544
+             */
+            implementation 'com.gauravk.bubblenavigation:bubblenavigation:1.0.7'
+
+            /*
+                    MaterialDrawer
+                    https://github.com/mikepenz/MaterialDrawer
+             */
+            implementation "com.mikepenz:materialdrawer:6.1.2"
+            implementation "androidx.annotation:annotation:1.0.2"
+            implementation "com.google.android.material:material:1.0.0"
 
         }
 
