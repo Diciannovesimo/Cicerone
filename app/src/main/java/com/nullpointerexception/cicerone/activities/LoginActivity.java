@@ -80,7 +80,48 @@ public class LoginActivity extends AppCompatActivity
                     @Override
                     public void onSuccess(LoginResult loginResult)
                     {
-                        AuthenticationManager.get().setFacebookUser(loginResult);
+                        AuthenticationManager.get().setFacebookUser(loginResult)
+                            .addOnLoginResultListener(new AuthenticationManager.LoginAttempt.OnLoginResultListener()
+                            {
+                                @Override
+                                public void onLoginResult(boolean result)
+                                {
+                                    if(result)
+                                    {
+                                        BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
+                                        new BackEndInterface.OnOperationCompleteListener()
+                                        {
+                                            @Override
+                                            public void onSuccess()
+                                            {
+                                                BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
+
+                                                LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                                finish();
+                                            }
+
+                                            @Override
+                                            public void onError()
+                                            {
+                                                runOnUiThread(new Runnable()
+                                                {
+                                                    @Override
+                                                    public void run()
+                                                    {
+                                                        Toast.makeText(LoginActivity.this,
+                                                                getResources().getString(R.string.generic_error),
+                                                                Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                    else
+                                    {
+
+                                    }
+                                }
+                            });
                     }
 
                     @Override
@@ -215,23 +256,12 @@ public class LoginActivity extends AppCompatActivity
                                 if(result)  //  Login successful
                                 {
                                     BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
-                                            new BackEndInterface.OnDataReceivedListener()
+                                            new BackEndInterface.OnOperationCompleteListener()
                                             {
                                                 @Override
-                                                public void onDataReceived()
+                                                public void onSuccess()
                                                 {
                                                     BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
-
-                                                    runOnUiThread(new Runnable()
-                                                    {
-                                                        @Override
-                                                        public void run()
-                                                        {
-                                                            Toast.makeText(getApplicationContext(),
-                                                                    getApplicationContext().getResources().getString(R.string.loginToast1) + " " +
-                                                                            AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    });
 
                                                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                                     finish();
@@ -360,23 +390,12 @@ public class LoginActivity extends AppCompatActivity
                         if(result)  //  Login successful
                         {
                             BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
-                                    new BackEndInterface.OnDataReceivedListener()
+                                    new BackEndInterface.OnOperationCompleteListener()
                                     {
                                         @Override
-                                        public void onDataReceived()
+                                        public void onSuccess()
                                         {
                                             BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
-
-                                            LoginActivity.this.runOnUiThread(new Runnable()
-                                            {
-                                                @Override
-                                                public void run()
-                                                {
-                                                    Toast.makeText(getApplicationContext(),
-                                                            getApplicationContext().getResources().getString(R.string.loginToast1) + " " +
-                                                                    AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
 
                                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                             finish();

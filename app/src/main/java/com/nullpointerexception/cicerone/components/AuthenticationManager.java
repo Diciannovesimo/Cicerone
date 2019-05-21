@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -24,7 +23,6 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.nullpointerexception.cicerone.R;
-import com.nullpointerexception.cicerone.activities.MainActivity;
 
 import java.util.Arrays;
 
@@ -64,49 +62,45 @@ public class AuthenticationManager
 
     /**
      *      Initialize all fields required to use this class
+     *
      *      @param context Context that will be used by this class
+     *
+     *      @return null: if there aren't users logged, an instance of login attempt otherwise.
      */
-    public void initialize(Activity context)
+    public LoginAttempt initialize(Activity context)
     {
         this.context = context;
         FirebaseApp.initializeApp(context);
         auth = FirebaseAuth.getInstance();
 
         if(auth.getCurrentUser() != null)
+        {
             currentUser = new User(auth.getCurrentUser());
 
-        auth.addAuthStateListener(new FirebaseAuth.AuthStateListener()
-        {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
+            BackEndInterface.get().getEntity(currentUser, new BackEndInterface.OnOperationCompleteListener()
             {
-                if(firebaseAuth.getCurrentUser() != null)
-                    currentUser = new User(firebaseAuth.getCurrentUser());
-
-                if(currentUser != null)
+                @Override
+                public void onSuccess()
                 {
-                    final User user = new User();
-                    user.setId(currentUser.getId());
-
-                    BackEndInterface.get().getField(user, "name", new BackEndInterface.OnDataReceivedListener()
-                    {
-                        @Override
-                        public void onDataReceived()
-                        {
-                            Log.i("Test", "Obtained " + user.getName());
-                        }
-
-                        @Override
-                        public void onError()
-                        {
-                            Log.i("Test", "Error.");
-                        }
-                    });
+                    if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
+                        currentLoginAttempt.getOnLoginResultListener().onLoginResult(true);
                 }
 
-            }
-        });
+                @Override
+                public void onError()
+                {
+                    if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
+                        currentLoginAttempt.getOnLoginResultListener().onLoginResult(false);
+                }
+            });
+        }
+        else
+        {
+            return null;
+        }
 
+        currentLoginAttempt = new LoginAttempt();
+        return currentLoginAttempt;
     }
 
     /**
@@ -124,7 +118,7 @@ public class AuthenticationManager
 
         //  Don't allow to login if before signed out with current account.
         if(currentUser != null)
-            return loginAttempt;        // TODO: Question to user if want to sign out?
+            logout();
 
         auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>()
@@ -145,8 +139,8 @@ public class AuthenticationManager
                                     loginAttempt.getOnLoginResultListener().onLoginResult(true);
                             }
                             else
-                            if(loginAttempt.getOnLoginResultListener() != null)
-                                loginAttempt.getOnLoginResultListener().onLoginResult(false);
+                                if(loginAttempt.getOnLoginResultListener() != null)
+                                    loginAttempt.getOnLoginResultListener().onLoginResult(false);
                         }
                         else
                         {
@@ -175,8 +169,8 @@ public class AuthenticationManager
         final LoginAttempt loginAttempt = new LoginAttempt();
 
         //  Don't allow to login if before signed out with current account.
-        if(auth.getCurrentUser() != null)
-            return loginAttempt;
+        if(currentUser != null)
+            logout();
 
         auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>()
@@ -206,8 +200,6 @@ public class AuthenticationManager
                             if(loginAttempt.getOnUidListener() != null)
                                 loginAttempt.getOnUidListener().onError();
                         }
-
-                        auth.signOut();
 
                     }
                 });
@@ -252,15 +244,15 @@ public class AuthenticationManager
                 deleteUser(email, password);
             }
         }
-
-        login(email, password).addOnLoginResultListener(new LoginAttempt.OnLoginResultListener()
-        {
-            @Override
-            public void onLoginResult(boolean result)
+        else
+            login(email, password).addOnLoginResultListener(new LoginAttempt.OnLoginResultListener()
             {
-                deleteUser(email, password);
-            }
-        });
+                @Override
+                public void onLoginResult(boolean result)
+                {
+                    deleteUser(email, password);
+                }
+            });
     }
 
     /**
@@ -372,7 +364,7 @@ public class AuthenticationManager
      *
      *      @param loginResult  Result of Login Sign-in callback success method
      */
-    public void setFacebookUser(LoginResult loginResult)
+    public LoginAttempt setFacebookUser(LoginResult loginResult)
     {
         AuthCredential credential = FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken());
         auth.signInWithCredential(credential)
@@ -384,52 +376,28 @@ public class AuthenticationManager
                         if (task.isSuccessful())
                         {
                             if(auth.getCurrentUser() != null)
+                            {
                                 currentUser = new User(auth.getCurrentUser());
 
-                            BackEndInterface.get().getEntity(currentUser, new BackEndInterface.OnDataReceivedListener()
+                                if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
+                                    currentLoginAttempt.getOnLoginResultListener().onLoginResult(true);
+                            }
+                            else
                             {
-                                @Override
-                                public void onDataReceived()
-                                {
-                                    BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
-
-                                    ((Activity) context).runOnUiThread(new Runnable()
-                                    {
-                                        @Override
-                                        public void run()
-                                        {
-                                            Toast.makeText(context, context.getResources().getString(R.string.loginToast1) + " " +
-                                                    AuthenticationManager.get().getUserLogged().getDisplayName(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-
-                                    context.startActivity(new Intent(context, MainActivity.class));
-
-                                }
-
-                                @Override
-                                public void onError()
-                                {
-                                    ((Activity) context).runOnUiThread(new Runnable()
-                                    {
-                                        @Override
-                                        public void run()
-                                        {
-                                            Toast.makeText(context, context.getResources().getString(R.string.generic_error),
-                                                    Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
-                            });
+                                if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
+                                    currentLoginAttempt.getOnLoginResultListener().onLoginResult(false);
+                            }
                         }
                         else
                         {
-                            Toast.makeText(context, context.getResources().getString(R.string.generic_error),
-                                    Toast.LENGTH_SHORT).show();
+                            if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
+                                currentLoginAttempt.getOnLoginResultListener().onLoginResult(true);
                         }
                     }
                 });
 
+        currentLoginAttempt = new LoginAttempt();
+        return currentLoginAttempt;
     }
 
     /**

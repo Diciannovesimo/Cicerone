@@ -14,6 +14,8 @@ import com.nullpointerexception.cicerone.components.AuthenticationManager;
 public class SplashScreen extends AppCompatActivity
 {
 
+    private boolean stopHandler = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -23,19 +25,47 @@ public class SplashScreen extends AppCompatActivity
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
 
-        AuthenticationManager.get().initialize(this);
+        AuthenticationManager.LoginAttempt loginAttempt = AuthenticationManager.get().initialize(this);
 
-        new Handler().post(new Runnable()
+        if(loginAttempt != null)
+        {
+            loginAttempt.addOnLoginResultListener(new AuthenticationManager.LoginAttempt.OnLoginResultListener()
+            {
+                @Override
+                public void onLoginResult(boolean result)
+                {
+                    stopHandler = true;
+
+                    if(result)
+                        startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                    else
+                        startActivity(new Intent(SplashScreen.this, LoginActivity.class));
+
+                    finish();
+                }
+            });
+        }
+        else
+        {
+            startActivity(new Intent(SplashScreen.this, LoginActivity.class));
+            finish();
+        }
+
+        new Handler().postDelayed(new Runnable()
         {
             @Override
             public void run()
             {
-                if(AuthenticationManager.get().isUserLogged())
-                    startActivity(new Intent(SplashScreen.this, MainActivity.class));
-                else
-                    startActivity(new Intent(SplashScreen.this, LoginActivity.class));
-                finish();
+                if( ! stopHandler)
+                {
+                    if(AuthenticationManager.get().isUserLogged())
+                        startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                    else
+                        startActivity(new Intent(SplashScreen.this, LoginActivity.class));
+
+                    finish();
+                }
             }
-        });
+        }, 10 * 1000);
     }
 }
