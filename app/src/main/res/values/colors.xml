@@ -5,6 +5,11 @@
     <color name="colorAccent">#f8f8f8</color>
     <color name="colorAccent2">#25d8a7</color>
 
+    <!-- Used for EditText in Itineraries activity -->
+    <color name="notPressedEt">#FFB57A</color>
+    <color name="big_hor_divider">#525252</color>
+    <color name="small_hor_divider">#FAFAFA</color>
+
     <!-- Used only for Bottom-Nav-Bar library -->
     <color name="colorBackground">#F8F8F8</color>
     <color name="colorNavAccentSelected">#FF7700</color>

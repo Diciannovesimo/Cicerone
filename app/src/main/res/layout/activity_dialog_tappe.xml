@@ -32,6 +32,7 @@
     <com.faltenreich.textinputview.TextInputView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="5dp"
         android:tint="@color/colorPrimary"
         app:overlapAction="push">
 
@@ -50,6 +51,7 @@
         android:layout_height="150dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="15dp"
+        android:padding="5dp"
         app:hasFocus="false"
         app:labelText="Descrizione"
         app:maxCharacters="250">
@@ -57,15 +59,16 @@
         <com.kinda.mtextfield.ExtendedEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Descrizione"/>
+            android:hint="Descrizione" />
 
     </com.kinda.mtextfield.TextFieldBoxes>
 
     <Button
-        android:id="@+id/createPoint_btn"
+        android:id="@+id/createStage_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
+        android:layout_marginTop="100dp"
         android:text="crea" />
 
 </LinearLayout>

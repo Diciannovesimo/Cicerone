@@ -58,4 +58,7 @@
     <string name="noTrips">Non ci sono viaggi.</string>
     <string name="title_activity_itinerary">activity_itinerary</string>
 
+    <!-- Google API -->
+    <string name="place_KEY">AIzaSyCoYirGU9t1T1lyAmy_0CsJeH7ikMTZYng</string>
+
 </resources>
