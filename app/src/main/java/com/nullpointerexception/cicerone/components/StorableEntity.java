@@ -63,7 +63,8 @@ public abstract class StorableEntity
                 if(ignore)
                     continue;
 
-                result.put(field.getName(), value != null ? value.toString() : "");
+                if(!field.isSynthetic())
+                    result.put(field.getName(), value != null ? value.toString() : "");
             }
         }
         catch (IllegalAccessException e)
