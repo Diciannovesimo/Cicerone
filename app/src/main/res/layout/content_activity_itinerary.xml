@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activities.ItineraryActivity"
+    tools:showIn="@layout/activity_itinerary">
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="0dp"
+        android:layout_height="350dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <com.faltenreich.textinputview.TextInputView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:tint="@color/colorPrimary"
+                app:overlapAction="push">
+
+                <EditText
+                    android:id="@+id/place_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:ems="10"
+                    android:hint="Luogo"
+                    android:inputType="textShortMessage" />
+            </com.faltenreich.textinputview.TextInputView>
+
+            <com.faltenreich.textinputview.TextInputView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:tint="@color/colorPrimary"
+                app:overlapAction="push">
+
+
+                <EditText
+                    android:id="@+id/meetPlace_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:ems="10"
+                    android:hint="Punto di incontro"
+                    android:inputType="textPersonName" />
+            </com.faltenreich.textinputview.TextInputView>
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="?android:attr/listDivider" />
+
+            <EditText
+                android:id="@+id/date_picker"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:editable="false"
+                android:ems="10"
+                android:focusable="false"
+                android:hint="Data"
+                android:inputType="datetime" />
+
+            <EditText
+                android:id="@+id/time_picker"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:editable="false"
+                android:ems="10"
+                android:focusable="false"
+                android:hint="Ora incontro"
+                android:inputType="time" />
+
+
+            <View
+                android:id="@+id/divider1"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="?android:attr/listDivider" />
+
+            <com.faltenreich.textinputview.TextInputView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:tint="@color/colorPrimary"
+                app:overlapAction="push">
+
+                <EditText
+                    android:id="@+id/MaxParticipants_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:ems="10"
+                    android:hint="Max. partecipanti"
+                    android:inputType="numberDecimal" />
+            </com.faltenreich.textinputview.TextInputView>
+
+            <com.faltenreich.textinputview.TextInputView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:tint="@color/colorPrimary"
+                app:overlapAction="push">
+
+                <EditText
+                    android:id="@+id/language_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:ems="10"
+                    android:hint="Lingua di comunicazione"
+                    android:inputType="textPersonName" />
+            </com.faltenreich.textinputview.TextInputView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <com.faltenreich.textinputview.TextInputView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:tint="@color/colorPrimary"
+                    app:overlapAction="push">
+
+                    <EditText
+                        android:id="@+id/recompense_et"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:ems="10"
+                        android:hint="Compenso"
+                        android:inputType="textPersonName" />
+                </com.faltenreich.textinputview.TextInputView>
+
+                <com.jaredrummler.materialspinner.MaterialSpinner
+                    android:id="@+id/spinner_valute"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <com.kinda.mtextfield.TextFieldBoxes
+                android:id="@+id/text_field_boxes4"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="15dp"
+                app:hasFocus="false"
+                app:labelText="Descrizione"
+                app:maxCharacters="250">
+
+                <com.kinda.mtextfield.ExtendedEditText
+                    android:id="@+id/description_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Descrizione" />
+
+            </com.kinda.mtextfield.TextFieldBoxes>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
+</androidx.constraintlayout.widget.ConstraintLayout>

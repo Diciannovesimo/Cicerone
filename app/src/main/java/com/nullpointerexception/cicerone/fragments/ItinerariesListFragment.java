@@ -1,5 +1,6 @@
 package com.nullpointerexception.cicerone.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.activities.ItineraryActivity;
+import com.nullpointerexception.cicerone.activities.LoginActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 
 public class ItinerariesListFragment extends Fragment
@@ -40,6 +44,13 @@ public class ItinerariesListFragment extends Fragment
 
         itinerariesList = view.findViewById(R.id.itinerariesListContainer);
         newItineraryButton = view.findViewById(R.id.newItineraryButton);
+
+        newItineraryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(view.getContext(), ItineraryActivity.class));
+            }
+        });
 
         return view;
     }

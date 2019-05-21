@@ -20,10 +20,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".activities.DialogTappe"></activity>
+        <activity android:name=".fragments.dialog_tappe" />
+        <activity
+            android:name=".activities.ItineraryActivity"
+            android:label="@string/title_activity_itinerary"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activities.RegistrationActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

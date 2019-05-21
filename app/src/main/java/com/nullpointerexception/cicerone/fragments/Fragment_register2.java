@@ -10,6 +10,7 @@ import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
 
+import com.kinda.mtextfield.TextFieldBoxes;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.activities.RegistrationActivity;
 
