@@ -145,9 +145,6 @@ public class RegistrationActivity extends AppCompatActivity {
                                     {
                                         if(task.isSuccessful())
                                         {
-
-                                            AuthenticationManager.get().logout();
-
                                             AuthenticationManager.get().getUIdOf(user.getEmail(),
                                                     fragment1.getPasswordField().getText().toString())
                                                     .addOnUidListener(new AuthenticationManager.LoginAttempt.OnUIDListener()
@@ -156,15 +153,28 @@ public class RegistrationActivity extends AppCompatActivity {
                                                         public void onIdObtained(String uid)
                                                         {
                                                             user.setId(uid);
-                                                            BackEndInterface.get().storeEntity(user);
-                                                            showDialog(true);
+                                                            BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
+                                                                @Override
+                                                                public void onSuccess()
+                                                                {
+                                                                    showDialog(true);
+                                                                }
+
+                                                                @Override
+                                                                public void onError()
+                                                                {
+                                                                    showDialog(false);
+                                                                }
+                                                            });
                                                         }
 
                                                         @Override
                                                         public void onError()
                                                         {
+                                                            /*
                                                             AuthenticationManager.get().deleteUser(user.getEmail(),
                                                                     fragment1.getPasswordField().getText().toString());
+                                                                    */
                                                             showDialog(false);
                                                         }
                                                     });

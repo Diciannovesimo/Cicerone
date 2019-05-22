@@ -1,3 +1,4 @@
+
 package com.nullpointerexception.cicerone.activities;
 
 import android.content.Intent;
@@ -52,20 +53,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        /*
-        NavigationPage page1 = new NavigationPage(getString(R.string.menu_home), ContextCompat.getDrawable(this, R.drawable.ic_home), new HomeFragment());
-        NavigationPage page2 = new NavigationPage(getString(R.string.menu_trips_list), ContextCompat.getDrawable(this, R.drawable.ic_trips), new ItinerariesListFragment());
-        NavigationPage page3 = new NavigationPage(getString(R.string.menu_itineraries_list), ContextCompat.getDrawable(this, R.drawable.ic_location), new ItinerariesListFragment());
-        NavigationPage page4 = new NavigationPage(getString(R.string.menu_profile), ContextCompat.getDrawable(this, R.drawable.ic_profile), new HomeFragment());
-
-        List<NavigationPage> navigationPages = new Vector<>();
-        navigationPages.add(page1);
-        navigationPages.add(page2);
-        navigationPages.add(page3);
-        navigationPages.add(page4);
-
-        super.setupBottomBarHolderActivity(navigationPages);*/
 
         /*
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

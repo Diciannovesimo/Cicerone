@@ -42,11 +42,13 @@ import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
 
 public class ItineraryActivity extends AppCompatActivity {
 
-    private EditText mLuogo, mPuntoIncontro, mData, mOra, mMaxPart, mLingua, mCompenso, mMaps;
+    private EditText mLuogo, mPuntoIncontro, mData, mOra, mMaxPart, mLingua, mMaps;
     private ExtendedEditText mDescrizione;
+    private studio.carbonylgroup.textfieldboxes.ExtendedEditText mCompenso;
     private ImageView mAddStage;
-    private TextFieldBoxes luogo_box;
+    private TextFieldBoxes luogo_box, punto_box, data_box, orario_box;
     private int AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final String TAG = "ItineraryActivity";
 
     //Datepicker object
     Calendar calendar;
@@ -71,14 +73,17 @@ public class ItineraryActivity extends AppCompatActivity {
 
         mLuogo = findViewById(R.id.place_et);
         mPuntoIncontro = findViewById(R.id.meetPlace_et);
-        mData = findViewById(R.id.date_picker);
-        mOra = findViewById(R.id.time_picker);
         mMaxPart = findViewById(R.id.MaxParticipants_et);
         mLingua = findViewById(R.id.language_et);
         mCompenso = findViewById(R.id.recompense_et);
         mDescrizione = findViewById(R.id.description_et);
         mAddStage = findViewById(R.id.addStage_btn);
+        mData = findViewById(R.id.date_picker);
+        mOra = findViewById(R.id.time_picker);
         luogo_box = findViewById(R.id.luogo_box);
+        punto_box = findViewById(R.id.punto_box);
+        data_box = findViewById(R.id.data_box);
+        orario_box = findViewById(R.id.orario_box);
 
         Window window = getWindow();
         window.setStatusBarColor(Color.parseColor("#FF5500"));
@@ -90,15 +95,24 @@ public class ItineraryActivity extends AppCompatActivity {
 
         MaterialSpinner spinner = findViewById(R.id.spinner_valute);
         spinner.setItems("€ Euro", "$ Dollaro", "£ Sterlina");
+        mCompenso.setPrefix("€ ");
         spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
 
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-
+                Log.i(TAG, item);
+                switch(position) {
+                    case 0:
+                        mCompenso.setPrefix("€ ");break;
+                    case 1:
+                        mCompenso.setPrefix("$ ");break;
+                    case 2:
+                        mCompenso.setPrefix("£ ");break;
+                }
             }
         });
 
-        mData.setOnClickListener(new View.OnClickListener() {
+        data_box.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 calendar = Calendar.getInstance();
@@ -117,7 +131,7 @@ public class ItineraryActivity extends AppCompatActivity {
             }
         });
 
-        mOra.setOnClickListener(new View.OnClickListener() {
+        orario_box.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Calendar mcurrentTime = Calendar.getInstance();
@@ -155,6 +169,16 @@ public class ItineraryActivity extends AppCompatActivity {
         });
 
         luogo_box.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Autocomplete.IntentBuilder(
+                        AutocompleteActivityMode.FULLSCREEN, fields)
+                        .build(v.getContext());
+                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+            }
+        });
+
+        punto_box.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Autocomplete.IntentBuilder(
