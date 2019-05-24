@@ -155,6 +155,8 @@ public class ItineraryActivity extends AppCompatActivity {
             mPlaceDesc = mView.findViewById(R.id.placeDesc_et);
             place_box = mView.findViewById(R.id.place_box);
             create_stage = mView.findViewById(R.id.createStage_btn);
+            
+            mPlace.setEnabled(false);
 
             mBuilder.setView(mView);
             AlertDialog dialog = mBuilder.create();
@@ -169,23 +171,27 @@ public class ItineraryActivity extends AppCompatActivity {
 
             descrizione_tappa_box.setSimpleTextChangeWatcher((theNewText, isError) -> {
                 if(theNewText.length() > 250) {
-                    descrizione_tappa_box.setError("Superato numero massimo caratteri", true);
+                    descrizione_tappa_box.setError("Superato numero massimo caratteri", false);
                 }
             });
 
             create_stage.setOnClickListener(v12 -> {
-                View newPlace = getLayoutInflater().inflate(R.layout.stage_layout, null);
+                if(mPlaceDesc.getText().toString().length() > 250) {
+                    descrizione_tappa_box.setError("Inserisci una descrizione più corta", true);
+                }else{
+                    View newPlace = getLayoutInflater().inflate(R.layout.stage_layout, null);
 
-                placeDescription_tv = newPlace.findViewById(R.id.placeDescription_tv);
-                placeName_tv = newPlace.findViewById(R.id.placeName_tv);
+                    placeDescription_tv = newPlace.findViewById(R.id.placeDescription_tv);
+                    placeName_tv = newPlace.findViewById(R.id.placeName_tv);
 
-                placeName_tv.setText(mPlace.getText().toString());
-                placeDescription_tv.setText(mPlaceDesc.getText().toString());
+                    placeName_tv.setText(mPlace.getText().toString());
+                    placeDescription_tv.setText(mPlaceDesc.getText().toString());
 
-                linearLayout.addView(newPlace, 0);
-                dialog.dismiss();
+                    linearLayout.addView(newPlace, 0);
 
-                scrollView.post(() -> ObjectAnimator.ofInt(scrollView, "scrollY",  scrollView.getBottom()).setDuration(800).start());
+                    dialog.dismiss();
+                    scrollView.post(() -> ObjectAnimator.ofInt(scrollView, "scrollY",  scrollView.getBottom()).setDuration(800).start());
+                }
             });
 
 
