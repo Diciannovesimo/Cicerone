@@ -11,7 +11,7 @@
 
 
     <ScrollView
-        android:id="@+id/scrollView2"
+        android:id="@+id/scrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -38,12 +38,11 @@
                 app:secondaryColor="@color/notPressedEt">
 
                 <studio.carbonylgroup.textfieldboxes.ExtendedEditText
-                    android:id="@+id/place_et"
-                    android:layout_width="200dp"
+                    android:id="@+id/luogo_et"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="false"
-                    android:editable="false"
-                    android:hint="Luogo" />
+                    android:editable="false" />
 
             </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
 
@@ -63,11 +62,10 @@
 
                 <studio.carbonylgroup.textfieldboxes.ExtendedEditText
                     android:id="@+id/meetPlace_et"
-                    android:layout_width="200dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="false"
-                    android:editable="false"
-                    android:hint="Punto di incontro" />
+                    android:editable="false" />
 
             </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
 
@@ -87,10 +85,9 @@
 
                 <studio.carbonylgroup.textfieldboxes.ExtendedEditText
                     android:id="@+id/date_picker"
-                    android:layout_width="200dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:editable="false"
-                    android:hint="Data incontro"
                     android:inputType="datetime" />
 
             </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
@@ -111,12 +108,11 @@
 
                 <studio.carbonylgroup.textfieldboxes.ExtendedEditText
                     android:id="@+id/time_picker"
-                    android:layout_width="200dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="false"
                     android:editable="false"
                     android:focusable="false"
-                    android:hint="Orario di incontro"
                     android:inputType="datetime" />
 
             </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
@@ -128,7 +124,7 @@
                 android:background="@color/small_hor_divider" />
 
             <studio.carbonylgroup.textfieldboxes.TextFieldBoxes
-                android:id="@+id/text_field_boxes4"
+                android:id="@+id/partecipanti_box"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:labelText="Max. partecipanti"
@@ -139,7 +135,7 @@
                     android:id="@+id/MaxParticipants_et"
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
-                    android:hint="Max. partecipanti" />
+                    android:hint="Insert a number" />
 
             </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
 
@@ -161,7 +157,7 @@
                     android:id="@+id/language_et"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Lingua di comunicazione" />
+                    android:inputType="textShortMessage" />
 
             </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
 
@@ -188,7 +184,8 @@
                         android:id="@+id/recompense_et"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
-                        android:hint="Compenso" />
+                        android:hint="Compenso"
+                        android:inputType="numberDecimal" />
 
                 </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
 
@@ -210,9 +207,9 @@
                 android:background="@color/small_hor_divider" />
 
             <com.kinda.mtextfield.TextFieldBoxes
-                android:id="@+id/text_field_boxes7"
+                android:id="@+id/descrizione_box"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="15dp"
                 app:hasFocus="false"
@@ -225,23 +222,23 @@
                     android:id="@+id/description_et"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Descrizione" />
+                    android:hint="Inserisci una descrizione del tuo itinerario" />
 
             </com.kinda.mtextfield.TextFieldBoxes>
 
             <LinearLayout
+                android:id="@+id/listStages"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
                 <ImageView
                     android:id="@+id/addStage_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_gravity="center"
                     android:clickable="true"
-                    android:tint="#4CAF50"
-                    app:srcCompat="@drawable/ic_add" />
+                    app:srcCompat="@drawable/ic_plus_green" />
 
             </LinearLayout>
         </LinearLayout>
