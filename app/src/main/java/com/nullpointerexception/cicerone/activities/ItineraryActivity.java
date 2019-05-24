@@ -11,7 +11,6 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.kinda.mtextfield.ExtendedEditText;
 import com.nullpointerexception.cicerone.R;
@@ -19,11 +18,9 @@ import com.nullpointerexception.cicerone.R;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.DialogFragment;
 
 //Google SDk
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.net.PlacesClient;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,13 +39,17 @@ import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
 
 public class ItineraryActivity extends AppCompatActivity {
 
+    private static final String TAG = "ItineraryActivity";
     private EditText mLuogo, mPuntoIncontro, mData, mOra, mMaxPart, mLingua, mMaps;
     private ExtendedEditText mDescrizione;
     private studio.carbonylgroup.textfieldboxes.ExtendedEditText mCompenso;
     private ImageView mAddStage;
     private TextFieldBoxes luogo_box, punto_box, data_box, orario_box;
-    private int AUTOCOMPLETE_REQUEST_CODE = 1;
-    private static final String TAG = "ItineraryActivity";
+    private String place_string[] = new String[2];
+    private List<Place.Field> fields;
+    private static int AUTOCOMPLETE_REQUEST_CODE = 1;
+    private boolean luogo_or_punto = true;
+
 
     //Datepicker object
     Calendar calendar;
@@ -62,14 +63,6 @@ public class ItineraryActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Nuovo itinerario");
         setSupportActionBar(toolbar);
-
-        // Initialize Places.
-        Places.initialize(getApplicationContext(), getResources().getString(R.string.place_KEY));
-
-        // Create a new Places client instance.
-        PlacesClient placesClient = Places.createClient(this);
-
-        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
 
         mLuogo = findViewById(R.id.place_et);
         mPuntoIncontro = findViewById(R.id.meetPlace_et);
@@ -92,6 +85,10 @@ public class ItineraryActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
+
+        Places.initialize(getApplicationContext(), getResources().getString(R.string.place_KEY));
+        fields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
+
 
         MaterialSpinner spinner = findViewById(R.id.spinner_valute);
         spinner.setItems("€ Euro", "$ Dollaro", "£ Sterlina");
@@ -181,10 +178,12 @@ public class ItineraryActivity extends AppCompatActivity {
         punto_box.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                luogo_or_punto = false;
                 Intent intent = new Autocomplete.IntentBuilder(
                         AutocompleteActivityMode.FULLSCREEN, fields)
                         .build(v.getContext());
                 startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+                mPuntoIncontro.setText(place_string[1]);
             }
         });
     }
@@ -193,18 +192,21 @@ public class ItineraryActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
+                //Log.i("it_view", "Place: " + place.getName() + ", " + place.getId());
                 Place place = Autocomplete.getPlaceFromIntent(data);
-                Log.i("it_view", "Place: " + place.getName() + ", " + place.getId());
-                if(!mLuogo.getText().toString().isEmpty())
-                    mLuogo.setText("");
+                place_string[0] = place.getName();
+                place_string[1] = place.getAddress();
+                if(luogo_or_punto == true)
+                    mLuogo.setText(place_string[0]);
                 else
-                    mLuogo.setText(place.getName());
-            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-                Status status = Autocomplete.getStatusFromIntent(data);
-                Log.i("it_view", status.getStatusMessage());
-            } else if (resultCode == RESULT_CANCELED) {
-                // The user canceled the operation.
+                    mPuntoIncontro.setText(place_string[0]);
             }
+        } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+            Status status = Autocomplete.getStatusFromIntent(data);
+            Log.i("it_view", status.getStatusMessage());
+        } else if (resultCode == RESULT_CANCELED) {
+            // The user canceled the operation.
         }
     }
 }
+

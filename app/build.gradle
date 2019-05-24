@@ -136,12 +136,14 @@ apply plugin: "org.sonarqube"
 
 sonarqube {
     properties {
+        def libraries = project.android.sdkDirectory.getPath() + "/platforms/android-23/android.jar"/* + ", build/intermediates/exploded-aar*//**//*classes.jar"*/
         property "sonar.projectName", "Cicerone"
         property "sonar.projectKey", "com.nullpointerexception.cicerone"
         property "sonar.host.url", "http://localhost:9000"
         property "sonar.language", "java"
         property "sonar.sources", "src/main/java"
-        property "sonar.login", "root"
-        property "sonar.password", "root"
+        property "sonar.libraries", libraries
+        property "sonar.login", "admin"
+        property "sonar.password", "admin"
     }
 }

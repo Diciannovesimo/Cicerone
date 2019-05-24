@@ -47,6 +47,7 @@ public class SplashScreen extends AppCompatActivity
         }
         else
         {
+            stopHandler = true;
             startActivity(new Intent(SplashScreen.this, LoginActivity.class));
             finish();
         }
