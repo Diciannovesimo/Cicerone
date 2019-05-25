@@ -13,12 +13,22 @@
             <set />
           </value>
         </entry>
+        <entry key="$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a780cffc0a615782c3db6417526a4fdd/jars/classes.jar!/com/google/android/gms/tasks/OnCompleteListener.class">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/build.gradle">
           <value>
             <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/androidTest/java/com/nullpointerexception/cicerone/components/BackEndInterfaceTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/androidTest/java/com/nullpointerexception/cicerone/components/ItineraryTest.java">
           <value>
             <set />
           </value>
@@ -189,6 +199,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/test/java/com/nullpointerexception/cicerone/BackEndInterfaceTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/test/java/com/nullpointerexception/cicerone/components/ItineraryTest.java">
           <value>
             <set />
           </value>
