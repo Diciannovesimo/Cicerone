@@ -5,7 +5,9 @@ import androidx.annotation.NonNull;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *      User
@@ -14,7 +16,7 @@ import java.util.List;
  *
  *      @author Luca
  */
-public class User extends StorableEntity
+public class User extends StorableEntity implements StorableAsField
 {
     /**  Id of account (generally provided by FireBase)   */
     protected String id,
@@ -142,5 +144,74 @@ public class User extends StorableEntity
     public List<String> getIgnoredFields()
     {
         return Collections.singletonList("id");
+    }
+
+    /**
+     *      Implementation of its superclass method.
+     *      Provides an id to indexing storage of this object type as sub-field.
+     *
+     *      @return     Identifier of this object type as sub-field on database.
+     */
+    @Override
+    public String getFieldId()
+    {
+        return id;
+    }
+
+    /**
+     *      Implementation of its superclass method.
+     *
+     *      @return The map with field values needed.
+     */
+    @Override
+    public Map<String, String> getSubFields()
+    {
+        Map<String, String> map = new HashMap<>();
+
+        String displayName = getDisplayName();
+        String imageUrl = getProfileImageUrl();
+
+        if(displayName != null)
+            map.put("displayName", displayName);
+
+        if(imageUrl != null)
+            map.put("profileImageUrl", imageUrl);
+
+        return map;
+    }
+
+    /**
+     *      Implementation of its superclass method.
+     *      Restores fields stored before on database.
+     */
+    @Override
+    public void restoreSubFields(Map<String, String> subFields)
+    {
+        for(String key : subFields.keySet())
+        {
+            String value = subFields.get(key);
+
+            if(value != null)
+            {
+                if(key.equals("displayName"))
+                {
+                    if(value.contains(" "))
+                    {
+                        name = value.substring(0, value.indexOf(" "));
+                        surname = value.substring(value.indexOf(" ")+1);
+                    }
+                    else
+                    {
+                        name = value;
+                        surname = "";
+                    }
+                }
+
+                if(key.equals("profileImageUrl"))
+                {
+                    profileImageUrl = value;
+                }
+            }
+        }
     }
 }

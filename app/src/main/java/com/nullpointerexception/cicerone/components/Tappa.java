@@ -2,14 +2,19 @@ package com.nullpointerexception.cicerone.components;
 
 import com.google.android.gms.maps.model.LatLng;
 
-public class Tappa {
+import java.util.HashMap;
+import java.util.Map;
+
+public class Tappa implements StorableAsField
+{
 
     private String nome;
     private String indirizzo;
     private LatLng coordinate;
     private String descrizione;
 
-    public Tappa(String nome, String indirizzo, LatLng coordinate) {
+    public Tappa(String nome, String indirizzo, LatLng coordinate)
+    {
         this.nome = nome;
         this.indirizzo = indirizzo;
         this.coordinate = coordinate;
@@ -47,5 +52,23 @@ public class Tappa {
 
     public void setDescrizione(String descrizione) {
         this.descrizione = descrizione;
+    }
+
+    @Override
+    public String getFieldId()
+    {
+        return null;
+    }
+
+    @Override
+    public Map<String, String> getSubFields()
+    {
+        return new HashMap<>();
+    }
+
+    @Override
+    public void restoreSubFields(Map<String, String> subFields)
+    {
+
     }
 }
