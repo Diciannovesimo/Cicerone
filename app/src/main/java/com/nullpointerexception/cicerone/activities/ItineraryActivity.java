@@ -201,8 +201,15 @@ public class ItineraryActivity extends AppCompatActivity {
 
             create_stage.setOnClickListener(v12 -> {
                 if(mPlaceDesc.getText().toString().length() > 250) {
-                    descrizione_tappa_box.setError("Inserisci una descrizione più corta", true);
-                }else{
+                    descrizione_tappa_box.setError("Inserisci una descrizione più corta", false);
+                }else if(mPlaceDesc.getText().toString().isEmpty()) {
+
+                    descrizione_tappa_box.setError("Descrizione obligatoria", false);
+
+                    if(mPlace.getText().toString().isEmpty()) {
+                        place_box.setError("Nome tappa obligatoria", false);
+                    }
+                }else {
 
                     if(errorMsg_tv.getVisibility() == View.VISIBLE)
                         errorMsg_tv.setVisibility(View.GONE);
