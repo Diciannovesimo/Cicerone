@@ -357,7 +357,7 @@ public class ItineraryActivity extends AppCompatActivity {
                 itinerary.setDate(mData.getText().toString());
                 itinerary.setMeetingTime(mOra.getText().toString());
                 itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
-                itinerary.setLanguage(mLingua.getText().toString());
+                itinerary.setLanguage(mLingua.getText().toString().trim());
                 itinerary.setCurrency(currency);
 
                 if(!mCompenso.getText().toString().equals(""))

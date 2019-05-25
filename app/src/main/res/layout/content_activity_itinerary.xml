@@ -134,7 +134,8 @@
                 <studio.carbonylgroup.textfieldboxes.ExtendedEditText
                     android:id="@+id/MaxParticipants_et"
                     android:layout_width="200dp"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:inputType="number" />
 
             </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
 
