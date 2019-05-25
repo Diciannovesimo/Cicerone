@@ -60,7 +60,7 @@
 
         <com.kinda.mtextfield.ExtendedEditText
             android:id="@+id/placeDesc_et"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
     </com.kinda.mtextfield.TextFieldBoxes>

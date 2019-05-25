@@ -6,27 +6,10 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-
-import com.google.android.gms.common.api.Status;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteActivity;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
-import com.jaredrummler.materialspinner.MaterialSpinner;
-import com.kinda.mtextfield.ExtendedEditText;
-import com.nullpointerexception.cicerone.R;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-//Google SDk
-import com.google.android.libraries.places.api.Places;
-
-
-import com.nullpointerexception.cicerone.components.googleAutocompletationField;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -35,12 +18,32 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.gms.common.api.Status;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.kinda.mtextfield.ExtendedEditText;
+import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.Tappa;
+import com.nullpointerexception.cicerone.components.googleAutocompletationField;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
 import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
+
+//Google SDk
 
 public class ItineraryActivity extends AppCompatActivity {
 
@@ -53,13 +56,17 @@ public class ItineraryActivity extends AppCompatActivity {
     private TextFieldBoxes luogo_box, punto_box, data_box, orario_box, partecipanti_box, place_box;
     private com.kinda.mtextfield.TextFieldBoxes descrizione_itinerario_box, descrizione_tappa_box;
     private Button create_stage;
-    private String place_string[] = new String[2];
     private List<Place.Field> fields;
+    private Tappa tappa;
+    private ArrayList<Tappa> tappe = new ArrayList<>();
     private static int AUTOCOMPLETE_REQUEST_CODE = 1;
     private googleAutocompletationField Google_field;
     private LinearLayout linearLayout;
     private ScrollView scrollView;
     private int actual_field;
+
+    //Boolean value ti set variable layoutparams of et on addStage dialog
+    boolean setted = false;
 
     //Datepicker object
     Calendar calendar;
@@ -93,7 +100,7 @@ public class ItineraryActivity extends AppCompatActivity {
 
         //Initialize Google Places API
         Places.initialize(getApplicationContext(), getResources().getString(R.string.place_KEY));
-        fields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
+        fields = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG);
 
         //Initialize spinner
         MaterialSpinner spinner = findViewById(R.id.spinner_valute);
@@ -155,7 +162,7 @@ public class ItineraryActivity extends AppCompatActivity {
             mPlaceDesc = mView.findViewById(R.id.placeDesc_et);
             place_box = mView.findViewById(R.id.place_box);
             create_stage = mView.findViewById(R.id.createStage_btn);
-            
+
             mPlace.setEnabled(false);
 
             mBuilder.setView(mView);
@@ -170,9 +177,8 @@ public class ItineraryActivity extends AppCompatActivity {
             });
 
             descrizione_tappa_box.setSimpleTextChangeWatcher((theNewText, isError) -> {
-                if(theNewText.length() > 250) {
+                if(theNewText.length() > 250)
                     descrizione_tappa_box.setError("Superato numero massimo caratteri", false);
-                }
             });
 
             create_stage.setOnClickListener(v12 -> {
@@ -189,11 +195,13 @@ public class ItineraryActivity extends AppCompatActivity {
 
                     linearLayout.addView(newPlace, 0);
 
+                    tappa.setDescrizione(mPlaceDesc.getText().toString());
+                    tappe.add(tappa);
+
                     dialog.dismiss();
                     scrollView.post(() -> ObjectAnimator.ofInt(scrollView, "scrollY",  scrollView.getBottom()).setDuration(800).start());
                 }
             });
-
 
             dialog.show();
         });
@@ -212,7 +220,6 @@ public class ItineraryActivity extends AppCompatActivity {
                     AutocompleteActivityMode.FULLSCREEN, fields)
                     .build(v.getContext());
             startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-            mPuntoIncontro.setText(place_string[1]);
         });
 
         partecipanti_box.setSimpleTextChangeWatcher((theNewText, isError) -> {
@@ -238,21 +245,25 @@ public class ItineraryActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                //Log.i("it_view", "Place: " + place.getName() + ", " + place.getId());
+
                 Place place = Autocomplete.getPlaceFromIntent(data);
-                place_string[0] = place.getName();
-                place_string[1] = String.valueOf(place.getLatLng());
 
                 switch(actual_field) {
                     case 1:
-                        mLuogo.setText(place_string[0]);
+                        mLuogo.setText(place.getName());
                         break;
                     case 2:
-                        mPuntoIncontro.setText(place_string[0]);
+                        mPuntoIncontro.setText(place.getAddress());
                         break;
                     case 3:
                         if(mPlace != null)
-                            mPlace.setText(place_string[0]);
+                            tappa = new Tappa(place.getName(), place.getAddress(), place.getLatLng());
+
+                            mPlace.setText(tappa.getIndirizzo());
+
+                            if(!mPlaceDesc.getText().toString().isEmpty()) {
+                                tappa.setDescrizione(mPlaceDesc.getText().toString());
+                            }
                         break;
                 }
             }
@@ -282,6 +293,32 @@ public class ItineraryActivity extends AppCompatActivity {
         descrizione_itinerario_box = findViewById(R.id.descrizione_box);
         linearLayout = findViewById(R.id.listStages);
         scrollView = findViewById(R.id.scrollView);
+    }
+
+    //Impostazioni menù
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_itinerary, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.createItinerary) {
+            Toast.makeText(getApplicationContext(), "Itinerario creato", Toast.LENGTH_SHORT).show();
+
+            //TODO: Salvare i dati nella classe itinerario
+
+            finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
 
