@@ -33,12 +33,13 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.kinda.mtextfield.ExtendedEditText;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.Tappa;
 import com.nullpointerexception.cicerone.components.googleAutocompletationField;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
@@ -48,21 +49,26 @@ import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
 public class ItineraryActivity extends AppCompatActivity {
 
     private static final String TAG = "ItineraryActivity";
-    private EditText mLuogo, mPuntoIncontro, mData, mOra, mMaxPart, mLingua, mMaps, mPlace, mPlaceDesc;
+    private EditText mLuogo, mPuntoIncontro, mData, mOra, mMaxPart, mLingua, mPlace, mPlaceDesc;
     private ExtendedEditText mDescrizione;
     private studio.carbonylgroup.textfieldboxes.ExtendedEditText mCompenso;
-    private ImageView mAddStage;
-    private TextView placeName_tv, placeDescription_tv;
-    private TextFieldBoxes luogo_box, punto_box, data_box, orario_box, partecipanti_box, place_box;
+    private ImageView mAddStage, mRemoveStage;
+    private TextView placeName_tv, placeDescription_tv, listStage_title, errorMsg_tv;
+    private TextFieldBoxes luogo_box, punto_box, data_box, orario_box, partecipanti_box, place_box, lingua_box;
     private com.kinda.mtextfield.TextFieldBoxes descrizione_itinerario_box, descrizione_tappa_box;
     private Button create_stage;
     private List<Place.Field> fields;
     private Tappa tappa;
-    private ArrayList<Tappa> tappe = new ArrayList<>();
+    private HashMap<String, Tappa> tappe = new HashMap<>();
     private static int AUTOCOMPLETE_REQUEST_CODE = 1;
     private googleAutocompletationField Google_field;
     private LinearLayout linearLayout;
     private ScrollView scrollView;
+    private String currency;
+
+    //Istanza itinerario
+    Itinerary itinerary;
+
     private int actual_field;
 
     //Boolean value ti set variable layoutparams of et on addStage dialog
@@ -106,15 +112,22 @@ public class ItineraryActivity extends AppCompatActivity {
         MaterialSpinner spinner = findViewById(R.id.spinner_valute);
         spinner.setItems("€ Euro", "$ Dollaro", "£ Sterlina");
         mCompenso.setPrefix("€ ");
+        currency = "€";
         spinner.setOnItemSelectedListener((MaterialSpinner.OnItemSelectedListener<String>) (view, position, id, item) -> {
             Log.i(TAG, item);
             switch(position) {
                 case 0:
-                    mCompenso.setPrefix("€ ");break;
+                    mCompenso.setPrefix("€ ");
+                    currency = "€";
+                    break;
                 case 1:
-                    mCompenso.setPrefix("$ ");break;
+                    mCompenso.setPrefix("$ ");
+                    currency = "$";
+                    break;
                 case 2:
-                    mCompenso.setPrefix("£ ");break;
+                    mCompenso.setPrefix("£ ");
+                    currency = "£";
+                    break;
             }
         });
 
@@ -168,6 +181,11 @@ public class ItineraryActivity extends AppCompatActivity {
             mBuilder.setView(mView);
             AlertDialog dialog = mBuilder.create();
 
+            dialog.setOnDismissListener(dialog1 -> {
+                if(tappe.size() == 0 && (listStage_title.getVisibility() == View.GONE) && (errorMsg_tv.getVisibility() == View.GONE))
+                    listStage_title.setVisibility(View.VISIBLE);
+            });
+
             place_box.setOnClickListener(v1 -> {
                 actual_field = Google_field.PLACE.getN();
                 Intent intent = new Autocomplete.IntentBuilder(
@@ -185,18 +203,34 @@ public class ItineraryActivity extends AppCompatActivity {
                 if(mPlaceDesc.getText().toString().length() > 250) {
                     descrizione_tappa_box.setError("Inserisci una descrizione più corta", true);
                 }else{
+
+                    if(errorMsg_tv.getVisibility() == View.VISIBLE)
+                        errorMsg_tv.setVisibility(View.GONE);
+
+                    listStage_title.setVisibility(View.GONE);
                     View newPlace = getLayoutInflater().inflate(R.layout.stage_layout, null);
 
                     placeDescription_tv = newPlace.findViewById(R.id.placeDescription_tv);
                     placeName_tv = newPlace.findViewById(R.id.placeName_tv);
+                    mRemoveStage = newPlace.findViewById(R.id.mRemoveStage);
 
                     placeName_tv.setText(mPlace.getText().toString());
                     placeDescription_tv.setText(mPlaceDesc.getText().toString());
 
+                    newPlace.setTag(tappa.getNome());
+
+                    mRemoveStage.setOnClickListener(v13 -> {
+                        tappe.remove(newPlace.getTag());
+                        linearLayout.removeView(newPlace);
+
+                        if(listStage_title.getVisibility() == View.GONE)
+                            listStage_title.setVisibility(View.VISIBLE);
+                    });
+
                     linearLayout.addView(newPlace, 0);
 
                     tappa.setDescrizione(mPlaceDesc.getText().toString());
-                    tappe.add(tappa);
+                    tappe.put(tappa.getNome(), tappa);
 
                     dialog.dismiss();
                     scrollView.post(() -> ObjectAnimator.ofInt(scrollView, "scrollY",  scrollView.getBottom()).setDuration(800).start());
@@ -291,8 +325,11 @@ public class ItineraryActivity extends AppCompatActivity {
         orario_box = findViewById(R.id.orario_box);
         partecipanti_box = findViewById(R.id.partecipanti_box);
         descrizione_itinerario_box = findViewById(R.id.descrizione_box);
+        lingua_box = findViewById(R.id.lingua_box);
         linearLayout = findViewById(R.id.listStages);
         scrollView = findViewById(R.id.scrollView);
+        listStage_title = findViewById(R.id.listStage_title);
+        errorMsg_tv = findViewById(R.id.errorMsg_tv);
     }
 
     //Impostazioni menù
@@ -310,15 +347,82 @@ public class ItineraryActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.createItinerary) {
-            Toast.makeText(getApplicationContext(), "Itinerario creato", Toast.LENGTH_SHORT).show();
 
-            //TODO: Salvare i dati nella classe itinerario
+            itinerary = new Itinerary();
 
-            finish();
+            if(checkField()) {
+                //Inserimento specifiche nell'itinerario
+                itinerary.setLocation(mLuogo.getText().toString());
+                itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
+                itinerary.setDate(mData.getText().toString());
+                itinerary.setMeetingTime(mOra.getText().toString());
+                itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
+                itinerary.setLanguage(mLingua.getText().toString());
+                itinerary.setCurrency(currency);
+
+                if(!mCompenso.getText().toString().equals(""))
+                    itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
+
+                itinerary.setDescription(mDescrizione.getText().toString());
+                itinerary.setStages(tappe.values());
+
+                //TODO: Memorizzare l'itinerario nel DB
+                //BackEndInterface.get().storeField(itinerary, );
+                Toast.makeText(getApplicationContext(), "Itinerario creato", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
+
+    private boolean checkField() {
+        boolean alright = true;
+
+        if(mLuogo.getText().toString().isEmpty()) {
+            luogo_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(mPuntoIncontro.getText().toString().isEmpty()) {
+            punto_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(mData.getText().toString().isEmpty()) {
+            data_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(mOra.getText().toString().isEmpty()) {
+            orario_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(mMaxPart.getText().toString().isEmpty()) {
+            partecipanti_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(mLingua.getText().toString().isEmpty()) {
+            lingua_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(mDescrizione.getText().toString().isEmpty()) {
+            descrizione_itinerario_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(tappe.size() == 0) {
+            listStage_title.setVisibility(View.GONE);
+            errorMsg_tv.setVisibility(View.VISIBLE);
+            alright = false;
+        }
+
+        return alright;
+    }
+
 }
 
