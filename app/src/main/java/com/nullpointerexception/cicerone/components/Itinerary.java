@@ -1,5 +1,6 @@
 package com.nullpointerexception.cicerone.components;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -26,7 +27,9 @@ public class Itinerary extends StorableEntity
     /**   Language spoken during itinerary by Cicerone who is guiding it  */
             language,
     /**   Currency of price of itinerary  */
-            currency;
+            currency,
+    /**   Description of itinerary  */
+            description;
 
     /**   Price to pay to Cicerone to participate to this itinerary  */
     private float price;
@@ -35,7 +38,7 @@ public class Itinerary extends StorableEntity
     private int maxParticipants;
 
     /**   List of stages that will be visited into this itinerary  */
-    private List<Tappa> stages;
+    private Collection<Tappa> stages;
 
     /**   List of users that will participate to this itinerary  */
     private List<User> participants;
@@ -124,12 +127,20 @@ public class Itinerary extends StorableEntity
         this.maxParticipants = maxParticipants;
     }
 
-    public List<Tappa> getStages() {
+    public Collection<Tappa> getStages() {
         return stages;
     }
 
-    public void setStages(List<Tappa> stages) {
+    public void setStages(Collection<Tappa> stages) {
         this.stages = stages;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
