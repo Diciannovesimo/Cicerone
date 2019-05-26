@@ -1,6 +1,5 @@
 package com.nullpointerexception.cicerone.components;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -13,7 +12,7 @@ import java.util.List;
 public class Itinerary extends StorableEntity
 {
     /**   Id of itinerary  */
-    private String id,
+    protected String id,
     /**   Id of cicerone which have created this itinerary  */
             idCicerone,
     /**   City of itinerary  */
@@ -32,16 +31,16 @@ public class Itinerary extends StorableEntity
             description;
 
     /**   Price to pay to Cicerone to participate to this itinerary  */
-    private float price;
+    protected float price;
 
     /**   Max numbers of participants to this itinerary  */
-    private int maxParticipants;
+    protected int maxParticipants;
 
     /**   List of stages that will be visited into this itinerary  */
-    private Collection<Tappa> stages;
+    protected List<Stage> stages;
 
     /**   List of users that will participate to this itinerary  */
-    private List<User> participants;
+    protected List<User> participants;
 
     public void setId(String id) {
         this.id = id;
@@ -127,11 +126,11 @@ public class Itinerary extends StorableEntity
         this.maxParticipants = maxParticipants;
     }
 
-    public Collection<Tappa> getStages() {
+    public List<Stage> getStages() {
         return stages;
     }
 
-    public void setStages(Collection<Tappa> stages) {
+    public void setStages(List<Stage> stages) {
         this.stages = stages;
     }
 

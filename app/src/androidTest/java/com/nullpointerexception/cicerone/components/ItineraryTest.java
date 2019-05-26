@@ -9,9 +9,12 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.fail;
 
-public class ItineraryTest {
+public class ItineraryTest
+{
 
     @Rule
     public ActivityTestRule<SplashScreen> mActivityTestRule = new ActivityTestRule<>(SplashScreen.class);
@@ -37,7 +40,7 @@ public class ItineraryTest {
     PRICE = 100;
 
     List<User> participants = null;
-    List<Tappa> stages = null;
+    List<Stage> stages = null;
 
     // per il test sull'inserimento dell'utente
     private final String TEST_ID = "TEST";

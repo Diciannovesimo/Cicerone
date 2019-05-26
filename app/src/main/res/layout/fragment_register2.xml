@@ -22,7 +22,7 @@
             android:drawableLeft="@drawable/ic_identity"
             android:drawablePadding="10sp"
             android:ems="10"
-            android:hint="@string/nome"
+            android:hint="@string/name"
             android:inputType="textPersonName"
             android:textColor="#fff"
             android:textColorHint="#FFFFFFFF"

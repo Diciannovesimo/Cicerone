@@ -34,7 +34,7 @@ import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.kinda.mtextfield.ExtendedEditText;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.Itinerary;
-import com.nullpointerexception.cicerone.components.Tappa;
+import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.googleAutocompletationField;
 
 import java.util.Arrays;
@@ -58,8 +58,8 @@ public class ItineraryActivity extends AppCompatActivity {
     private com.kinda.mtextfield.TextFieldBoxes descrizione_itinerario_box, descrizione_tappa_box;
     private Button create_stage;
     private List<Place.Field> fields;
-    private Tappa tappa;
-    private HashMap<String, Tappa> tappe = new HashMap<>();
+    private Stage stage;
+    private HashMap<String, Stage> tappe = new HashMap<>();
     private static int AUTOCOMPLETE_REQUEST_CODE = 1;
     private googleAutocompletationField Google_field;
     private LinearLayout linearLayout;
@@ -207,7 +207,7 @@ public class ItineraryActivity extends AppCompatActivity {
                     descrizione_tappa_box.setError("Descrizione obligatoria", false);
 
                     if(mPlace.getText().toString().isEmpty()) {
-                        place_box.setError("Nome tappa obligatoria", false);
+                        place_box.setError("Nome stage obligatoria", false);
                     }
                 }else {
 
@@ -224,7 +224,7 @@ public class ItineraryActivity extends AppCompatActivity {
                     placeName_tv.setText(mPlace.getText().toString());
                     placeDescription_tv.setText(mPlaceDesc.getText().toString());
 
-                    newPlace.setTag(tappa.getNome());
+                    newPlace.setTag(stage.getName());
 
                     mRemoveStage.setOnClickListener(v13 -> {
                         tappe.remove(newPlace.getTag());
@@ -236,8 +236,8 @@ public class ItineraryActivity extends AppCompatActivity {
 
                     linearLayout.addView(newPlace, 0);
 
-                    tappa.setDescrizione(mPlaceDesc.getText().toString());
-                    tappe.put(tappa.getNome(), tappa);
+                    stage.setDescription(mPlaceDesc.getText().toString());
+                    tappe.put(stage.getName(), stage);
 
                     dialog.dismiss();
                     scrollView.post(() -> ObjectAnimator.ofInt(scrollView, "scrollY",  scrollView.getBottom()).setDuration(800).start());
@@ -298,12 +298,12 @@ public class ItineraryActivity extends AppCompatActivity {
                         break;
                     case 3:
                         if(mPlace != null)
-                            tappa = new Tappa(place.getName(), place.getAddress(), place.getLatLng());
+                            stage = new Stage(place.getName(), place.getAddress(), place.getLatLng());
 
-                            mPlace.setText(tappa.getIndirizzo());
+                            mPlace.setText(stage.getAddress());
 
                             if(!mPlaceDesc.getText().toString().isEmpty()) {
-                                tappa.setDescrizione(mPlaceDesc.getText().toString());
+                                stage.setDescription(mPlaceDesc.getText().toString());
                             }
                         break;
                 }
@@ -371,7 +371,8 @@ public class ItineraryActivity extends AppCompatActivity {
                     itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
 
                 itinerary.setDescription(mDescrizione.getText().toString());
-                itinerary.setStages(tappe.values());
+                //  TODO: Claudio cambia qui, come accordatoci in telefonata !
+                //itinerary.setStages(tappe.values());
 
                 //TODO: Memorizzare l'itinerario nel DB
                 //BackEndInterface.get().storeField(itinerary, );

@@ -2,6 +2,7 @@ package com.nullpointerexception.cicerone.components;
 
 import androidx.test.rule.ActivityTestRule;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.nullpointerexception.cicerone.activities.SplashScreen;
 
 import org.junit.FixMethodOrder;
@@ -9,7 +10,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -98,6 +101,52 @@ public class BackEndInterfaceTest
                         fail();
                     }
                 });
+            }
+
+            @Override
+            public void onError()
+            {
+                fail();
+            }
+        });
+    }
+
+    @Test
+    public void A22_storeEntityItineraryTest()
+    {
+        Itinerary itinerary = new Itinerary();
+
+        itinerary.setId("Test");
+        itinerary.setLanguage("italiano");
+        itinerary.setDescription("Descrizione fake.");
+        itinerary.setDate(Calendar.getInstance().toString());
+        itinerary.setIdCicerone("FAKE_USER");
+
+        List<Stage> stages = new Vector<>();
+        stages.add(new Stage("Colosseo", "Via address ...", new LatLng(30.221, 48.65265)));
+        stages.add(new Stage("Pianeta terra", "Via Lattea", new LatLng(74.24621, 16.65)));
+        stages.add(new Stage("Computer Point", "Via davanti la casa di William", new LatLng(18.235, 52.21985)));
+        itinerary.setStages(stages);
+
+        List<User> users = new Vector<>();
+        User user1 = new User();
+            user1.setId("user1");
+            user1.setName("User");  user1.setSurname("1");
+            user1.setProfileImageUrl("urlFake//:fwer5w6er51gw5erg16w5er1");
+        User user2 = new User();
+            user2.setId("user2");
+            user2.setName("User");  user2.setSurname("2");
+            user2.setProfileImageUrl("urlFake2//:fwer5w6er51gw5erg16w5er1");
+        users.add(user1);
+        users.add(user2);
+        itinerary.setParticipants(users);
+
+        BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener()
+        {
+            @Override
+            public void onSuccess()
+            {
+                assertTrue(true);
             }
 
             @Override

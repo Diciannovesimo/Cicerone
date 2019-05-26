@@ -27,22 +27,37 @@ public class SplashScreen extends AppCompatActivity
 
         AuthenticationManager.LoginAttempt loginAttempt = AuthenticationManager.get().initialize(this);
 
+        /*  Usato per testare getEntity()   -   Nelle classi di Test non funziona
+        Itinerary itinerary = new Itinerary();
+        itinerary.setId("Test");
+
+        BackEndInterface.get().getEntity(itinerary, new BackEndInterface.OnOperationCompleteListener()
+        {
+            @Override
+            public void onSuccess()
+            {
+
+            }
+
+            @Override
+            public void onError()
+            {
+
+            }
+        });*/
+
         if(loginAttempt != null)
         {
-            loginAttempt.addOnLoginResultListener(new AuthenticationManager.LoginAttempt.OnLoginResultListener()
+            loginAttempt.addOnLoginResultListener(result ->
             {
-                @Override
-                public void onLoginResult(boolean result)
-                {
-                    stopHandler = true;
+                stopHandler = true;
 
-                    if(result)
-                        startActivity(new Intent(SplashScreen.this, MainActivity.class));
-                    else
-                        startActivity(new Intent(SplashScreen.this, LoginActivity.class));
+                if(result)
+                    startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                else
+                    startActivity(new Intent(SplashScreen.this, LoginActivity.class));
 
-                    finish();
-                }
+                finish();
             });
         }
         else

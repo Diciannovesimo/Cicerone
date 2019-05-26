@@ -222,7 +222,7 @@
                     android:id="@+id/description_et"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Inserisci una descrizione del tuo itinerario" />
+                    android:hint="Inserisci una description del tuo itinerario" />
 
             </com.kinda.mtextfield.TextFieldBoxes>
 

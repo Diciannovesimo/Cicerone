@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -12,8 +13,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  *      Interfaces components to FireBase Database,
@@ -86,7 +90,7 @@ public class BackEndInterface
     /**
      *      Calls storeEntity() without callback methods
      */
-    public void storeEntity(StorableEntity entity) { storeField(entity, null); }
+    public void storeEntity(StorableEntity entity) { storeEntity(entity, null); }
 
     /**
      *      Stores an object on the FireBase database, encrypting its values.
@@ -113,7 +117,11 @@ public class BackEndInterface
 
         Map<String, StoredFieldValue> fields = getFields(entity);
 
-        reported = false;
+        Task<Void> resultHandler = null;
+
+        DatabaseReference ref = database.getReference(entityName)
+                .child(id);
+
         for(String fieldName : fields.keySet() )
         {
             StoredFieldValue storedFieldValue = fields.get(fieldName);
@@ -121,77 +129,82 @@ public class BackEndInterface
             if(storedFieldValue == null)
                 continue;
 
-            /*
-                    Check field type
-             */
+            resultHandler = storeValue(ref.child(fieldName), storedFieldValue);
+        }
+
+        if(resultHandler != null)
+        {
+            resultHandler.addOnCompleteListener(task ->
+            {
+                long delay = System.currentTimeMillis() - cTime;
+                Log.i(TAG, "Operation storeEntity(" + entity.getClass().getSimpleName() +
+                        "): stored a field in " + delay + " ms.");
+
+                if(onOperationCompleteListener != null)
+                    onOperationCompleteListener.onSuccess();
+            })
+            .addOnFailureListener(e ->
+            {
+                if(onOperationCompleteListener != null)
+                    onOperationCompleteListener.onError();
+            });
+        }
+    }
+
+    /**
+     *      Stores a single storedFieldValue on database
+     *
+     *      @param ref current root node of database you want to start to store
+     *      @param storedFieldValue field to store.
+     */
+    private Task<Void> storeValue(DatabaseReference ref, StoredFieldValue storedFieldValue)
+    {
+        Task<Void> result = null;
+
+        if(storedFieldValue == null)
+            return result;
+
+        /*
+             Check field type
+         */
+        if(storedFieldValue.isAList())
+        {
+            for(StoredFieldValue sfv : storedFieldValue.getValuesList())
+            {
+                Task<Void> resultTemp = storeValue(ref, sfv);
+
+                if(resultTemp != null)
+                    result = resultTemp;
+            }
+        }
+        else
+        {
             if(storedFieldValue.isSubfield())
             {
                 StorableAsField saf = storedFieldValue.getSubField();
 
+                if(saf == null)
+                    return result;
+
                 Map<String, String> subFields = saf.getSubFields();
                 for(String subFieldName : subFields.keySet())
                 {
-                    DatabaseReference ref = database.getReference(entityName)
-                            .child(id)
-                            .child(fieldName)
-                            .child(saf.getFieldId())
-                            .child(subFieldName);
-
                     String fieldValue = encrypt( subFields.get(subFieldName) );
 
-                    ref.setValue( fieldValue )
-                            .addOnCompleteListener(task ->
-                            {
-                                long delay = System.currentTimeMillis() - cTime;
-                                Log.i(TAG, "Operation storeEntity(" + entity.getClass().getSimpleName() +
-                                        "): stored a field in " + delay + " ms.");
-
-                                if(onOperationCompleteListener != null && ! reported)
-                                {
-                                    onOperationCompleteListener.onSuccess();
-                                    reported = true;
-                                }
-                            })
-                            .addOnFailureListener(e ->
-                            {
-                                if(onOperationCompleteListener != null && ! reported)
-                                {
-                                    onOperationCompleteListener.onError();
-                                    reported = true;
-                                }
-                            });
+                    result = ref.child(saf.getFieldId().replace(".", "~")
+                            .replace("/", "-"))
+                            .child(subFieldName)
+                            .setValue( fieldValue );
                 }
             }
             else
             {
                 String fieldValue = encrypt(storedFieldValue.getValue());
-
-                DatabaseReference ref = database.getReference(entityName)
-                        .child(id)
-                        .child(fieldName);
-                ref.setValue( fieldValue )
-                        .addOnCompleteListener(task ->
-                        {
-                            long delay = System.currentTimeMillis() - cTime;
-                            Log.i(TAG, "Operation storeEntity(" + entity.getClass().getSimpleName() +
-                                    "): stored a field in " + delay + " ms.");
-
-                            if(onOperationCompleteListener != null && ! reported)
-                            {
-                                onOperationCompleteListener.onSuccess();
-                                reported = true;
-                            }
-                        })
-                        .addOnFailureListener(e ->
-                        {
-                            if(onOperationCompleteListener != null && ! reported)
-                            {
-                                onOperationCompleteListener.onError();
-                                reported = true;
-                            }
-                        });
+                result = ref.setValue( fieldValue );
             }
         }
+
+        return result;
     }
 
     /**
@@ -234,16 +247,41 @@ public class BackEndInterface
 
                         StoredFieldValue storedFieldValue = fields.get(fieldName);
 
-                        if(storedFieldValue.isSubfield())
+                        if(storedFieldValue == null || fieldName == null)
+                            continue;
+
+                        if(storedFieldValue.isAList())
                         {
-                            //  TODO: Restore sub-entity
+                            Log.i(TAG, fieldName + ": List detected");
+
+                            if(storedFieldValue.getValuesList() == null)
+                                continue;
+
+                            Log.i(TAG, fieldName + ": List not null");
+
+                            for(StoredFieldValue sfv : storedFieldValue.getValuesList())
+                            {
+                                Log.i(TAG, fieldName + ": into List (" + sfv.toString() + ")");
+
+                                if(sfv.isSubfield())
+                                {
+                                    Log.i(TAG, fieldName + ": put [" + getValue(ds.child(sfv.getSubField().getFieldId()), sfv) + "]");
+
+                                    fields.put(fieldName, new StoredFieldValue(
+                                            getValue(ds.child(sfv.getSubField().getFieldId()), sfv)));
+                                }
+                                else
+                                {
+                                    Log.i(TAG, fieldName + ": put [" + getValue(ds, sfv) + "]");
+
+                                    fields.put(fieldName, new StoredFieldValue(getValue(ds, sfv)));
+                                }
+                            }
                         }
                         else
                         {
-                            String fieldValue = decrypt(ds.getValue(String.class));
-
-                            if(fieldName != null)
-                                fields.put(fieldName, new StoredFieldValue(fieldValue) );
+                            Log.i(TAG, fieldName + ": Just a normal string");
+                            fields.put(fieldName, new StoredFieldValue( getValue(ds, storedFieldValue)) );
                         }
                     }
                     catch (Exception e)
@@ -251,6 +289,14 @@ public class BackEndInterface
                         Log.e(TAG, "getEntity Error: " + e.toString());
                     }
                 }
+
+                Log.i(TAG, "Before");
+                for(String key : fields.keySet())
+                {
+                    if(fields.get(key) != null)
+                        Log.i(TAG, "\"" + key + "\": " + fields.get(key).toString());
+                }
+                Log.i(TAG, "After");
 
                 setFields(entity, fields);
 
@@ -271,6 +317,36 @@ public class BackEndInterface
                     onOperationCompleteListener.onError();
             }
         });
+    }
+
+    private String getValue(DataSnapshot ds, StoredFieldValue storedFieldValue)
+    {
+        String result = "";
+
+        if(storedFieldValue.isSubfield())
+        {
+            StorableAsField saf = storedFieldValue.getSubField();
+
+            if(saf == null)
+                return "";
+
+            for(String key : saf.getSubFields().keySet())
+            {
+                String fieldValue = decrypt(ds.child(key).getValue(String.class));
+
+                if(fieldValue != null)
+                    return fieldValue;
+            }
+        }
+        else
+        {
+            String fieldValue = decrypt(ds.getValue(String.class));
+
+            if(fieldValue != null)
+                return fieldValue;
+        }
+
+        return result;
     }
 
     /**
@@ -529,6 +605,39 @@ public class BackEndInterface
                     continue;
                 }
 
+                if(field.getType().isAssignableFrom(List.class) )
+                {
+                    List<?> values = (List<?>) field.get(entity);
+
+                    if( values != null && ! values.isEmpty())
+                    {
+                        if(values.get(0) instanceof StorableAsField)
+                        {
+                            List<StoredFieldValue> storedFieldValues = new Vector<>();
+
+                            for(Object saf : values)
+                                storedFieldValues.add( new StoredFieldValue((StorableAsField) saf) );
+
+                            result.put(field.getName(), new StoredFieldValue(storedFieldValues) );
+                        }
+                        else
+                        {
+                            List<StoredFieldValue> storedFieldValues = new Vector<>();
+
+                            for(Object obj : values)
+                                storedFieldValues.add( new StoredFieldValue( obj.toString() ) );
+
+                            result.put(field.getName(), new StoredFieldValue(storedFieldValues) );
+                        }
+                    }
+                    else
+                    {
+                        //  TODO: add empty values to support getEntity()
+                    }
+
+                    continue;
+                }
+
                 if( ! field.isSynthetic() && ((entity instanceof Serializable) ||
                         ( ! field.getName().equalsIgnoreCase("serialversionUID")) ))
                 {
@@ -563,6 +672,9 @@ public class BackEndInterface
         for(String fieldName : fields.keySet())
         {
             StoredFieldValue storedFieldValue = fields.get(fieldName);
+
+            if(storedFieldValue == null)
+                continue;
 
             if(storedFieldValue.isSubfield())
             {
@@ -639,8 +751,12 @@ public class BackEndInterface
         private String value;
         /**   SubField value  */
         private StorableAsField subField;
+        /**   List of subfields  */
+        private List<StoredFieldValue> valuesList;
         /**   Used to determinate type of field value  */
         private boolean isSubfield = false;
+        /**   Used to determinate if this field value is a list  */
+        private boolean isAList = false;
 
         public StoredFieldValue(@NonNull String value)
         {
@@ -653,6 +769,14 @@ public class BackEndInterface
             this.subField = subField;
         }
 
+        public StoredFieldValue(@NonNull List<StoredFieldValue> valuesList)
+        {
+            this.valuesList = valuesList;
+            isAList = true;
+            if( ! valuesList.isEmpty())
+                isSubfield = valuesList.get(0).isSubfield;
+        }
+
         public String getValue() {
             return value;
         }
@@ -663,6 +787,26 @@ public class BackEndInterface
 
         public boolean isSubfield() {
             return isSubfield;
+        }
+
+        public List<StoredFieldValue> getValuesList() {
+            return valuesList;
+        }
+
+        public boolean isAList() {
+            return isAList;
+        }
+
+        @Override
+        public String toString()
+        {
+            return "StoredFieldValue{" +
+                    "value='" + value + '\'' +
+                    ", subField=" + subField +
+                    ", valuesList=" + (valuesList != null? Arrays.toString(valuesList.toArray()) : "") +
+                    ", isSubfield=" + isSubfield +
+                    ", isAList=" + isAList +
+                    '}';
         }
     }
 
