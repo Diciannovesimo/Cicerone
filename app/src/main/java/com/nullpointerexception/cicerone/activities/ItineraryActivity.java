@@ -300,14 +300,13 @@ public class ItineraryActivity extends AppCompatActivity {
                         mPuntoIncontro.setText(place.getAddress());
                         break;
                     case 3:
-                        if(mPlace != null)
-                            stage = new Stage(place.getName(), place.getAddress(), place.getLatLng());
+                        stage = new Stage(place.getName(), place.getAddress(), place.getLatLng());
 
-                            mPlace.setText(stage.getAddress());
+                        mPlace.setText(stage.getAddress());
 
-                            if(!mPlaceDesc.getText().toString().isEmpty()) {
-                                stage.setDescription(mPlaceDesc.getText().toString());
-                            }
+                        if(!mPlaceDesc.getText().toString().isEmpty())
+                            stage.setDescription(mPlaceDesc.getText().toString());
+
                         break;
                 }
             }
@@ -329,6 +328,7 @@ public class ItineraryActivity extends AppCompatActivity {
         mAddStage = findViewById(R.id.addStage_btn);
         mData = findViewById(R.id.date_picker);
         mOra = findViewById(R.id.time_picker);
+        mPlace = findViewById(R.id.place_et);
         luogo_box = findViewById(R.id.luogo_box);
         punto_box = findViewById(R.id.punto_box);
         data_box = findViewById(R.id.data_box);
