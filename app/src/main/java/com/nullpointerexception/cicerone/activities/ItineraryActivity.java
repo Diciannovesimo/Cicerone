@@ -33,6 +33,7 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.kinda.mtextfield.ExtendedEditText;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.googleAutocompletationField;
@@ -382,10 +383,20 @@ public class ItineraryActivity extends AppCompatActivity {
 
                 itinerary.setStages(tappeInterface);
 
-                //TODO: Memorizzare l'itinerario nel DB
-                //BackEndInterface.get().storeField(itinerary, );
-                Toast.makeText(getApplicationContext(), "Itinerario creato", Toast.LENGTH_SHORT).show();
-                finish();
+                BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(getApplicationContext(), "Itinerario creato", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                    @Override
+                    public void onError() {
+                        Toast.makeText(getApplicationContext(), "Errore nel caricamento dell'itinerario\nRiprova", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+
             }
 
             return true;
