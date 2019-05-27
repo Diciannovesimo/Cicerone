@@ -37,10 +37,12 @@ import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.googleAutocompletationField;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
 
@@ -371,8 +373,14 @@ public class ItineraryActivity extends AppCompatActivity {
                     itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
 
                 itinerary.setDescription(mDescrizione.getText().toString());
-                //  TODO: Claudio cambia qui, come accordatoci in telefonata !
-                //itinerary.setStages(tappe.values());
+
+                //Creao lista adatta per il passaggio dei dati alla BackEndInterface
+                List<Stage> tappeInterface = new ArrayList<>();
+
+                for (Map.Entry<String, Stage> entry : tappe.entrySet())
+                    tappeInterface.add(entry.getValue());
+
+                itinerary.setStages(tappeInterface);
 
                 //TODO: Memorizzare l'itinerario nel DB
                 //BackEndInterface.get().storeField(itinerary, );
