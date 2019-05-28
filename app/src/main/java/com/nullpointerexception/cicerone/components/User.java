@@ -181,6 +181,12 @@ public class User extends StorableEntity implements StorableAsField
         return map;
     }
 
+    @Override
+    public void restoreId(String id)
+    {
+        this.id = id;
+    }
+
     /**
      *      Implementation of its superclass method.
      *      Restores fields stored before on database.
@@ -221,17 +227,17 @@ public class User extends StorableEntity implements StorableAsField
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) &&
-                Objects.equals(email, user.email) &&
-                Objects.equals(profileImageUrl, user.profileImageUrl) &&
-                Objects.equals(name, user.name) &&
-                Objects.equals(surname, user.surname) &&
-                Objects.equals(dateBirth, user.dateBirth) &&
-                Objects.equals(phoneNumber, user.phoneNumber);
+        return Objects.equals(getId(), user.getId()) &&
+                Objects.equals(getEmail(), user.getEmail()) &&
+                Objects.equals(getProfileImageUrl(), user.getProfileImageUrl()) &&
+                Objects.equals(getName(), user.getName()) &&
+                Objects.equals(getSurname(), user.getSurname()) &&
+                Objects.equals(getDateBirth(), user.getDateBirth()) &&
+                Objects.equals(getPhoneNumber(), user.getPhoneNumber());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, email, profileImageUrl, name, surname, dateBirth, phoneNumber);
+        return Objects.hash(getId(), getEmail(), getProfileImageUrl(), getName(), getSurname(), getDateBirth(), getPhoneNumber());
     }
 }

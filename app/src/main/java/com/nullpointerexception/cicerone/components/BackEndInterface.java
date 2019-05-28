@@ -84,9 +84,6 @@ public class BackEndInterface
         return string;
     }
 
-    /**   Used to show only one time reports, or calling callback methods  */
-    private boolean reported = false;
-
     /**
      *      Calls storeEntity() without callback methods
      */
@@ -115,7 +112,7 @@ public class BackEndInterface
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         String entityName = entity.getClass().getSimpleName().toLowerCase();
 
-        Map<String, StoredFieldValue> fields = getFields(entity);
+        Map<String, FieldValue> fields = getFields(entity);
 
         Task<Void> resultHandler = null;
 
@@ -124,12 +121,12 @@ public class BackEndInterface
 
         for(String fieldName : fields.keySet() )
         {
-            StoredFieldValue storedFieldValue = fields.get(fieldName);
+            FieldValue fieldValue = fields.get(fieldName);
 
-            if(storedFieldValue == null)
+            if(fieldValue == null)
                 continue;
 
-            resultHandler = storeValue(ref.child(fieldName), storedFieldValue);
+            resultHandler = storeValue(ref.child(fieldName), fieldValue);
         }
 
         if(resultHandler != null)
@@ -157,7 +154,7 @@ public class BackEndInterface
      *      @param ref current root node of database you want to start to store
      *      @param storedFieldValue field to store.
      */
-    private Task<Void> storeValue(DatabaseReference ref, StoredFieldValue storedFieldValue)
+    private Task<Void> storeValue(DatabaseReference ref, FieldValue storedFieldValue)
     {
         Task<Void> result = null;
 
@@ -169,7 +166,7 @@ public class BackEndInterface
          */
         if(storedFieldValue.isAList())
         {
-            for(StoredFieldValue sfv : storedFieldValue.getValuesList())
+            for(FieldValue sfv : storedFieldValue.getValuesList())
             {
                 Task<Void> resultTemp = storeValue(ref, sfv);
 
@@ -237,7 +234,7 @@ public class BackEndInterface
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
-                Map<String, StoredFieldValue> fields = getFields(entity);
+                Map<String, FieldValue> fields = getFields(entity);
 
                 for(DataSnapshot ds : dataSnapshot.getChildren())
                 {
@@ -245,43 +242,86 @@ public class BackEndInterface
                     {
                         String fieldName = ds.getKey();
 
-                        StoredFieldValue storedFieldValue = fields.get(fieldName);
+                        FieldValue fieldValue = fields.get(fieldName);
 
-                        if(storedFieldValue == null || fieldName == null)
+                        if(fieldValue == null || fieldName == null)
                             continue;
 
-                        if(storedFieldValue.isAList())
+                        if(fieldValue.isAList())
                         {
                             Log.i(TAG, fieldName + ": List detected");
 
-                            if(storedFieldValue.getValuesList() == null)
-                                continue;
+                            List<FieldValue> fieldValues = new Vector<>();
 
-                            Log.i(TAG, fieldName + ": List not null");
-
-                            for(StoredFieldValue sfv : storedFieldValue.getValuesList())
+                            for(DataSnapshot dsChild1 : ds.getChildren())
                             {
-                                Log.i(TAG, fieldName + ": into List (" + sfv.toString() + ")");
+                                Map<String, String> map = new HashMap<>();
 
-                                if(sfv.isSubfield())
+                                for(DataSnapshot dsChild2 : dsChild1.getChildren())
                                 {
-                                    Log.i(TAG, fieldName + ": put [" + getValue(ds.child(sfv.getSubField().getFieldId()), sfv) + "]");
+                                    String subFieldName = dsChild2.getKey();
 
-                                    fields.put(fieldName, new StoredFieldValue(
-                                            getValue(ds.child(sfv.getSubField().getFieldId()), sfv)));
+                                    if(subFieldName != null)
+                                        map.put(subFieldName, dsChild2.getValue(String.class));
                                 }
-                                else
+
+                                fieldValues.add(new FieldValue(new StorableAsField()
                                 {
-                                    Log.i(TAG, fieldName + ": put [" + getValue(ds, sfv) + "]");
+                                    @Override
+                                    public String getFieldId() { return dsChild1.getKey(); }
 
-                                    fields.put(fieldName, new StoredFieldValue(getValue(ds, sfv)));
-                                }
+                                    @Override
+                                    public Map<String, String> getSubFields()
+                                    {
+                                        return map;
+                                    }
+
+                                    @Override
+                                    public void restoreId(String id) { }
+
+                                    @Override
+                                    public void restoreSubFields(Map<String, String> subFields) { }
+                                }));
                             }
+
+                            fields.put(fieldName, new FieldValue(fieldValues));
+                        }
+                        if(fieldValue.isSubfield())
+                        {
+                            Log.i(TAG, fieldName + ": SubField detected");
+
+                            Map<String, String> map = new HashMap<>();
+
+                            for(DataSnapshot dsChild : ds.getChildren())
+                            {
+                                String subFieldName = dsChild.getKey();
+
+                                if(subFieldName != null)
+                                    map.put(subFieldName, dsChild.getValue(String.class));
+                            }
+
+                            fields.put(fieldName, new FieldValue(new StorableAsField()
+                            {
+                                @Override
+                                public String getFieldId() { return null; }
+
+                                @Override
+                                public Map<String, String> getSubFields()
+                                {
+                                    return map;
+                                }
+
+                                @Override
+                                public void restoreId(String id) { }
+
+                                @Override
+                                public void restoreSubFields(Map<String, String> subFields) { }
+                            }));
                         }
                         else
                         {
                             Log.i(TAG, fieldName + ": Just a normal string");
-                            fields.put(fieldName, new StoredFieldValue( getValue(ds, storedFieldValue)) );
+                            fields.put(fieldName, new FieldValue( getValue(ds, fieldValue)) );
                         }
                     }
                     catch (Exception e)
@@ -290,13 +330,13 @@ public class BackEndInterface
                     }
                 }
 
-                Log.i(TAG, "Before");
+                Log.i(TAG, "Fields Map:");
                 for(String key : fields.keySet())
                 {
                     if(fields.get(key) != null)
                         Log.i(TAG, "\"" + key + "\": " + fields.get(key).toString());
                 }
-                Log.i(TAG, "After");
+                Log.i(TAG, "------------");
 
                 setFields(entity, fields);
 
@@ -319,7 +359,7 @@ public class BackEndInterface
         });
     }
 
-    private String getValue(DataSnapshot ds, StoredFieldValue storedFieldValue)
+    private String getValue(DataSnapshot ds, FieldValue storedFieldValue)
     {
         String result = "";
 
@@ -378,7 +418,7 @@ public class BackEndInterface
 
         String entityName = entity.getClass().getSimpleName().toLowerCase();
 
-        StoredFieldValue storedFieldValue = getFields(entity).get(fieldName);
+        FieldValue storedFieldValue = getFields(entity).get(fieldName);
 
         if(storedFieldValue.isSubfield())
         {
@@ -435,9 +475,12 @@ public class BackEndInterface
 
         final String id = getIdFrom(entity);
 
-        StoredFieldValue storedFieldValue = getFields(entity).get(fieldName);
+        FieldValue fieldValue = getFields(entity).get(fieldName);
 
-        if(storedFieldValue.isSubfield())
+        if(fieldValue == null)
+            return;
+
+        if(fieldValue.isSubfield())
         {
             // TODO: Restore sub-field
         }
@@ -577,9 +620,9 @@ public class BackEndInterface
      *
      *      @return Tha map created containing fields and their values.
      */
-    private Map<String, StoredFieldValue> getFields(StorableEntity entity)
+    private Map<String, FieldValue> getFields(StorableEntity entity)
     {
-        Map<String, StoredFieldValue> result = new HashMap<>();
+        Map<String, FieldValue> result = new HashMap<>();
 
         try
         {
@@ -601,38 +644,41 @@ public class BackEndInterface
                 if(field.getDeclaringClass().isAssignableFrom(StorableAsField.class) )
                 {
                     StorableAsField saf = (StorableAsField) value;
-                    result.put(field.getName(), new StoredFieldValue(saf));
+                    result.put(field.getName(), new FieldValue(saf));
                     continue;
                 }
 
                 if(field.getType().isAssignableFrom(List.class) )
                 {
+                    //Object probe = field.get(entity);
+
                     List<?> values = (List<?>) field.get(entity);
 
                     if( values != null && ! values.isEmpty())
                     {
                         if(values.get(0) instanceof StorableAsField)
                         {
-                            List<StoredFieldValue> storedFieldValues = new Vector<>();
+                            List<FieldValue> fieldValues = new Vector<>();
 
                             for(Object saf : values)
-                                storedFieldValues.add( new StoredFieldValue((StorableAsField) saf) );
+                                fieldValues.add( new FieldValue((StorableAsField) saf) );
 
-                            result.put(field.getName(), new StoredFieldValue(storedFieldValues) );
+                            result.put(field.getName(), new FieldValue(fieldValues) );
                         }
                         else
                         {
-                            List<StoredFieldValue> storedFieldValues = new Vector<>();
+                            List<FieldValue> fieldValues = new Vector<>();
 
                             for(Object obj : values)
-                                storedFieldValues.add( new StoredFieldValue( obj.toString() ) );
+                                fieldValues.add( new FieldValue( obj.toString() ) );
 
-                            result.put(field.getName(), new StoredFieldValue(storedFieldValues) );
+                            result.put(field.getName(), new FieldValue(fieldValues) );
                         }
                     }
                     else
                     {
-                        //  TODO: add empty values to support getEntity()
+                        //  used to let see this field to getEntity()
+                        result.put(field.getName(), new FieldValue(new Vector<>()) );
                     }
 
                     continue;
@@ -642,7 +688,7 @@ public class BackEndInterface
                         ( ! field.getName().equalsIgnoreCase("serialversionUID")) ))
                 {
                     String val = value != null ? value.toString() : "";
-                    result.put(field.getName(), new StoredFieldValue(val) );
+                    result.put(field.getName(), new FieldValue(val) );
                 }
             }
         }
@@ -664,27 +710,69 @@ public class BackEndInterface
      *          keys:       declared fields name, as String
      *          values:     runtime value of field in the current instance of object
      */
-    private void setFields(StorableEntity entity, Map<String, StoredFieldValue> fields)
+    private void setFields(StorableEntity entity, Map<String, FieldValue> fields)
     {
         if(fields == null)
             return;
 
         for(String fieldName : fields.keySet())
         {
-            StoredFieldValue storedFieldValue = fields.get(fieldName);
+            FieldValue fieldValue = fields.get(fieldName);
 
-            if(storedFieldValue == null)
+            if(fieldValue == null)
                 continue;
-
-            if(storedFieldValue.isSubfield())
-            {
-
-                continue;
-            }
 
             try
             {
                 Field field = entity.getClass().getDeclaredField(fieldName);
+
+                if(fieldValue.isAList())
+                {
+
+                    if(fieldValue.getValuesList() != null)
+                    {
+                        for(FieldValue fv : fieldValue.getValuesList())
+                        {
+                            if(fv.isSubfield())
+                            {
+                                StorableAsField saf = fv.getSubField();
+
+                                if(saf == null)
+                                    continue;
+
+                                Object newObject = ((ListOfStorables) entity).addNewInstanceInto(fieldName);
+
+                                if(newObject instanceof StorableAsField)
+                                {
+                                    ((StorableAsField) newObject).restoreSubFields(saf.getSubFields());
+                                    ((StorableAsField) newObject).restoreId(
+                                            saf.getFieldId()
+                                                    .replace("~", ".")
+                                                    .replace("-", "/"));
+                                }
+                            }
+                            else
+                            {
+                                ((List<String>) field.get(entity)).add(fv.getValue());
+                            }
+                        }
+                    }
+
+                    continue;
+                }
+
+                if(fieldValue.isSubfield())
+                {
+
+                    StorableAsField saf = fieldValue.getSubField();
+
+                    if(saf == null)
+                        continue;
+
+                    ((StorableAsField) field.get(entity)).restoreSubFields( saf.getSubFields() );
+
+                    continue;
+                }
 
                 if(field.getClass().isPrimitive())
                 {
@@ -695,28 +783,28 @@ public class BackEndInterface
 
                     if(field.getType().equals(int.class))
                     {
-                        String value = storedFieldValue.getValue();
+                        String value = fieldValue.getValue();
                         if(value != null)
                             field.set(entity, Integer.parseInt(value));
                     }
 
                     if(field.getType().equals(float.class))
                     {
-                        String value = storedFieldValue.getValue();
+                        String value = fieldValue.getValue();
                         if(value != null)
                             field.set(entity, Float.parseFloat(value));
                     }
 
                     if(field.getType().equals(double.class))
                     {
-                        String value = storedFieldValue.getValue();
+                        String value = fieldValue.getValue();
                         if(value != null)
                             field.set(entity, Double.parseDouble(value));
                     }
 
                     if(field.getType().equals(boolean.class))
                     {
-                        String value = storedFieldValue.getValue();
+                        String value = fieldValue.getValue();
                         if(value != null)
                             field.set(entity, Boolean.parseBoolean(value));
                     }
@@ -725,12 +813,12 @@ public class BackEndInterface
                 {
                     if(field.getType().equals(String.class))
                     {
-                        String value = storedFieldValue.getValue();
+                        String value = fieldValue.getValue();
                         if(value != null)
                             field.set(entity, value);
                     }
 
-                    entity.setComplexTypedField(field, storedFieldValue.getValue());
+                    entity.setComplexTypedField(field, fieldValue.getValue());
                 }
             }
             catch (Exception e)
@@ -745,31 +833,31 @@ public class BackEndInterface
      *          -   A String value
      *          -   A sub field, with its own fields.
      */
-    public class StoredFieldValue
+    public class FieldValue
     {
         /**   Simple string value  */
         private String value;
         /**   SubField value  */
         private StorableAsField subField;
         /**   List of subfields  */
-        private List<StoredFieldValue> valuesList;
+        private List<FieldValue> valuesList;
         /**   Used to determinate type of field value  */
         private boolean isSubfield = false;
         /**   Used to determinate if this field value is a list  */
         private boolean isAList = false;
 
-        public StoredFieldValue(@NonNull String value)
+        public FieldValue(@NonNull String value)
         {
             this.value = value;
         }
 
-        public StoredFieldValue(@NonNull StorableAsField subField)
+        public FieldValue(@NonNull StorableAsField subField)
         {
             isSubfield = true;
             this.subField = subField;
         }
 
-        public StoredFieldValue(@NonNull List<StoredFieldValue> valuesList)
+        public FieldValue(@NonNull List<FieldValue> valuesList)
         {
             this.valuesList = valuesList;
             isAList = true;
@@ -789,7 +877,7 @@ public class BackEndInterface
             return isSubfield;
         }
 
-        public List<StoredFieldValue> getValuesList() {
+        public List<FieldValue> getValuesList() {
             return valuesList;
         }
 
@@ -800,7 +888,7 @@ public class BackEndInterface
         @Override
         public String toString()
         {
-            return "StoredFieldValue{" +
+            return "FieldValue{" +
                     "value='" + value + '\'' +
                     ", subField=" + subField +
                     ", valuesList=" + (valuesList != null? Arrays.toString(valuesList.toArray()) : "") +

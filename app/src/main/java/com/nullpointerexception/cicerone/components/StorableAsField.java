@@ -17,6 +17,9 @@ public interface StorableAsField
     /**   Generate a map with couples of (fieldName, fieldValue) that you want to get stored  */
     Map<String, String> getSubFields();
 
+    /**   Restore field used as id on database.  */
+    void restoreId(String id);
+
     /**   It should restore fields with fields map passed as parameters, which have fields in the format
      *    specified with implementation of getSubFields() method. */
     void restoreSubFields(Map<String, String> subFields);

@@ -249,8 +249,7 @@ public class BackEndInterfaceTest
                 TEST2.setId(TEST1.getId());
                 TEST2.setName(TEST1.getName());
 
-
-                BackEndInterface.get().getEntity(TEST1, new BackEndInterface.OnOperationCompleteListener()
+                BackEndInterface.get().getEntity(TEST2, new BackEndInterface.OnOperationCompleteListener()
                 {
                     @Override
                     public void onSuccess()

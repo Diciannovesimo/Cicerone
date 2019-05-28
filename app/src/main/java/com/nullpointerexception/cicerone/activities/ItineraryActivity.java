@@ -382,6 +382,7 @@ public class ItineraryActivity extends AppCompatActivity {
                     tappeInterface.add(entry.getValue());
 
                 itinerary.setStages(tappeInterface);
+                //  TODO: Assegna qui le coordinate dell'itinerario, Claudio!
 
                 BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
                     @Override

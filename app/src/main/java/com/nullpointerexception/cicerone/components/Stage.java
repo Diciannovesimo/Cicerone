@@ -73,6 +73,15 @@ public class Stage implements StorableAsField
     }
 
     @Override
+    public void restoreId(String id)
+    {
+        id = id.replace(" ", "");
+        double lat = Double.parseDouble( id.substring(id.indexOf("(")+1, id.indexOf(",")) );
+        double lng = Double.parseDouble( id.substring(id.indexOf(",")+1, id.indexOf(")")) );
+        this.coordinates = new LatLng(lat, lng);
+    }
+
+    @Override
     public void restoreSubFields(Map<String, String> subFields)
     {
         for(String key : subFields.keySet())

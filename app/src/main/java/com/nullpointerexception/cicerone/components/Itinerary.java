@@ -1,6 +1,7 @@
 package com.nullpointerexception.cicerone.components;
 
 import java.util.List;
+import java.util.Vector;
 
 /**
  *      Itinerary
@@ -9,7 +10,7 @@ import java.util.List;
  *
  *      @author Luca
  */
-public class Itinerary extends StorableEntity
+public class Itinerary extends StorableEntity implements ListOfStorables
 {
     /**   Id of itinerary  */
     protected String id,
@@ -146,5 +147,32 @@ public class Itinerary extends StorableEntity
     public String getId()
     {
         return id;
+    }
+
+    @Override
+    public Object addNewInstanceInto(String fieldName)
+    {
+        if(fieldName.equals("stages"))
+        {
+            Stage stage = new Stage();
+
+            if(stages == null)
+                stages = new Vector<>();
+
+            stages.add(stage);
+            return stage;
+        }
+        else if(fieldName.equals("participants"))
+        {
+            User user = new User();
+
+            if(participants == null)
+                participants = new Vector<>();
+
+            participants.add(user);
+            return user;
+        }
+
+        return null;
     }
 }

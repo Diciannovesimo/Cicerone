@@ -33,8 +33,9 @@ public class HomeFragment extends Fragment
         if(getActivity() != null && ((MainActivity) getActivity()).getSupportActionBar() != null)
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.menu_home);
 
-        ((TextView) view.findViewById(R.id.welcomeText)).setText(
-                "Ciao, " + AuthenticationManager.get().getUserLogged().getName() + " !");
+        if(AuthenticationManager.get().getUserLogged() != null)
+            ((TextView) view.findViewById(R.id.welcomeText)).setText(
+                    "Ciao, " + AuthenticationManager.get().getUserLogged().getName() + " !");
         return view;
     }
 }

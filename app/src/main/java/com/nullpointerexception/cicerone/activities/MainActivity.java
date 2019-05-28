@@ -113,8 +113,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .withActivity(this)
                         .addProfiles
                         (
-                                new ProfileDrawerItem().withName(user.getDisplayName())
-                                        .withEmail(user.getEmail())
+                                new ProfileDrawerItem().withName(user != null? user.getDisplayName(): "")
+                                        .withEmail(user != null? user.getEmail(): "")
                                         .withIcon(getResources().getDrawable(R.drawable.ic_profile))
                         )
                         .withSelectionListEnabled(false)
