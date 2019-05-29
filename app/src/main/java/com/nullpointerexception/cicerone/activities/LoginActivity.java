@@ -222,24 +222,13 @@ public class LoginActivity extends AppCompatActivity
                 Set interaction events
           */
 
-        registrationButton.setOnClickListener(new View.OnClickListener()
+        registrationButton.setOnClickListener(view ->
         {
-            @Override
-            public void onClick(View view)
-            {
-                Intent register_activity = new Intent(getApplicationContext(), RegistrationActivity.class);
-                startActivity(register_activity);
-            }
+            Intent register_activity = new Intent(getApplicationContext(), RegistrationActivity.class);
+            startActivity(register_activity);
         });
 
-        loginButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                checkFields();
-            }
-        });
+        loginButton.setOnClickListener(view -> checkFields());
 
         googleSignInButton.setOnClickListener(new View.OnClickListener()
         {
@@ -364,74 +353,66 @@ public class LoginActivity extends AppCompatActivity
                 Login attempt
          */
         AuthenticationManager.get().login(emailField.getText().toString(), passwordField.getText().toString())
-                .addOnLoginResultListener(new AuthenticationManager.LoginAttempt.OnLoginResultListener()
+                .addOnLoginResultListener(result ->
                 {
-                    @Override
-                    public void onLoginResult(boolean result)
+                    /*
+                            Removes login animation
+                     */
+                    runOnUiThread(() ->
                     {
-                        /*
-                                Removes login animation
-                         */
+                        ViewGroup root1 = (ViewGroup) passwordField.getRootView();
+                        View target = root1.findViewWithTag(LOGIN_ANIMATION_TAG);
+                        if(target != null)
+                            root1.removeView(target);
+                    });
+
+                    loginTimer.cancel();
+
+                    if(result)  //  Login successful
+                    {
+                        BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
+                                new BackEndInterface.OnOperationCompleteListener()
+                                {
+                                    @Override
+                                    public void onSuccess()
+                                    {
+                                        BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
+
+                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onError()
+                                    {
+                                        LoginActivity.this.runOnUiThread(new Runnable()
+                                        {
+                                            @Override
+                                            public void run()
+                                            {
+                                                Toast.makeText(getApplicationContext(),
+                                                        getApplicationContext().getResources().getString(R.string.generic_error),
+                                                        Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                });
+                    }
+                    else        // Login failed
+                    {
                         runOnUiThread(new Runnable()
                         {
                             @Override
                             public void run()
                             {
-                                ViewGroup root = (ViewGroup) passwordField.getRootView();
-                                View target = root.findViewWithTag(LOGIN_ANIMATION_TAG);
-                                if(target != null)
-                                    root.removeView(target);
+                                // Show error message
+                                new KAlertDialog(LoginActivity.this, KAlertDialog.ERROR_TYPE)
+                                        .setTitleText(getResources().getString(R.string.loginDialogText1))
+                                        .setContentText(getResources().getString(R.string.loginDialogText2))
+                                        .setConfirmText("OK")
+                                        .show();
                             }
                         });
-
-                        loginTimer.cancel();
-
-                        if(result)  //  Login successful
-                        {
-                            BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
-                                    new BackEndInterface.OnOperationCompleteListener()
-                                    {
-                                        @Override
-                                        public void onSuccess()
-                                        {
-                                            BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
-
-                                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                            finish();
-                                        }
-
-                                        @Override
-                                        public void onError()
-                                        {
-                                            LoginActivity.this.runOnUiThread(new Runnable()
-                                            {
-                                                @Override
-                                                public void run()
-                                                {
-                                                    Toast.makeText(getApplicationContext(),
-                                                            getApplicationContext().getResources().getString(R.string.generic_error),
-                                                            Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                        }
-                                    });
-                        }
-                        else        // Login failed
-                        {
-                            runOnUiThread(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    // Show error message
-                                    new KAlertDialog(LoginActivity.this, KAlertDialog.ERROR_TYPE)
-                                            .setTitleText(getResources().getString(R.string.loginDialogText1))
-                                            .setContentText(getResources().getString(R.string.loginDialogText2))
-                                            .setConfirmText("OK")
-                                            .show();
-                                }
-                            });
-                        }
                     }
                 });
 

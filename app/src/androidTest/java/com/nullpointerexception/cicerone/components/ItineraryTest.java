@@ -156,7 +156,8 @@ public class ItineraryTest
         e vedere se sono uguali
      */
     @Test
-    public void GetEntityItinerary(){
+    public void GetEntityItinerary()
+    {
         final Itinerary fakeIt = new Itinerary();
         final Itinerary testIt = new Itinerary();
 
@@ -178,7 +179,7 @@ public class ItineraryTest
             }
 
             @Override
-            public void onError() {fail();}
+            public void onError() { fail(); }
         });
 
         BackEndInterface.get().getEntity(testIt, new BackEndInterface.OnOperationCompleteListener() {

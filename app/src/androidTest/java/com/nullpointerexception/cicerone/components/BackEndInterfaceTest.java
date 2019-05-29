@@ -234,27 +234,49 @@ public class BackEndInterfaceTest
     }
 
     @Test
-    public void D_UserTest ()
+    public void getItineraryTest()
     {
-        final User TEST1 = new User();
-        final User TEST2 = new User();
-        TEST1.setId("FAKE_USER_TEST");
-        TEST1.setName(TEST_NAME);
+        Itinerary test = new Itinerary();
+        test.setId("Test");
 
-        BackEndInterface.get().storeEntity(TEST1, new BackEndInterface.OnOperationCompleteListener()
-        {
+        BackEndInterface.get().getEntity(test, new BackEndInterface.OnOperationCompleteListener() {
             @Override
             public void onSuccess()
             {
-                TEST2.setId(TEST1.getId());
-                TEST2.setName(TEST1.getName());
+                assertEquals(test.getParticipants().get(0).getId(), "user1");
+            }
 
-                BackEndInterface.get().getEntity(TEST2, new BackEndInterface.OnOperationCompleteListener()
-                {
+            @Override
+            public void onError()
+            {
+                fail();
+            }
+        });
+    }
+
+    @Test
+    public void storeItineraryTest()
+    {
+        Itinerary test = new Itinerary();
+        test.setId("TestStore");
+        List<Stage> stages = new Vector<>();
+        Stage stage = new Stage();
+        stage.setCoordinates(new LatLng(12.6516, 165.532));
+        stages.add(stage);
+        test.setStages(stages);
+
+        BackEndInterface.get().storeEntity(test, new BackEndInterface.OnOperationCompleteListener() {
+            @Override
+            public void onSuccess()
+            {
+                Itinerary test2 = new Itinerary();
+                test2.setId("TestStore");
+
+                BackEndInterface.get().getEntity(test2, new BackEndInterface.OnOperationCompleteListener() {
                     @Override
                     public void onSuccess()
                     {
-                        assertEquals(TEST2, TEST1);
+                        assertEquals(test2, test);
                     }
 
                     @Override
@@ -265,11 +287,33 @@ public class BackEndInterfaceTest
                 });
             }
 
-                @Override
-                public void onError()
-                {
-                    fail();
-                }
+            @Override
+            public void onError()
+            {
+                fail();
+            }
+        });
+    }
+
+    @Test
+    public void removeItineraryTest()
+    {
+        Itinerary test = new Itinerary();
+        test.setId("TestStore");
+
+        BackEndInterface.get().removeEntity(test, new BackEndInterface.OnOperationCompleteListener()
+        {
+            @Override
+            public void onSuccess()
+            {
+                assertTrue(true);
+            }
+
+            @Override
+            public void onError()
+            {
+                fail();
+            }
         });
     }
 

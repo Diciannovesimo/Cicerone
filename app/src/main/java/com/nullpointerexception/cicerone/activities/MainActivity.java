@@ -20,7 +20,6 @@ import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.User;
@@ -124,20 +123,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         //new DividerDrawerItem(),
                         new SecondaryDrawerItem().withName("Logout").withIdentifier(123)
                 )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+                .withOnDrawerItemClickListener((view, position, drawerItem) ->
                 {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                    if(drawerItem.getIdentifier() == 123)
                     {
-                        if(drawerItem.getIdentifier() == 123)
-                        {
-                            AuthenticationManager.get().logout();
-                            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                            finish();
-                        }
-
-                        return true;
+                        AuthenticationManager.get().logout();
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        finish();
                     }
+
+                    return true;
                 })
                 .build();
     }

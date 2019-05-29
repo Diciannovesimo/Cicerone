@@ -1,6 +1,7 @@
 package com.nullpointerexception.cicerone.components;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 
 /**
@@ -143,6 +144,11 @@ public class Itinerary extends StorableEntity implements ListOfStorables
         this.description = description;
     }
 
+    public void generateId()
+    {
+        id = idCicerone + date + meetingTime;
+    }
+
     @Override
     public String getId()
     {
@@ -174,5 +180,30 @@ public class Itinerary extends StorableEntity implements ListOfStorables
         }
 
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Itinerary itinerary = (Itinerary) o;
+        return Float.compare(itinerary.getPrice(), getPrice()) == 0 &&
+                getMaxParticipants() == itinerary.getMaxParticipants() &&
+                Objects.equals(getId(), itinerary.getId()) &&
+                Objects.equals(getIdCicerone(), itinerary.getIdCicerone()) &&
+                Objects.equals(getLocation(), itinerary.getLocation()) &&
+                Objects.equals(getDate(), itinerary.getDate()) &&
+                Objects.equals(getMeetingPlace(), itinerary.getMeetingPlace()) &&
+                Objects.equals(getMeetingTime(), itinerary.getMeetingTime()) &&
+                Objects.equals(getLanguage(), itinerary.getLanguage()) &&
+                Objects.equals(getCurrency(), itinerary.getCurrency()) &&
+                Objects.equals(getDescription(), itinerary.getDescription()) &&
+                Objects.equals(getStages(), itinerary.getStages()) &&
+                Objects.equals(getParticipants(), itinerary.getParticipants());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getIdCicerone(), getLocation(), getDate(), getMeetingPlace(), getMeetingTime(), getLanguage(), getCurrency(), getDescription(), getPrice(), getMaxParticipants(), getStages(), getParticipants());
     }
 }
