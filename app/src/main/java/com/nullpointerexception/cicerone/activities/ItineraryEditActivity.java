@@ -89,6 +89,7 @@ public class ItineraryEditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_itinerary_edit);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Modifica itinerario");
         setSupportActionBar(toolbar);
 
         //Check if actionbar is initialized
