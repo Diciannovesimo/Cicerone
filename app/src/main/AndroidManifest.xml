@@ -20,7 +20,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.DialogTappe"></activity>
+        <activity
+            android:name=".activities.ItineraryEditActivity"
+            android:label="@string/title_activity_itinerary_edit"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".activities.DialogTappe" />
         <activity
             android:name=".activities.ItineraryActivity"
             android:label="@string/title_activity_itinerary"

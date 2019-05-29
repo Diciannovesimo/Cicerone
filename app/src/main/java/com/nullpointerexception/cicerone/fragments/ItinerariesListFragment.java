@@ -5,19 +5,30 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.activities.ItineraryActivity;
-import com.nullpointerexception.cicerone.activities.LoginActivity;
+import com.nullpointerexception.cicerone.activities.ItineraryEditActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
+import com.nullpointerexception.cicerone.components.Itinerary;
+import com.nullpointerexception.cicerone.components.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItinerariesListFragment extends Fragment
 {
+    //Test things
+    private Button editItinerary_test;
+    private Itinerary testItinerary;
+    private Stage stage1, stage2, stage3;
+    private List<Stage> listPlace_test = new ArrayList<>();
 
     /*
             Views
@@ -45,10 +56,59 @@ public class ItinerariesListFragment extends Fragment
         itinerariesList = view.findViewById(R.id.itinerariesListContainer);
         newItineraryButton = view.findViewById(R.id.newItineraryButton);
 
+        //Inizializzo test
+        editItinerary_test = view.findViewById(R.id.editItinerary_testButton);
+
+        testItinerary = new Itinerary();
+        stage1 = new Stage();
+        stage2 = new Stage();
+        stage3 = new Stage();
+
+        testItinerary.setLocation("Bari");
+        testItinerary.setCurrency("€");
+        testItinerary.setDate("30/5/2019");
+        testItinerary.setDescription("prova");
+        testItinerary.setLanguage("Italiano");
+        testItinerary.setMaxParticipants(10);
+        testItinerary.setMeetingPlace("Corso Cavour, Bari BA, Italy");
+        testItinerary.setMeetingTime("12:7");
+        testItinerary.setPrice(0);
+        testItinerary.setIdCicerone("34CCpLlS9Eb6aTUcOXLvt5gh0cu1");
+        testItinerary.setId("34CCpLlS9Eb6aTUcOXLvt5gh0cu130-5-201912:7");
+
+        stage1.setAddress("Corso Italia, 15, 70122 Bari BA, Italy");
+        stage1.setDescription("prova2");
+        stage1.setName("Multicinema Galleria");
+
+        stage2.setAddress("Corso Cavour, 12, 70122 Bari BA, Italy");
+        stage2.setDescription("prova1");
+        stage2.setName("Teatro Petruzzelli");
+
+        stage3.setAddress("Piazza Mercantile, 70, 70122 Bari BA, Italy");
+        stage3.setDescription("prova");
+        stage3.setName("Column of Shame or Column of Justice");
+
+        listPlace_test.add(stage1);
+        listPlace_test.add(stage2);
+        listPlace_test.add(stage3);
+
+        testItinerary.setStages(listPlace_test);
+
         newItineraryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(view.getContext(), ItineraryActivity.class));
+            }
+        });
+
+        editItinerary_test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), ItineraryEditActivity.class);
+                Gson gson = new Gson();
+                String itineratyJson = gson.toJson(testItinerary);
+                intent.putExtra("test_itinerary", itineratyJson);
+                startActivity(intent);
             }
         });
 

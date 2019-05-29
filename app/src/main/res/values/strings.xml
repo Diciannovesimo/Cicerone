@@ -59,5 +59,6 @@
 
     <!-- Google API -->
     <string name="place_KEY">AIzaSyCoYirGU9t1T1lyAmy_0CsJeH7ikMTZYng</string>
+    <string name="title_activity_itinerary_edit">ItineraryEditActivity</string>
 
 </resources>

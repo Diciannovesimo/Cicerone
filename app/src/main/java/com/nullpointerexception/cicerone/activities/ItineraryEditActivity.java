@@ -30,6 +30,7 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.gson.Gson;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.kinda.alert.KAlertDialog;
 import com.kinda.mtextfield.ExtendedEditText;
@@ -49,9 +50,9 @@ import java.util.Map;
 
 import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
 
-public class ItineraryActivity extends AppCompatActivity {
+public class ItineraryEditActivity extends AppCompatActivity {
 
-    private static final String TAG = "ItineraryActivity";
+    private static final String TAG = "ItineraryEditActivity";
     private EditText mLuogo, mPuntoIncontro, mData, mOra, mMaxPart, mLingua, mPlace, mPlaceDesc;
     private ExtendedEditText mDescrizione;
     private studio.carbonylgroup.textfieldboxes.ExtendedEditText mCompenso;
@@ -60,19 +61,23 @@ public class ItineraryActivity extends AppCompatActivity {
     private TextFieldBoxes luogo_box, punto_box, data_box, orario_box, partecipanti_box, place_box, lingua_box;
     private com.kinda.mtextfield.TextFieldBoxes descrizione_itinerario_box, descrizione_tappa_box;
     private Button create_stage;
-    private List<Place.Field> fields;
-    private Stage stage;
-    private HashMap<String, Stage> tappe = new HashMap<>();
-    private static int AUTOCOMPLETE_REQUEST_CODE = 1;
-    private googleAutocompletationField Google_field;
     private LinearLayout linearLayout;
     private ScrollView scrollView;
     private String currency;
+    private Stage stage;
+    private HashMap<String, Stage> tappe = new HashMap<>();
+    private googleAutocompletationField Google_field;
+
+    private MaterialSpinner spinner;
+
+    private int actual_field;
 
     //Istanza itinerario
     Itinerary itinerary;
 
-    private int actual_field;
+    //Google things
+    private List<Place.Field> fields;
+    private static int AUTOCOMPLETE_REQUEST_CODE = 1;
 
     //Datepicker object
     Calendar calendar;
@@ -82,13 +87,31 @@ public class ItineraryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_itinerary);
+        setContentView(R.layout.activity_itinerary_edit);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Nuovo itinerario");
         setSupportActionBar(toolbar);
+
+        //Check if actionbar is initialized
+        if(getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //Change color of toolbar
+        Window window = getWindow();
+        window.setStatusBarColor(Color.parseColor("#FF5500"));
+
+        //Receiver data from intent
+        Gson gson = new Gson();
+        itinerary = gson.fromJson(getIntent().getStringExtra("test_itinerary"), Itinerary.class);
 
         //Initialize graphic interface
         initUI();
+
+        //Initialize Google Places API
+        Places.initialize(getApplicationContext(), getResources().getString(R.string.place_KEY));
+        fields = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG);
+
+        //Set text in fields
+        setTextField();
 
         //Disable all EditText
         mLuogo.setEnabled(false);
@@ -96,21 +119,6 @@ public class ItineraryActivity extends AppCompatActivity {
         mData.setEnabled(false);
         mOra.setEnabled(false);
 
-        //Change color of toolbar
-        Window window = getWindow();
-        window.setStatusBarColor(Color.parseColor("#FF5500"));
-
-        //Check if actionbar is initialized
-        if(getSupportActionBar() != null)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        //Initialize Google Places API
-        Places.initialize(getApplicationContext(), getResources().getString(R.string.place_KEY));
-        fields = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG);
-
-        //Initialize spinner
-        MaterialSpinner spinner = findViewById(R.id.spinner_valute);
-        spinner.setItems("€ Euro", "$ Dollaro", "£ Sterlina");
         mCompenso.setPrefix("€ ");
         currency = "€";
         spinner.setOnItemSelectedListener((MaterialSpinner.OnItemSelectedListener<String>) (view, position, id, item) -> {
@@ -131,6 +139,7 @@ public class ItineraryActivity extends AppCompatActivity {
             }
         });
 
+
         //Listener
         data_box.setOnClickListener(v -> {
             calendar = Calendar.getInstance();
@@ -150,7 +159,7 @@ public class ItineraryActivity extends AppCompatActivity {
             int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
             int minute = mcurrentTime.get(Calendar.MINUTE);
             TimePickerDialog mTimePicker;
-            mTimePicker = new TimePickerDialog(ItineraryActivity.this, R.style.DialogTheme, (timePicker, selectedHour, selectedMinute) -> {
+            mTimePicker = new TimePickerDialog(ItineraryEditActivity.this, R.style.DialogTheme, (timePicker, selectedHour, selectedMinute) -> {
                 String text = "";
                 text += selectedHour;
                 text += ":";
@@ -167,7 +176,7 @@ public class ItineraryActivity extends AppCompatActivity {
         });
 
         mAddStage.setOnClickListener(v -> {
-            AlertDialog.Builder mBuilder = new AlertDialog.Builder(ItineraryActivity.this);
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(ItineraryEditActivity.this);
             View mView = getLayoutInflater().inflate(R.layout.activity_dialog_tappe, null);
 
             descrizione_tappa_box = mView.findViewById(R.id.text_desc_boxes);
@@ -293,7 +302,6 @@ public class ItineraryActivity extends AppCompatActivity {
                 descrizione_itinerario_box.setError("Superato numero massimo caratteri", true);
             }
         });
-
     }
 
     @Override
@@ -353,6 +361,14 @@ public class ItineraryActivity extends AppCompatActivity {
         errorMsg_tv = findViewById(R.id.errorMsg_tv);
     }
 
+    private boolean placeAlreadyExist(String field) {
+        for (Map.Entry<String, Stage> entry : tappe.entrySet()) {
+            if(field.equals(entry.getValue().getAddress()))
+                return true;
+        }
+        return false;
+    }
+
     //Impostazioni menù
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -361,6 +377,53 @@ public class ItineraryActivity extends AppCompatActivity {
         inflater.inflate(R.menu.menu_itinerary, menu);
 
         return true;
+    }
+
+    private boolean checkField() {
+        boolean alright = true;
+
+        if(mLuogo.getText().toString().isEmpty()) {
+            luogo_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(mPuntoIncontro.getText().toString().isEmpty()) {
+            punto_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(mData.getText().toString().isEmpty()) {
+            data_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(mOra.getText().toString().isEmpty()) {
+            orario_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(mMaxPart.getText().toString().isEmpty()) {
+            partecipanti_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(mLingua.getText().toString().isEmpty()) {
+            lingua_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(mDescrizione.getText().toString().isEmpty()) {
+            descrizione_itinerario_box.setError("Il campo non può essere vuoto", false);
+            alright = false;
+        }
+
+        if(tappe.size() == 0) {
+            listStage_title.setVisibility(View.GONE);
+            errorMsg_tv.setVisibility(View.VISIBLE);
+            alright = false;
+        }
+
+        return alright;
     }
 
     @Override
@@ -417,59 +480,61 @@ public class ItineraryActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean checkField() {
-        boolean alright = true;
+    private void setTextField() {
+        mLuogo.setText(itinerary.getLocation());
+        mPuntoIncontro.setText(itinerary.getMeetingPlace());
+        mData.setText(itinerary.getDate());
+        mOra.setText(itinerary.getMeetingTime());
+        mLingua.setText(itinerary.getLanguage());
+        mMaxPart.setText(String.valueOf(itinerary.getMaxParticipants()));
+        mCompenso.setText(String.valueOf(itinerary.getPrice()));
+        mCompenso.setPrefix(itinerary.getCurrency() + " ");
 
-        if(mLuogo.getText().toString().isEmpty()) {
-            luogo_box.setError("Il campo non può essere vuoto", false);
-            alright = false;
+        //Initialize spinner
+        spinner = findViewById(R.id.spinner_valute);
+        spinner.setItems("€ Euro", "$ Dollaro", "£ Sterlina");
+        switch (itinerary.getCurrency()) {
+            case "€":
+                spinner.setSelectedIndex(0);
+                break;
+            case "$":
+                spinner.setSelectedIndex(1);
+                break;
+            case "£":
+                spinner.setSelectedIndex(2);
+                break;
         }
 
-        if(mPuntoIncontro.getText().toString().isEmpty()) {
-            punto_box.setError("Il campo non può essere vuoto", false);
-            alright = false;
-        }
+        mDescrizione.setText(itinerary.getDescription());
 
-        if(mData.getText().toString().isEmpty()) {
-            data_box.setError("Il campo non può essere vuoto", false);
-            alright = false;
-        }
+        for(int i = 0; i < itinerary.getStages().size(); ++i)
+            tappe.put(itinerary.getStages().get(i).getName(), itinerary.getStages().get(i));
 
-        if(mOra.getText().toString().isEmpty()) {
-            orario_box.setError("Il campo non può essere vuoto", false);
-            alright = false;
-        }
+        //Creo nuovi Layout tappe
+        if(tappe.size() > 0) {
+            listStage_title.setVisibility(View.INVISIBLE);
 
-        if(mMaxPart.getText().toString().isEmpty()) {
-            partecipanti_box.setError("Il campo non può essere vuoto", false);
-            alright = false;
-        }
+            for (Map.Entry<String, Stage> entry : tappe.entrySet()) {
+                View newPlace = getLayoutInflater().inflate(R.layout.stage_layout, null);
+                placeDescription_tv = newPlace.findViewById(R.id.placeDescription_tv);
+                placeName_tv = newPlace.findViewById(R.id.placeName_tv);
+                mRemoveStage = newPlace.findViewById(R.id.mRemoveStage);
 
-        if(mLingua.getText().toString().isEmpty()) {
-            lingua_box.setError("Il campo non può essere vuoto", false);
-            alright = false;
-        }
+                placeName_tv.setText(entry.getValue().getName());
+                placeDescription_tv.setText(entry.getValue().getDescription());
 
-        if(mDescrizione.getText().toString().isEmpty()) {
-            descrizione_itinerario_box.setError("Il campo non può essere vuoto", false);
-            alright = false;
-        }
+                newPlace.setTag(entry.getValue().getName());
 
-        if(tappe.size() == 0) {
-            listStage_title.setVisibility(View.GONE);
-            errorMsg_tv.setVisibility(View.VISIBLE);
-            alright = false;
-        }
+                mRemoveStage.setOnClickListener(v13 -> {
+                    tappe.remove(newPlace.getTag());
+                    linearLayout.removeView(newPlace);
+                });
 
-        return alright;
+                linearLayout.addView(newPlace, 0);
+            }
+        }else {
+            listStage_title.setVisibility(View.INVISIBLE);
+        }
     }
 
-    private boolean placeAlreadyExist(String field) {
-        for (Map.Entry<String, Stage> entry : tappe.entrySet()) {
-            if(field.equals(entry.getValue().getAddress()))
-                return true;
-        }
-         return false;
-    }
 }
-

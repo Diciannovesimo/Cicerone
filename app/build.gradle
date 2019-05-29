@@ -128,6 +128,9 @@ dependencies
             implementation "androidx.annotation:annotation:1.0.2"
             implementation "com.google.android.material:material:1.0.0"
 
+            //Json Google library
+            implementation 'com.google.code.gson:gson:2.8.4'
+
         }
 
 apply plugin: 'com.google.gms.google-services'
@@ -136,7 +139,8 @@ apply plugin: "org.sonarqube"
 
 sonarqube {
     properties {
-        def libraries = project.android.sdkDirectory.getPath() + "/platforms/android-23/android.jar"/* + ", build/intermediates/exploded-aar*//**//*classes.jar"*/
+        def libraries = project.android.sdkDirectory.getPath() + "/platforms/android-23/android.jar"
+/* + ", build/intermediates/exploded-aar*//**//*classes.jar"*/
         property "sonar.projectName", "Cicerone"
         property "sonar.projectKey", "com.nullpointerexception.cicerone"
         property "sonar.host.url", "http://localhost:9000"
