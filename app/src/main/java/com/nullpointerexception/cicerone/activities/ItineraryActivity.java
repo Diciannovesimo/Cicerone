@@ -31,6 +31,7 @@ import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.kinda.alert.KAlertDialog;
 import com.kinda.mtextfield.ExtendedEditText;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
@@ -204,22 +205,36 @@ public class ItineraryActivity extends AppCompatActivity {
 
             create_stage.setOnClickListener(v12 -> {
                 if(mPlaceDesc.getText().toString().length() > 250) {
+
                     descrizione_tappa_box.setError("Inserisci una descrizione più corta", false);
+
                 }else if(mPlaceDesc.getText().toString().isEmpty()) {
 
                     descrizione_tappa_box.setError("Descrizione obligatoria", false);
 
-                    if(mPlace.getText().toString().isEmpty()) {
-                        place_box.setError("Nome stage obligatoria", false);
-                    }
-                }else {
+                }else if(mPlace.getText().toString().isEmpty()) {
 
+                    place_box.setError("Nome stage obligatoria", false);
+
+                }else if(placeAlreadyExist(mPlace.getText().toString())){
+
+                    runOnUiThread(() -> {
+                        // Show error message
+                        new KAlertDialog(mView.getContext(), KAlertDialog.ERROR_TYPE)
+                                .setTitleText("Nome tappa già esistente")
+                                .setContentText("È impossibile inserire due tappe uguali")
+                                .setConfirmText("OK")
+                                .show();
+                    });
+
+                }else{
                     if(errorMsg_tv.getVisibility() == View.VISIBLE)
                         errorMsg_tv.setVisibility(View.GONE);
 
                     listStage_title.setVisibility(View.GONE);
-                    View newPlace = getLayoutInflater().inflate(R.layout.stage_layout, null);
 
+                    //Creo nuovo Layout
+                    View newPlace = getLayoutInflater().inflate(R.layout.stage_layout, null);
                     placeDescription_tv = newPlace.findViewById(R.id.placeDescription_tv);
                     placeName_tv = newPlace.findViewById(R.id.placeName_tv);
                     mRemoveStage = newPlace.findViewById(R.id.mRemoveStage);
@@ -376,13 +391,12 @@ public class ItineraryActivity extends AppCompatActivity {
                 itinerary.setDescription(mDescrizione.getText().toString());
 
                 //Creao lista adatta per il passaggio dei dati alla BackEndInterface
-                List<Stage> tappeInterface = new ArrayList<>();
+                List<Stage> placeInterface = new ArrayList<>();
 
                 for (Map.Entry<String, Stage> entry : tappe.entrySet())
-                    tappeInterface.add(entry.getValue());
+                    placeInterface.add(entry.getValue());
 
-                itinerary.setStages(tappeInterface);
-                //  TODO: Assegna qui le coordinate dell'itinerario, Claudio!
+                itinerary.setStages(placeInterface);
 
                 BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
                     @Override
@@ -452,5 +466,12 @@ public class ItineraryActivity extends AppCompatActivity {
         return alright;
     }
 
+    private boolean placeAlreadyExist(String field) {
+        for (Map.Entry<String, Stage> entry : tappe.entrySet()) {
+            if(field.equals(entry.getValue().getAddress()))
+                return true;
+        }
+         return false;
+    }
 }
 
