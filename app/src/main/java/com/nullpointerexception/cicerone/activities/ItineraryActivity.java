@@ -34,6 +34,7 @@ import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.kinda.alert.KAlertDialog;
 import com.kinda.mtextfield.ExtendedEditText;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.Stage;
@@ -384,6 +385,8 @@ public class ItineraryActivity extends AppCompatActivity {
                 itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
                 itinerary.setLanguage(mLingua.getText().toString().trim());
                 itinerary.setCurrency(currency);
+                itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
+                itinerary.generateId();
 
                 if(!mCompenso.getText().toString().equals(""))
                     itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));

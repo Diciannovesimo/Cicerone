@@ -147,6 +147,7 @@ public class Itinerary extends StorableEntity implements ListOfStorables
     public void generateId()
     {
         id = idCicerone + date + meetingTime;
+        id = id.replace("/", "-").replace(".", "~");
     }
 
     @Override
