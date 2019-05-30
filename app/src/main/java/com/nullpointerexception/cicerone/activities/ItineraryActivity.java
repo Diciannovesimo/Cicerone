@@ -476,5 +476,12 @@ public class ItineraryActivity extends AppCompatActivity {
         }
          return false;
     }
+
+    @Override
+    public boolean onSupportNavigateUp()
+    {
+        finish();
+        return super.onSupportNavigateUp();
+    }
 }
 
