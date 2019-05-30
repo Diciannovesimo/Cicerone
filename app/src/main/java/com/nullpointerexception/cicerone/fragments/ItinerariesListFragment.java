@@ -10,12 +10,14 @@ import android.widget.Button;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.activities.ItineraryActivity;
 import com.nullpointerexception.cicerone.activities.ItineraryEditActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
+import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.Stage;
 
@@ -73,20 +75,23 @@ public class ItinerariesListFragment extends Fragment
         testItinerary.setMeetingPlace("Corso Cavour, Bari BA, Italy");
         testItinerary.setMeetingTime("12:7");
         testItinerary.setPrice(0);
-        testItinerary.setIdCicerone("34CCpLlS9Eb6aTUcOXLvt5gh0cu1");
-        testItinerary.setId("34CCpLlS9Eb6aTUcOXLvt5gh0cu130-5-201912:7");
+        testItinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
+        testItinerary.generateId();
 
         stage1.setAddress("Corso Italia, 15, 70122 Bari BA, Italy");
         stage1.setDescription("prova2");
         stage1.setName("Multicinema Galleria");
+        stage1.setCoordinates(new LatLng(41.1187193, 16.8664923));
 
         stage2.setAddress("Corso Cavour, 12, 70122 Bari BA, Italy");
         stage2.setDescription("prova1");
         stage2.setName("Teatro Petruzzelli");
+        stage2.setCoordinates(new LatLng(41.123568, 16.8709473));
 
         stage3.setAddress("Piazza Mercantile, 70, 70122 Bari BA, Italy");
         stage3.setDescription("prova");
         stage3.setName("Column of Shame or Column of Justice");
+        stage3.setCoordinates(new LatLng(41.128064, 16.8699213));
 
         listPlace_test.add(stage1);
         listPlace_test.add(stage2);

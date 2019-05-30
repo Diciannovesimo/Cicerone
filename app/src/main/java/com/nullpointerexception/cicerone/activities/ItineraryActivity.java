@@ -369,24 +369,24 @@ public class ItineraryActivity extends AppCompatActivity {
 
         if(id == R.id.createItinerary) {
 
-            itinerary = new Itinerary();
+            Itinerary new_itinerary = new Itinerary();
 
             if(checkField()) {
                 //Inserimento specifiche nell'itinerario
-                itinerary.setLocation(mLuogo.getText().toString());
-                itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
-                itinerary.setDate(mData.getText().toString());
-                itinerary.setMeetingTime(mOra.getText().toString());
-                itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
-                itinerary.setLanguage(mLingua.getText().toString().trim());
-                itinerary.setCurrency(currency);
-                itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
-                itinerary.generateId();
+                new_itinerary.setLocation(mLuogo.getText().toString());
+                new_itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
+                new_itinerary.setDate(mData.getText().toString());
+                new_itinerary.setMeetingTime(mOra.getText().toString());
+                new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
+                new_itinerary.setLanguage(mLingua.getText().toString().trim());
+                new_itinerary.setCurrency(currency);
+                new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
+                new_itinerary.generateId();
 
                 if(!mCompenso.getText().toString().equals(""))
-                    itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
+                    new_itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
 
-                itinerary.setDescription(mDescrizione.getText().toString());
+                new_itinerary.setDescription(mDescrizione.getText().toString());
 
                 //Creao lista adatta per il passaggio dei dati alla BackEndInterface
                 List<Stage> placeInterface = new ArrayList<>();
@@ -394,13 +394,20 @@ public class ItineraryActivity extends AppCompatActivity {
                 for (Map.Entry<String, Stage> entry : tappe.entrySet())
                     placeInterface.add(entry.getValue());
 
-                itinerary.setStages(placeInterface);
+                new_itinerary.setStages(placeInterface);
 
-                BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
                     @Override
                     public void onSuccess() {
-                        Toast.makeText(getApplicationContext(), "Itinerario creato", Toast.LENGTH_SHORT).show();
-                        finish();
+                        Log.d(TAG, "Entrato in onSucces");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Itinerario creato", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        });
+
                     }
 
                     @Override
