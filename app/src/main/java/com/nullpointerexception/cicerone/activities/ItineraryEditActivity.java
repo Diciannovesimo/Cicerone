@@ -254,7 +254,7 @@ public class ItineraryEditActivity extends AppCompatActivity {
                         tappe.remove(newPlace.getTag());
                         linearLayout.removeView(newPlace);
 
-                        if(listStage_title.getVisibility() == View.GONE)
+                        if(listStage_title.getVisibility() == View.GONE && tappe.size() == 0)
                             listStage_title.setVisibility(View.VISIBLE);
                     });
 
@@ -431,7 +431,7 @@ public class ItineraryEditActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.createItinerary) {
+        if(id == R.id.createItinerary && tappe.size() > 0) {
 
             BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
                 @Override
@@ -486,10 +486,13 @@ public class ItineraryEditActivity extends AppCompatActivity {
                 }
             });
 
-
-
             return true;
+        } else if(id == R.id.createItinerary){
+            Toast.makeText(getApplicationContext(), "Deve essere presente almeno una tappa", Toast.LENGTH_SHORT).show();
+            errorMsg_tv.setVisibility(View.VISIBLE);
+            listStage_title.setVisibility(View.GONE);
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -525,7 +528,7 @@ public class ItineraryEditActivity extends AppCompatActivity {
 
         //Creo nuovi Layout tappe
         if(tappe.size() > 0) {
-            listStage_title.setVisibility(View.INVISIBLE);
+            listStage_title.setVisibility(View.GONE);
 
             for (Map.Entry<String, Stage> entry : tappe.entrySet()) {
                 View newPlace = getLayoutInflater().inflate(R.layout.stage_layout, null);
@@ -541,13 +544,22 @@ public class ItineraryEditActivity extends AppCompatActivity {
                 mRemoveStage.setOnClickListener(v13 -> {
                     tappe.remove(newPlace.getTag());
                     linearLayout.removeView(newPlace);
+
+                    if(listStage_title.getVisibility() == View.GONE && tappe.size() == 0)
+                        listStage_title.setVisibility(View.VISIBLE);
                 });
 
                 linearLayout.addView(newPlace, 0);
             }
         }else {
-            listStage_title.setVisibility(View.INVISIBLE);
+            listStage_title.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return super.onSupportNavigateUp();
     }
 
 }

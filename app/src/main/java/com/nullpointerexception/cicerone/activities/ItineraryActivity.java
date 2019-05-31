@@ -244,7 +244,7 @@ public class ItineraryActivity extends AppCompatActivity {
                         tappe.remove(newPlace.getTag());
                         linearLayout.removeView(newPlace);
 
-                        if(listStage_title.getVisibility() == View.GONE)
+                        if(listStage_title.getVisibility() == View.GONE && tappe.size() == 0)
                             listStage_title.setVisibility(View.VISIBLE);
                     });
 
