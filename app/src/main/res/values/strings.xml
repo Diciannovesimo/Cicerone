@@ -47,6 +47,25 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
+    <!-- ItinerayEditActivity -->
+    <string name="ItinerayEditActivity_Title">Modifica itinerario</string>
+    <string name="max_char">Superato numero massimo caratteri</string>
+    <string name="insert_shorter_desc">Inserisci una descrizione più corta</string>
+    <string name="no_desc">Descrizione obligatoria</string>
+    <string name="no_place_name">Nome tappa obligatoria</string>
+    <string name="error_dialog_title">Nome tappa già esistente</string>
+    <string name="error_dialog_content">"È impossibile inserire due tappe uguali</string>
+    <string name="error_dialog_confirmText">OK</string>
+    <string name="succes_edit_toast">Itinerario modificato</string>
+    <string name="failure_edit_toast">Errore nel caricamento dell\'itinerario&lt;br /&gt;Riprova</string>
+    <string name="connection_error">Problema di connessione col server</string>
+    <string name="no_places">Deve essere presente almeno una tappa</string>
+    <string name="no_empty_field">Il campo non può essere vuoto</string>
+
+    <!-- ItinerayActivity -->
+    <string name="ItinerayActivity_Title">Modifica itinerario</string>
+    <string name="succes_create_itinerary_toast">Itinerario creato</string>
+
     <string name="menu_home">Home</string>
     <string name="menu_itineraries_list">I tuoi itinerari</string>
     <string name="menu_trips_list">I tuoi viaggi</string>
@@ -60,5 +79,8 @@
     <!-- Google API -->
     <string name="place_KEY">AIzaSyCoYirGU9t1T1lyAmy_0CsJeH7ikMTZYng</string>
     <string name="title_activity_itinerary_edit">ItineraryEditActivity</string>
+
+    <!-- ItinerayEditActivity -->
+    <string name="time_picker">Scegli l\'ora</string>
 
 </resources>

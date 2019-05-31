@@ -17,6 +17,15 @@
         android:textAlignment="center"
         android:textSize="30sp" />
 
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="5dp"
+        android:text="Inserisci il luogo e una breve descrizione della tappa"
+        android:textAlignment="center" />
+
     <View
         android:id="@+id/divider3"
         android:layout_width="match_parent"
