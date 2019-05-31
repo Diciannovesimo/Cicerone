@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +19,7 @@ import com.nullpointerexception.cicerone.activities.ItineraryActivity;
 import com.nullpointerexception.cicerone.activities.ItineraryEditActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.Stage;
 
@@ -27,7 +29,7 @@ import java.util.List;
 public class ItinerariesListFragment extends Fragment
 {
     //Test things
-    private Button editItinerary_test;
+    private Button editItinerary_test, createItinerary_test;
     private Itinerary testItinerary;
     private Stage stage1, stage2, stage3;
     private List<Stage> listPlace_test = new ArrayList<>();
@@ -60,6 +62,7 @@ public class ItinerariesListFragment extends Fragment
 
         //Inizializzo test
         editItinerary_test = view.findViewById(R.id.editItinerary_testButton);
+        createItinerary_test = view.findViewById(R.id.createItinerary_testButton);
 
         testItinerary = new Itinerary();
         stage1 = new Stage();
@@ -68,7 +71,7 @@ public class ItinerariesListFragment extends Fragment
 
         testItinerary.setLocation("Bari");
         testItinerary.setCurrency("€");
-        testItinerary.setDate("30/5/2019");
+        testItinerary.setDate("31/5/2019");
         testItinerary.setDescription("prova");
         testItinerary.setLanguage("Italiano");
         testItinerary.setMaxParticipants(10);
@@ -114,6 +117,23 @@ public class ItinerariesListFragment extends Fragment
                 String itineratyJson = gson.toJson(testItinerary);
                 intent.putExtra("test_itinerary", itineratyJson);
                 startActivity(intent);
+            }
+        });
+
+        createItinerary_test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BackEndInterface.get().storeEntity(testItinerary, new BackEndInterface.OnOperationCompleteListener() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(getContext(), "Nodo creato", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError() {
+                        Toast.makeText(getContext(), "ERRORE: Nodo non creato", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 

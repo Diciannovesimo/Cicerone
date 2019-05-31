@@ -126,7 +126,10 @@ public class BackEndInterface
             if(fieldValue == null)
                 continue;
 
-            resultHandler = storeValue(ref.child(fieldName), fieldValue);
+            Task<Void> resultHandler2 = storeValue(ref.child(fieldName), fieldValue);
+
+            if(resultHandler2 != null)
+                resultHandler = resultHandler2;
         }
 
         if(resultHandler != null)
