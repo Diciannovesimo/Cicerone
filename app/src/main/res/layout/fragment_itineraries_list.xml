@@ -6,26 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".fragments.ItinerariesListFragment">
 
-    <Button
-        android:id="@+id/createItinerary_testButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="56dp"
-        android:text="Crea tappa"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/editItinerary_testButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="Modifica tappa"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <LinearLayout
         android:id="@+id/noItineraries"
         android:layout_width="wrap_content"

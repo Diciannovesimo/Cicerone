@@ -38,6 +38,7 @@ import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Itinerary;
+import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.googleAutocompletationField;
 
@@ -469,15 +470,17 @@ public class ItineraryActivity extends AppCompatActivity {
             new_itinerary.setStages(placeInterface);
 
             //Load the itinerary on Firebase DB
-            BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
+            BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener()
+            {
                 @Override
-                public void onSuccess() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
+                public void onSuccess()
+                {
+                    ObjectSharer.get().shareObject("new_itinerary", new_itinerary);
+
+                    runOnUiThread(() ->
+                    {
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
+                        finish();
                     });
 
                 }
@@ -552,7 +555,8 @@ public class ItineraryActivity extends AppCompatActivity {
      * @param coordinates The name of the Place
      * @return true if the field already exist, false if the place doesn't exist
      */
-    private boolean placeAlreadyExist(LatLng coordinates) {
+    private boolean placeAlreadyExist(LatLng coordinates)
+    {
         for (Map.Entry<String, Stage> entry : tappe.entrySet()) {
             if(coordinates.equals(entry.getValue().getCoordinates()))
                 return true;
@@ -561,7 +565,8 @@ public class ItineraryActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
+    public boolean onSupportNavigateUp()
+    {
         finish();
         return super.onSupportNavigateUp();
     }

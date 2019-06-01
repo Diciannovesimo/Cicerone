@@ -58,7 +58,8 @@ import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
  *
  * @author Claudio
  */
-public class ItineraryEditActivity extends AppCompatActivity {
+public class ItineraryEditActivity extends AppCompatActivity
+{
 
     private static final String TAG = "ItineraryEditActivity";
     private EditText mLuogo, mPuntoIncontro, mData, mOra, mMaxPart, mLingua, mPlace, mPlaceDesc;

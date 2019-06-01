@@ -80,7 +80,8 @@ public class Itinerary extends StorableEntity implements ListOfStorables
         this.meetingPlace = meetingPlace;
     }
 
-    public String getMeetingTime() {
+    public String getMeetingTime()
+    {
         return meetingTime;
     }
 
