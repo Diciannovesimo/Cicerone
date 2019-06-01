@@ -78,10 +78,16 @@ public class ItineraryActivity extends AppCompatActivity {
     private ScrollView scrollView;
     private String currency;
 
+    private MaterialSpinner spinner;
+
     //Istanza itinerario
-    Itinerary itinerary;
+    private Itinerary itinerary;
 
     private int actual_field;
+
+    private boolean edit_mode = false;
+
+    //
 
     //Datepicker object
     Calendar calendar;
@@ -117,8 +123,15 @@ public class ItineraryActivity extends AppCompatActivity {
         Places.initialize(getApplicationContext(), getResources().getString(R.string.place_KEY));
         fields = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG);
 
+        //Receiver data from intent if the user wants to edit an itinerary
+        if(ObjectSharer.get().getSharedObject("edit_itinerary") != null) {
+            edit_mode = true;
+            itinerary = (Itinerary)ObjectSharer.get().getSharedObject("edit_itinerary");
+            setTextField(itinerary);
+        }
+
         //Initialize spinner
-        MaterialSpinner spinner = findViewById(R.id.spinner_valute);
+        spinner = findViewById(R.id.spinner_valute);
         spinner.setItems("€ Euro", "$ Dollaro", "£ Sterlina");
         mCompenso.setPrefix("€ ");
         currency = "€";
@@ -442,57 +455,111 @@ public class ItineraryActivity extends AppCompatActivity {
 
         if(checkField() && id == R.id.createItinerary && tappe.size() > 0) {
 
-            //New itinerary, ready to be loaded on Firebase DB
-            Itinerary new_itinerary = new Itinerary();
+            if(!edit_mode) {
+                //New itinerary, ready to be loaded on Firebase DB
+                Itinerary new_itinerary = new Itinerary();
 
-            //Inserimento specifiche nell'itinerario
-            new_itinerary.setLocation(mLuogo.getText().toString());
-            new_itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
-            new_itinerary.setDate(mData.getText().toString());
-            new_itinerary.setMeetingTime(mOra.getText().toString());
-            if( ! mMaxPart.getText().toString().isEmpty())
+                //Inserimento specifiche nell'itinerario
+                new_itinerary.setLocation(mLuogo.getText().toString());
+                new_itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
+                new_itinerary.setDate(mData.getText().toString());
+                new_itinerary.setMeetingTime(mOra.getText().toString());
                 new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
-            new_itinerary.setLanguage(mLingua.getText().toString().trim());
-            new_itinerary.setCurrency(currency);
-            new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
-            new_itinerary.generateId();
+                new_itinerary.setLanguage(mLingua.getText().toString().trim());
+                new_itinerary.setCurrency(currency);
+                new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
+                new_itinerary.generateId();
 
-            if(!mCompenso.getText().toString().equals(""))
-                new_itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
+                if (!mCompenso.getText().toString().equals(""))
+                    new_itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
 
-            new_itinerary.setDescription(mDescrizione.getText().toString());
+                new_itinerary.setDescription(mDescrizione.getText().toString());
 
-            //Creao lista adatta per il passaggio dei dati alla BackEndInterface
-            List<Stage> placeInterface = new ArrayList<>();
+                //Creao lista adatta per il passaggio dei dati alla BackEndInterface
+                List<Stage> placeInterface = new ArrayList<>();
 
-            for (Map.Entry<String, Stage> entry : tappe.entrySet())
-                placeInterface.add(entry.getValue());
+                for (Map.Entry<String, Stage> entry : tappe.entrySet())
+                    placeInterface.add(entry.getValue());
 
-            new_itinerary.setStages(placeInterface);
+                new_itinerary.setStages(placeInterface);
 
-            //Load the itinerary on Firebase DB
-            BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener()
-            {
-                @Override
-                public void onSuccess()
-                {
-                    ObjectSharer.get().shareObject("new_itinerary", new_itinerary);
+                //Load the itinerary on Firebase DB
+                BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                    @Override
+                    public void onSuccess() {
+                        //Share new itinerary
+                        ObjectSharer.get().shareObject("new_itinerary", new_itinerary);
 
-                    runOnUiThread(() ->
-                    {
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
-                        finish();
-                    });
+                        //Delete received itinerary
+                        ObjectSharer.get().remove("edit_itinerary");
 
-                }
+                        runOnUiThread(() ->
+                        {
+                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
+                            finish();
+                        });
 
-                @Override
-                public void onError() {
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
+                    }
 
-                }
-            });
+                    @Override
+                    public void onError() {
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
 
+                    }
+                });
+            } else {
+                BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                    @Override
+                    public void onSuccess() {
+                        Itinerary new_itinerary = new Itinerary();
+
+                        //Inserimento specifiche nell'itinerario
+                        new_itinerary.setLocation(mLuogo.getText().toString());
+                        new_itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
+                        new_itinerary.setDate(mData.getText().toString());
+                        new_itinerary.setMeetingTime(mOra.getText().toString());
+                        new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
+                        new_itinerary.setLanguage(mLingua.getText().toString().trim());
+                        new_itinerary.setCurrency(currency);
+                        new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
+                        new_itinerary.generateId();
+
+                        if(!mCompenso.getText().toString().equals(""))
+                            new_itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
+
+                        new_itinerary.setDescription(mDescrizione.getText().toString());
+
+                        //Creao lista adatta per il passaggio dei dati alla BackEndInterface
+                        List<Stage> placeInterface = new ArrayList<>();
+
+                        for (Map.Entry<String, Stage> entry : tappe.entrySet())
+                            placeInterface.add(entry.getValue());
+
+                        new_itinerary.setStages(placeInterface);
+
+                        BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                            @Override
+                            public void onSuccess() {
+                                ObjectSharer.get().shareObject("new_itinerary", new_itinerary);
+
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_edit_toast), Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+
+                            @Override
+                            public void onError() {
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError() {
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.connection_error), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
             return true;
         } else if(id == R.id.createItinerary){
             Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_places), Toast.LENGTH_SHORT).show();
@@ -501,6 +568,71 @@ public class ItineraryActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Reads data from itinerary and sets them in the right EditText
+     */
+    private void setTextField(Itinerary itinerary) {
+        mLuogo.setText(itinerary.getLocation());
+        mPuntoIncontro.setText(itinerary.getMeetingPlace());
+        mData.setText(itinerary.getDate());
+        mOra.setText(itinerary.getMeetingTime());
+        mLingua.setText(itinerary.getLanguage());
+        mMaxPart.setText(String.valueOf(itinerary.getMaxParticipants()));
+        mCompenso.setText(String.valueOf(itinerary.getPrice()));
+        mCompenso.setPrefix(itinerary.getCurrency() + " ");
+
+        //Initialize spinner
+        spinner = findViewById(R.id.spinner_valute);
+        spinner.setItems("€ Euro", "$ Dollaro", "£ Sterlina");
+        switch (itinerary.getCurrency()) {
+            case "€":
+                spinner.setSelectedIndex(0);
+                break;
+            case "$":
+                spinner.setSelectedIndex(1);
+                break;
+            case "£":
+                spinner.setSelectedIndex(2);
+                break;
+        }
+
+        mDescrizione.setText(itinerary.getDescription());
+
+        for(int i = 0; i < itinerary.getStages().size(); ++i)
+            tappe.put(itinerary.getStages().get(i).getName(), itinerary.getStages().get(i));
+
+        //Creo nuovi Layout tappe
+        if(tappe.size() > 0) {
+            listStage_title.setVisibility(View.GONE);
+
+            for (Map.Entry<String, Stage> entry : tappe.entrySet()) {
+                View newPlace = getLayoutInflater().inflate(R.layout.stage_layout, null);
+                placeDescription_tv = newPlace.findViewById(R.id.placeDescription_tv);
+                placeName_tv = newPlace.findViewById(R.id.placeName_tv);
+                placeAddress_tv = newPlace.findViewById(R.id.placeAddress_tv);
+                mRemoveStage = newPlace.findViewById(R.id.mRemoveStage);
+
+                placeName_tv.setText(entry.getValue().getName());
+                placeDescription_tv.setText(entry.getValue().getDescription());
+                placeAddress_tv.setText(entry.getValue().getAddress());
+
+                newPlace.setTag(entry.getValue().getName());
+
+                mRemoveStage.setOnClickListener(v13 -> {
+                    tappe.remove(newPlace.getTag());
+                    linearLayout.removeView(newPlace);
+
+                    if(listStage_title.getVisibility() == View.GONE && tappe.size() == 0)
+                        listStage_title.setVisibility(View.VISIBLE);
+                });
+
+                linearLayout.addView(newPlace, 0);
+            }
+        }else {
+            listStage_title.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
