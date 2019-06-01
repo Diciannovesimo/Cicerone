@@ -9,6 +9,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.Serializable;
@@ -362,6 +363,156 @@ public class BackEndInterface
         });
     }
 
+    public void getItinerariesOf(String idCicerone, List<Itinerary> itinerariesList,
+                                 OnOperationCompleteListener onOperationCompleteListener)
+    {
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("itinerary");
+        Query query = ref.orderByKey()
+                .startAt(idCicerone)
+                .endAt(idCicerone.substring(0, idCicerone.length()-1) +
+                        (idCicerone.charAt(idCicerone.length()-1)+1) )
+                .limitToFirst(20);
+
+        query.addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                for(DataSnapshot ds : dataSnapshot.getChildren())
+                {
+                    Itinerary itinerary = new Itinerary();
+                    itinerary.setId(ds.getKey());
+                    getEntityFrom(itinerary, ds);
+                    itinerariesList.add(itinerary);
+                }
+
+                if(onOperationCompleteListener != null)
+                    onOperationCompleteListener.onSuccess();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError)
+            {
+                Log.e(TAG, "Error: " + databaseError.toString());
+                if(onOperationCompleteListener != null)
+                    onOperationCompleteListener.onError();
+            }
+        });
+    }
+
+    /**
+     *      Fills a passed entity with fields obtained from DataSnapshot passed.
+     *
+     *      @param entity       Entity to fill.
+     *      @param dataSnapshot DataSnapshot which provides fields of entity
+     */
+    private void getEntityFrom(StorableEntity entity, DataSnapshot dataSnapshot)
+    {
+        Map<String, FieldValue> fields = getFields(entity);
+
+        for(DataSnapshot ds : dataSnapshot.getChildren())
+        {
+            try
+            {
+                String fieldName = ds.getKey();
+
+                FieldValue fieldValue = fields.get(fieldName);
+
+                if(fieldValue == null || fieldName == null)
+                    return;
+
+                if(fieldValue.isAList())
+                {
+                    Log.i(TAG, fieldName + ": List detected");
+
+                    List<FieldValue> fieldValues = new Vector<>();
+
+                    for(DataSnapshot dsChild1 : ds.getChildren())
+                    {
+                        Map<String, String> map = new HashMap<>();
+
+                        for(DataSnapshot dsChild2 : dsChild1.getChildren())
+                        {
+                            String subFieldName = dsChild2.getKey();
+
+                            if(subFieldName != null)
+                                map.put(subFieldName, dsChild2.getValue(String.class));
+                        }
+
+                        fieldValues.add(new FieldValue(new StorableAsField()
+                        {
+                            @Override
+                            public String getFieldId() { return dsChild1.getKey(); }
+
+                            @Override
+                            public Map<String, String> getSubFields()
+                            {
+                                return map;
+                            }
+
+                            @Override
+                            public void restoreId(String id) { }
+
+                            @Override
+                            public void restoreSubFields(Map<String, String> subFields) { }
+                        }));
+                    }
+
+                    fields.put(fieldName, new FieldValue(fieldValues));
+                }
+                if(fieldValue.isSubfield())
+                {
+                    Map<String, String> map = new HashMap<>();
+
+                    for(DataSnapshot dsChild : ds.getChildren())
+                    {
+                        String subFieldName = dsChild.getKey();
+
+                        if(subFieldName != null)
+                            map.put(subFieldName, dsChild.getValue(String.class));
+                    }
+
+                    fields.put(fieldName, new FieldValue(new StorableAsField()
+                    {
+                        @Override
+                        public String getFieldId() { return null; }
+
+                        @Override
+                        public Map<String, String> getSubFields()
+                        {
+                            return map;
+                        }
+
+                        @Override
+                        public void restoreId(String id) { }
+
+                        @Override
+                        public void restoreSubFields(Map<String, String> subFields) { }
+                    }));
+                }
+                else
+                {
+                    fields.put(fieldName, new FieldValue( getValue(ds, fieldValue)) );
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, "getEntity Error: " + e.toString());
+            }
+        }
+
+        setFields(entity, fields);
+    }
+
+
+    /**
+     *      Get value as string of a FieldValue from a DataSnapshot
+     *
+     *      @param ds                   DataSnapshot
+     *      @param storedFieldValue     FieldValue
+     *      @return     Value, as string, of a FieldValue from a DataSnapshot.
+     */
     private String getValue(DataSnapshot ds, FieldValue storedFieldValue)
     {
         String result = "";

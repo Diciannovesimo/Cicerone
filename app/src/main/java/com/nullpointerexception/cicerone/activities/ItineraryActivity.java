@@ -450,7 +450,8 @@ public class ItineraryActivity extends AppCompatActivity {
             new_itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
             new_itinerary.setDate(mData.getText().toString());
             new_itinerary.setMeetingTime(mOra.getText().toString());
-            new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
+            if( ! mMaxPart.getText().toString().isEmpty())
+                new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
             new_itinerary.setLanguage(mLingua.getText().toString().trim());
             new_itinerary.setCurrency(currency);
             new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());

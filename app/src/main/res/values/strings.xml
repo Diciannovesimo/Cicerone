@@ -63,7 +63,7 @@
     <string name="no_empty_field">Il campo non può essere vuoto</string>
 
     <!-- ItinerayActivity -->
-    <string name="ItinerayActivity_Title">Modifica itinerario</string>
+    <string name="ItinerayActivity_Title">Nuovo itinerario</string>
     <string name="succes_create_itinerary_toast">Itinerario creato</string>
 
     <string name="menu_home">Home</string>
