@@ -187,8 +187,10 @@ public class ItineraryActivity extends AppCompatActivity {
 
                 if(selectedMinute == 0)
                     text += "00";
-                else
+                else if(selectedMinute < 10) {
+                    text += "0";
                     text += selectedMinute;
+                }
 
                 mOra.setText(text);
             }, hour, minute, true);
@@ -464,7 +466,10 @@ public class ItineraryActivity extends AppCompatActivity {
                 new_itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
                 new_itinerary.setDate(mData.getText().toString());
                 new_itinerary.setMeetingTime(mOra.getText().toString());
-                new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
+
+                if(!mMaxPart.getText().toString().isEmpty())
+                    new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
+
                 new_itinerary.setLanguage(mLingua.getText().toString().trim());
                 new_itinerary.setCurrency(currency);
                 new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
@@ -487,18 +492,15 @@ public class ItineraryActivity extends AppCompatActivity {
                 BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
                     @Override
                     public void onSuccess() {
+                        Log.i(TAG, "sono qui");
                         //Share new itinerary
                         ObjectSharer.get().shareObject("new_itinerary", new_itinerary);
 
                         //Delete received itinerary
                         ObjectSharer.get().remove("edit_itinerary");
 
-                        runOnUiThread(() ->
-                        {
-                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
-                            finish();
-                        });
-
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
+                        finish();
                     }
 
                     @Override
@@ -507,6 +509,7 @@ public class ItineraryActivity extends AppCompatActivity {
 
                     }
                 });
+                return true;
             } else {
                 BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
                     @Override
@@ -518,7 +521,10 @@ public class ItineraryActivity extends AppCompatActivity {
                         new_itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
                         new_itinerary.setDate(mData.getText().toString());
                         new_itinerary.setMeetingTime(mOra.getText().toString());
-                        new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
+
+                        if(!mMaxPart.getText().toString().isEmpty())
+                            new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
+
                         new_itinerary.setLanguage(mLingua.getText().toString().trim());
                         new_itinerary.setCurrency(currency);
                         new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
