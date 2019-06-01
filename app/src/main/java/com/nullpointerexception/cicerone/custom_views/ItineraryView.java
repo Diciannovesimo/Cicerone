@@ -1,6 +1,7 @@
 package com.nullpointerexception.cicerone.custom_views;
 
 import android.content.Context;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -27,6 +28,33 @@ public class ItineraryView extends FrameLayout
         date = findViewById(R.id.dateLabel);
         meeting = findViewById(R.id.meetingLabel);
         cicerone = findViewById(R.id.ciceroneLabel);
+
+        setOnTouchListener((view, motionEvent) ->
+        {
+            switch (motionEvent.getAction())
+            {
+                case MotionEvent.ACTION_DOWN:
+                    setScaleX(0.98f);
+                    setScaleY(0.98f);
+                    setAlpha(0.85f);
+                    break;
+
+                case MotionEvent.ACTION_CANCEL:
+                    setScaleX(1f);
+                    setScaleY(1f);
+                    setAlpha(1f);
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                    setScaleX(1f);
+                    setScaleY(1f);
+                    setAlpha(1f);
+                    performClick();
+                    break;
+            }
+
+            return false;
+        });
 
     }
 

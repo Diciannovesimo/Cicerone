@@ -1,6 +1,7 @@
 package com.nullpointerexception.cicerone.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -98,6 +99,7 @@ public class ItinerariesListFragment extends Fragment
         root.addView(frameLayout);
 
         //  Get itineraries
+        if(AuthenticationManager.get().getUserLogged() != null)
         BackEndInterface.get().getItinerariesOf(AuthenticationManager.get().getUserLogged().getId(),
                 itineraries, new BackEndInterface.OnOperationCompleteListener() 
                 {
@@ -107,9 +109,12 @@ public class ItinerariesListFragment extends Fragment
                         //  Remove login animation
                         if(getActivity() != null)
                             getActivity().runOnUiThread(() ->
-                                    ((ViewGroup)frameLayout.getParent()).removeView(frameLayout));
+                            {
+                                if(frameLayout.getParent() != null)
+                                    ((ViewGroup)frameLayout.getParent()).removeView(frameLayout);
+                            });
 
-                        addItineraryViews(itineraries);
+                        setItineraryViews(itineraries);
                     }
 
                     @Override
@@ -142,7 +147,7 @@ public class ItinerariesListFragment extends Fragment
     {
         itineraries.add(itinerary);
         adapter.notifyItemInserted( itineraries.size()-1 );
-        noItinerariesLabel.setVisibility(View.GONE);
+        noItinerariesLabel.setVisibility(itineraries.size() == 0 ? View.VISIBLE : View.GONE);
     }
 
     private void addItineraries(Itinerary... itineraries)
@@ -150,14 +155,13 @@ public class ItinerariesListFragment extends Fragment
         int startIndex = this.itineraries.size();
         this.itineraries.addAll(Arrays.asList(itineraries));
         adapter.notifyItemRangeInserted(startIndex, this.itineraries.size());
-        noItinerariesLabel.setVisibility(View.GONE);
+        noItinerariesLabel.setVisibility(this.itineraries.size() == 0 ? View.VISIBLE : View.GONE);
     }
 
-    private void addItineraryViews(List<Itinerary> itineraries)
+    private void setItineraryViews(List<Itinerary> itineraries)
     {
-        int startIndex = this.itineraries.size() - itineraries.size();
-        adapter.notifyItemRangeInserted(startIndex, this.itineraries.size());
-        noItinerariesLabel.setVisibility(View.GONE);
+        adapter.notifyDataSetChanged();
+        noItinerariesLabel.setVisibility(this.itineraries.size() == 0 ? View.VISIBLE : View.GONE);
     }
 
     private void removeItinerary(int i)
@@ -167,9 +171,11 @@ public class ItinerariesListFragment extends Fragment
         noItinerariesLabel.setVisibility(itineraries.size() == 0 ? View.VISIBLE : View.GONE);
     }
 
+    /*  TODO : Cancellando questa parte far eliminare da Claudio lo share object nell'activity di creazione itinerario.
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+
 
         Object obj = ObjectSharer.get().getSharedObject("new_itinerary");
         if(obj != null)
@@ -179,7 +185,7 @@ public class ItinerariesListFragment extends Fragment
         }
 
         super.onActivityResult(requestCode, resultCode, data);
-    }
+    }*/
 }
 
 class Adapter extends RecyclerView.Adapter
@@ -202,6 +208,12 @@ class Adapter extends RecyclerView.Adapter
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position)
     {
         ((ViewHolder) holder).setViewFor(dataSet.get(position));
+        ((ViewHolder) holder).getView().setOnClickListener(view ->
+        {
+            Context context = ((ViewHolder) holder).getView().getContext();
+            ObjectSharer.get().shareObject("edit_itinerary", dataSet.get(position));
+            context.startActivity(new Intent(context, ItineraryActivity.class));
+        });
     }
 
     @Override
@@ -224,6 +236,8 @@ class Adapter extends RecyclerView.Adapter
         {
             itineraryView.setFrom(itinerary);
         }
+
+        public ItineraryView getView()  { return itineraryView; }
     }
 
 }

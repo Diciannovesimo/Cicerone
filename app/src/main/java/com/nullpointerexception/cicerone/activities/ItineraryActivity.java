@@ -457,7 +457,8 @@ public class ItineraryActivity extends AppCompatActivity {
 
         if(checkField() && id == R.id.createItinerary && tappe.size() > 0) {
 
-            if(!edit_mode) {
+            if(!edit_mode)
+            {
                 //New itinerary, ready to be loaded on Firebase DB
                 Itinerary new_itinerary = new Itinerary();
 
@@ -491,12 +492,14 @@ public class ItineraryActivity extends AppCompatActivity {
                 //Load the itinerary on Firebase DB
                 BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
                     @Override
-                    public void onSuccess() {
+                    public void onSuccess()
+                    {
                         Log.i(TAG, "sono qui");
                         //Share new itinerary
                         ObjectSharer.get().shareObject("new_itinerary", new_itinerary);
 
                         //Delete received itinerary
+                        //  TODO: Claudio perchè questo non si trova nella edit mode?
                         ObjectSharer.get().remove("edit_itinerary");
 
                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();

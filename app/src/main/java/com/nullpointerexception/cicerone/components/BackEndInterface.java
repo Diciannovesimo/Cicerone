@@ -211,7 +211,7 @@ public class BackEndInterface
     /**
      *      Get data from FireBase database fro the given object, and set it with values obtained.
      *
-     *      @param entity                   Entity where will be written data.
+     *      @param entity                         Entity where will be written data.
      *      @param onOperationCompleteListener    Callback methods implementations.
      *
      *      @return The result of operation.
@@ -363,6 +363,13 @@ public class BackEndInterface
         });
     }
 
+    /**
+     *      Get itineraries created by a cicerone.
+     *
+     *      @param idCicerone                   Id of cicerone who has created itineraries.
+     *      @param itinerariesList              Itineraries created by specified cicerone.
+     *      @param onOperationCompleteListener  Implementation of a callback method.
+     */
     public void getItinerariesOf(String idCicerone, List<Itinerary> itinerariesList,
                                  OnOperationCompleteListener onOperationCompleteListener)
     {
@@ -372,13 +379,18 @@ public class BackEndInterface
                 .startAt(idCicerone)
                 .endAt(idCicerone.substring(0, idCicerone.length()-1) +
                         (idCicerone.charAt(idCicerone.length()-1)+1) )
-                .limitToFirst(20);
+                ;//.limitToFirst(20);
+        //  TODO: Inpagination
+
+        //  TODO: Sort list fetched
 
         query.addValueEventListener(new ValueEventListener()
         {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
             {
+                itinerariesList.clear();
+
                 for(DataSnapshot ds : dataSnapshot.getChildren())
                 {
                     Itinerary itinerary = new Itinerary();
