@@ -13,10 +13,22 @@
         android:padding="5sp"
         app:cardCornerRadius="5sp">
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/itineraryBack"
+                android:layout_width="match_parent"
+                android:layout_height="100sp"
+                android:scaleType="centerCrop" />
+
         <LinearLayout
+            android:id="@+id/layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:background="@drawable/itinerary_background"
             android:padding="5sp">
 
             <TextView
@@ -67,6 +79,7 @@
                 android:text="" />
 
         </LinearLayout>
+        </RelativeLayout>
 
     </androidx.cardview.widget.CardView>
 

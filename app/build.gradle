@@ -129,8 +129,12 @@ dependencies
             implementation "com.google.android.material:material:1.0.0"
             implementation 'androidx.cardview:cardview:1.0.0'
 
-            //  Json Google library
-            implementation 'com.google.code.gson:gson:2.8.4'
+            /*
+                    Glide
+                    https://github.com/bumptech/glide
+             */
+            implementation 'com.github.bumptech.glide:glide:4.9.0'
+            annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 
         }
 

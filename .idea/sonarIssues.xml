@@ -83,6 +83,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/components/ImageFetcher.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/components/Itinerary.java">
           <value>
             <set />
@@ -154,6 +159,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/res/drawable/button_background.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/drawable/itinerary_background.xml">
           <value>
             <set />
           </value>

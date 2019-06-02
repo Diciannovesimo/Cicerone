@@ -1,20 +1,26 @@
 package com.nullpointerexception.cicerone.custom_views;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.Glide;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.ImageFetcher;
 import com.nullpointerexception.cicerone.components.Itinerary;
 
 /**
@@ -32,6 +38,7 @@ public class ItineraryView extends FrameLayout
      */
     private View buttonsContainer, editButton, deleteButton;
     private TextView city, date, meeting, cicerone;
+    private ImageView imageView;
 
     /*
             Vars
@@ -63,6 +70,7 @@ public class ItineraryView extends FrameLayout
         buttonsContainer = findViewById(R.id.buttonsContainer);
         editButton = findViewById(R.id.editButton);
         deleteButton = findViewById(R.id.deleteButton);
+        imageView = findViewById(R.id.itineraryBack);
 
         setOnTouchListener((view, motionEvent) ->
         {
@@ -204,7 +212,7 @@ public class ItineraryView extends FrameLayout
     }
 
     /**
-     *      Set views contnt based on informations of itinerary passed.
+     *      Set views content based on informations of itinerary passed.
      *
      *      @param itinerary    Itinerary that gives informations.
      */
@@ -214,6 +222,39 @@ public class ItineraryView extends FrameLayout
         date.setText(itinerary.getDate());
         meeting.setText(itinerary.getMeetingPlace() + " - " + itinerary.getMeetingTime());
         cicerone.setVisibility(GONE);
+
+        View layout = findViewById(R.id.layout);
+
+        layout.post(() ->
+        {
+            imageView.setLayoutParams(new RelativeLayout.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT,
+                   layout.getHeight()));
+        });
+
+        //  TODO: Add check time
+
+        new ImageFetcher().findSubject(itinerary.getLocation(), new ImageFetcher.OnImageFoundListener()
+        {
+            @Override
+            public void onImageFound(String url)
+            {
+                Log.i("ImageFetcher", "Success! Link -->" + url);
+
+                if(city.getContext() instanceof Activity)
+                {
+                    ((Activity) city.getContext()).runOnUiThread(() ->
+                            Glide.with(city.getContext())
+                            .load(url)
+                            .into(imageView));
+                }
+            }
+
+            @Override
+            public void onError()
+            {
+                Log.i("ImageFetcher", "Errore.");
+            }
+        });
     }
 
     public void setAsLastElement(boolean value)
