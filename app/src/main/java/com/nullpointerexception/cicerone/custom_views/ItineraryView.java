@@ -23,6 +23,10 @@ import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.ImageFetcher;
 import com.nullpointerexception.cicerone.components.Itinerary;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  *      ItineraryView
  *
@@ -219,7 +223,17 @@ public class ItineraryView extends FrameLayout
     public void setFrom(Itinerary itinerary)
     {
         city.setText(itinerary.getLocation());
-        date.setText(itinerary.getDate());
+
+        //Change date format
+        try {
+            Date day = new SimpleDateFormat("yyyy/MM/dd", Locale.ITALY).parse(itinerary.getDate());
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
+            String dayString = formatter.format(day);
+            date.setText(dayString);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         meeting.setText(itinerary.getMeetingPlace() + " - " + itinerary.getMeetingTime());
         cicerone.setVisibility(GONE);
 

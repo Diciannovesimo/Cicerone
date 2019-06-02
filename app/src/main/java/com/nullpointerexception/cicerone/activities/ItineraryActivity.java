@@ -42,11 +42,14 @@ import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.googleAutocompletationField;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
@@ -77,17 +80,14 @@ public class ItineraryActivity extends AppCompatActivity {
     private LinearLayout linearLayout;
     private ScrollView scrollView;
     private String currency;
-
+    private Toolbar toolbar;
     private MaterialSpinner spinner;
+    private Menu menu;
 
     //Istanza itinerario
     private Itinerary itinerary;
-
     private int actual_field;
-
     private boolean edit_mode = false;
-
-    //
 
     //Datepicker object
     Calendar calendar;
@@ -98,18 +98,24 @@ public class ItineraryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_itinerary);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(getResources().getString(R.string.ItinerayActivity_Title));
-        setSupportActionBar(toolbar);
 
         //Initialize graphic interface
         initUI();
 
-        //Disable all EditText
-        mLuogo.setEnabled(false);
-        mPuntoIncontro.setEnabled(false);
-        mData.setEnabled(false);
-        mOra.setEnabled(false);
+        //Receiver data from intent if the user wants to edit an itinerary
+        if(ObjectSharer.get().getSharedObject("edit_itinerary") != null) {
+            edit_mode = true;
+            itinerary = (Itinerary)ObjectSharer.get().getSharedObject("edit_itinerary");
+            setTextField(itinerary);
+        }
+
+        if(edit_mode)
+            toolbar.setTitle(getResources().getString(R.string.ItinerayEditActivity_Title));
+        else
+            toolbar.setTitle(getResources().getString(R.string.ItinerayActivity_Title));
+
+        //Set toolbar
+        setSupportActionBar(toolbar);
 
         //Change color of toolbar
         Window window = getWindow();
@@ -122,13 +128,6 @@ public class ItineraryActivity extends AppCompatActivity {
         //Initialize Google Places API
         Places.initialize(getApplicationContext(), getResources().getString(R.string.place_KEY));
         fields = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG);
-
-        //Receiver data from intent if the user wants to edit an itinerary
-        if(ObjectSharer.get().getSharedObject("edit_itinerary") != null) {
-            edit_mode = true;
-            itinerary = (Itinerary)ObjectSharer.get().getSharedObject("edit_itinerary");
-            setTextField(itinerary);
-        }
 
         //Initialize spinner
         spinner = findViewById(R.id.spinner_valute);
@@ -158,7 +157,6 @@ public class ItineraryActivity extends AppCompatActivity {
          * Listener for Data field
          *
          */
-
         data_box.setOnClickListener(v -> {
             calendar = Calendar.getInstance();
             int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -166,7 +164,14 @@ public class ItineraryActivity extends AppCompatActivity {
             int year = calendar.get(Calendar.YEAR);
 
             dpd = new DatePickerDialog(v.getContext(), R.style.DialogTheme, (view, year12, month12, dayOfMonth) -> {
-                birthdayString = dayOfMonth + "/" + (month12 + 1) + "/" + year12;
+                if(dayOfMonth < 10)
+                    birthdayString += "0" + dayOfMonth + "/";
+
+                birthdayString = dayOfMonth + "/";
+                if((month12 + 1) < 10)
+                    birthdayString += "0" + (month12 + 1) + "/" + year12;
+                else
+                    birthdayString += (month12 + 1) + "/" + year12;
                 mData.setText(birthdayString);
             }, year, month, day);
             dpd.show();
@@ -189,6 +194,8 @@ public class ItineraryActivity extends AppCompatActivity {
                     text += "00";
                 else if(selectedMinute < 10) {
                     text += "0";
+                    text += selectedMinute;
+                } else{
                     text += selectedMinute;
                 }
 
@@ -409,6 +416,7 @@ public class ItineraryActivity extends AppCompatActivity {
      * initialize the ui
      */
     private void initUI() {
+        toolbar = findViewById(R.id.toolbar);
         mLuogo = findViewById(R.id.luogo_et);
         mPuntoIncontro = findViewById(R.id.meetPlace_et);
         mMaxPart = findViewById(R.id.MaxParticipants_et);
@@ -442,6 +450,8 @@ public class ItineraryActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_itinerary, menu);
 
+        this.menu = menu;
+        setItemTitle();
         return true;
     }
 
@@ -455,77 +465,33 @@ public class ItineraryActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if(checkField() && id == R.id.createItinerary && tappe.size() > 0) {
+        if(id == R.id.createItinerary) {
 
-            if(!edit_mode)
-            {
-                //New itinerary, ready to be loaded on Firebase DB
-                Itinerary new_itinerary = new Itinerary();
+            if (checkField()) {
 
-                //Inserimento specifiche nell'itinerario
-                new_itinerary.setLocation(mLuogo.getText().toString());
-                new_itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
-                new_itinerary.setDate(mData.getText().toString());
-                new_itinerary.setMeetingTime(mOra.getText().toString());
+                if (tappe.size() > 0) {
 
-                if(!mMaxPart.getText().toString().isEmpty())
-                    new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
-
-                new_itinerary.setLanguage(mLingua.getText().toString().trim());
-                new_itinerary.setCurrency(currency);
-                new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
-                new_itinerary.generateId();
-
-                if (!mCompenso.getText().toString().equals(""))
-                    new_itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
-
-                new_itinerary.setDescription(mDescrizione.getText().toString());
-
-                //Creao lista adatta per il passaggio dei dati alla BackEndInterface
-                List<Stage> placeInterface = new ArrayList<>();
-
-                for (Map.Entry<String, Stage> entry : tappe.entrySet())
-                    placeInterface.add(entry.getValue());
-
-                new_itinerary.setStages(placeInterface);
-
-                //Load the itinerary on Firebase DB
-                BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                    @Override
-                    public void onSuccess()
-                    {
-                        Log.i(TAG, "sono qui");
-                        //Share new itinerary
-                        ObjectSharer.get().shareObject("new_itinerary", new_itinerary);
-
-                        //Delete received itinerary
-                        //  TODO: Claudio perchè questo non si trova nella edit mode?
-                        ObjectSharer.get().remove("edit_itinerary");
-
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-
-                    @Override
-                    public void onError() {
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
-
-                    }
-                });
-                return true;
-            } else {
-                BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                    @Override
-                    public void onSuccess() {
+                    if (!edit_mode) {
+                        //New itinerary, ready to be loaded on Firebase DB
                         Itinerary new_itinerary = new Itinerary();
 
                         //Inserimento specifiche nell'itinerario
                         new_itinerary.setLocation(mLuogo.getText().toString());
                         new_itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
-                        new_itinerary.setDate(mData.getText().toString());
+
+                        //Formatting date
+                        try {
+                            Date day = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).parse(mData.getText().toString());
+                            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.ITALY);
+                            String dayString = formatter.format(day);
+                            new_itinerary.setDate(dayString);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                         new_itinerary.setMeetingTime(mOra.getText().toString());
 
-                        if(!mMaxPart.getText().toString().isEmpty())
+                        if (!mMaxPart.getText().toString().isEmpty())
                             new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
 
                         new_itinerary.setLanguage(mLingua.getText().toString().trim());
@@ -533,7 +499,7 @@ public class ItineraryActivity extends AppCompatActivity {
                         new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
                         new_itinerary.generateId();
 
-                        if(!mCompenso.getText().toString().equals(""))
+                        if (!mCompenso.getText().toString().equals(""))
                             new_itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
 
                         new_itinerary.setDescription(mDescrizione.getText().toString());
@@ -546,12 +512,12 @@ public class ItineraryActivity extends AppCompatActivity {
 
                         new_itinerary.setStages(placeInterface);
 
+                        //Load the itinerary on Firebase DB
                         BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
                             @Override
                             public void onSuccess() {
-                                ObjectSharer.get().shareObject("new_itinerary", new_itinerary);
 
-                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_edit_toast), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
                                 finish();
                             }
 
@@ -561,19 +527,83 @@ public class ItineraryActivity extends AppCompatActivity {
 
                             }
                         });
-                    }
+                        return true;
+                    } else {
+                        BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                            @Override
+                            public void onSuccess() {
+                                Itinerary new_itinerary = new Itinerary();
 
-                    @Override
-                    public void onError() {
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.connection_error), Toast.LENGTH_SHORT).show();
+                                //Inserimento specifiche nell'itinerario
+                                new_itinerary.setLocation(mLuogo.getText().toString());
+                                new_itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
+
+                                //Formatting date
+                                try {
+                                    Date day = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).parse(mData.getText().toString());
+                                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.ITALY);
+                                    String dayString = formatter.format(day);
+                                    new_itinerary.setDate(dayString);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+                                new_itinerary.setMeetingTime(mOra.getText().toString());
+
+                                if (!mMaxPart.getText().toString().isEmpty())
+                                    new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
+
+                                new_itinerary.setLanguage(mLingua.getText().toString().trim());
+                                new_itinerary.setCurrency(currency);
+                                new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
+                                new_itinerary.generateId();
+
+                                if (!mCompenso.getText().toString().equals(""))
+                                    new_itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
+
+                                new_itinerary.setDescription(mDescrizione.getText().toString());
+
+                                //Creao lista adatta per il passaggio dei dati alla BackEndInterface
+                                List<Stage> placeInterface = new ArrayList<>();
+
+                                for (Map.Entry<String, Stage> entry : tappe.entrySet())
+                                    placeInterface.add(entry.getValue());
+
+                                new_itinerary.setStages(placeInterface);
+
+                                BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        ObjectSharer.get().shareObject("new_itinerary", new_itinerary);
+
+                                        //Delete received itinerary
+                                        ObjectSharer.get().remove("edit_itinerary");
+
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_edit_toast), Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError() {
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.connection_error), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
-                });
+                    return true;
+                } else if (id == R.id.createItinerary) {
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_places), Toast.LENGTH_SHORT).show();
+                    errorMsg_tv.setVisibility(View.VISIBLE);
+                    listStage_title.setVisibility(View.GONE);
+                }
             }
-            return true;
-        } else if(id == R.id.createItinerary){
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_places), Toast.LENGTH_SHORT).show();
-            errorMsg_tv.setVisibility(View.VISIBLE);
-            listStage_title.setVisibility(View.GONE);
         }
 
         return super.onOptionsItemSelected(item);
@@ -585,7 +615,17 @@ public class ItineraryActivity extends AppCompatActivity {
     private void setTextField(Itinerary itinerary) {
         mLuogo.setText(itinerary.getLocation());
         mPuntoIncontro.setText(itinerary.getMeetingPlace());
-        mData.setText(itinerary.getDate());
+
+        //Change date format
+        try {
+            Date day = new SimpleDateFormat("yyyy/MM/dd", Locale.ITALY).parse(itinerary.getDate());
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
+            String dayString = formatter.format(day);
+            mData.setText(dayString);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         mOra.setText(itinerary.getMeetingTime());
         mLingua.setText(itinerary.getLanguage());
         mMaxPart.setText(String.valueOf(itinerary.getMaxParticipants()));
@@ -665,6 +705,19 @@ public class ItineraryActivity extends AppCompatActivity {
         if(mData.getText().toString().isEmpty()) {
             data_box.setError(getResources().getString(R.string.no_empty_field), false);
             alright = false;
+        } else{
+            Date day;
+            try {
+                day = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).parse(mData.getText().toString());
+
+                if(day.before(new Date())){
+                    data_box.setError(getResources().getString(R.string.incorrect_date), false);
+                    alright = false;
+                }
+            }catch (Exception e){
+                e.getStackTrace();
+            }
+
         }
 
         if(mOra.getText().toString().isEmpty()) {
@@ -711,6 +764,21 @@ public class ItineraryActivity extends AppCompatActivity {
     {
         finish();
         return super.onSupportNavigateUp();
+    }
+
+    private void setItemTitle() {
+        MenuItem button = menu.findItem(R.id.createItinerary);
+
+        if(edit_mode)
+            button.setTitle("modifica");
+        else
+            button.setTitle("crea");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ObjectSharer.get().remove("edit_itinerary");
     }
 }
 

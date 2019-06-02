@@ -172,21 +172,6 @@ public class ItinerariesListFragment extends Fragment
         noItinerariesLabel.setVisibility(itineraries.size() == 0 ? View.VISIBLE : View.GONE);
     }
 
-    /*  TODO : Cancellando questa parte far eliminare da Claudio lo share object nell'activity di creazione itinerario.
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-
-
-        Object obj = ObjectSharer.get().getSharedObject("new_itinerary");
-        if(obj != null)
-        {
-            addItinerary( (Itinerary) obj );
-            ObjectSharer.get().remove("new_itinerary");
-        }
-
-        super.onActivityResult(requestCode, resultCode, data);
-    }*/
 }
 
 class Adapter extends RecyclerView.Adapter

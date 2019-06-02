@@ -64,6 +64,7 @@
     <string name="connection_error">Problema di connessione col server</string>
     <string name="no_places">Deve essere presente almeno una tappa</string>
     <string name="no_empty_field">Il campo non può essere vuoto</string>
+    <string name="incorrect_date">Inserisci una data corretta, diversa dal giorno corrente</string>
 
     <!-- ItinerayActivity -->
     <string name="ItinerayActivity_Title">Nuovo itinerario</string>
