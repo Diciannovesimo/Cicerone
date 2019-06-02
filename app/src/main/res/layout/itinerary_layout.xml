@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardItinerary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5sp"
@@ -69,4 +70,54 @@
 
     </androidx.cardview.widget.CardView>
 
-</FrameLayout>
+    <LinearLayout
+        android:id="@+id/buttonsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cardItinerary"
+        android:gravity="center_horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/editButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5sp"
+            android:layout_marginBottom="5sp"
+            android:layout_marginRight="25sp"
+            android:drawableLeft="@drawable/ic_edit"
+            android:drawablePadding="10sp"
+            android:background="@drawable/button_background"
+            android:elevation="2sp"
+            android:paddingTop="9sp"
+            android:paddingBottom="9sp"
+            android:paddingLeft="18sp"
+            android:paddingRight="18sp"
+            android:drawableTint="#0077aa"
+            android:textColor="#0077aa"
+            android:gravity="center_vertical"
+            android:text="@string/edit"/>
+
+        <TextView
+            android:id="@+id/deleteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5sp"
+            android:layout_marginBottom="5sp"
+            android:layout_marginLeft="25sp"
+            android:drawableLeft="@drawable/ic_delete"
+            android:drawablePadding="10sp"
+            android:elevation="2sp"
+            android:background="@drawable/button_background"
+            android:paddingTop="9sp"
+            android:paddingBottom="9sp"
+            android:paddingLeft="18sp"
+            android:paddingRight="18sp"
+            android:drawableTint="#ff3333"
+            android:textColor="#ff3333"
+            android:gravity="center_vertical"
+            android:text="@string/delete"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

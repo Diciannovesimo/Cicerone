@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.activities.ItineraryActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
@@ -207,12 +208,57 @@ class Adapter extends RecyclerView.Adapter
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position)
     {
-        ((ViewHolder) holder).setViewFor(dataSet.get(position));
-        ((ViewHolder) holder).getView().setOnClickListener(view ->
+        ViewHolder viewHolder = (ViewHolder) holder;
+
+        viewHolder.setViewFor(dataSet.get(position));
+
+        viewHolder.getView().setAsLastElement((position == dataSet.size() -1 && dataSet.size() > 3));
+
+        viewHolder.getView().setOnViewClickListener(() ->
         {
-            Context context = ((ViewHolder) holder).getView().getContext();
+            Toast.makeText(viewHolder.getView().getContext(), "Open detail.", Toast.LENGTH_SHORT).show();
+        });
+
+        viewHolder.getView().setOnEditButtonClickListener(() ->
+        {
+            Context context = viewHolder.getView().getContext();
             ObjectSharer.get().shareObject("edit_itinerary", dataSet.get(position));
             context.startActivity(new Intent(context, ItineraryActivity.class));
+        });
+
+        viewHolder.getView().setOnDeleteButtonClickListener(() ->
+        {
+            Context context = viewHolder.getView().getContext();
+
+            new KAlertDialog(context)
+                    .setTitleText(context.getResources().getString(R.string.deleteDialogTitle))
+                    .setContentText(context.getResources().getString(R.string.deleteDialogMessage))
+                    .setConfirmText(context.getResources().getString(R.string.yes))
+                    .setCancelText(context.getResources().getString(R.string.no))
+                    .setConfirmClickListener(kAlertDialog ->
+                    {
+                        Itinerary itinerary = dataSet.get(position);
+                        BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener()
+                        {
+                            @Override
+                            public void onSuccess()
+                            {
+                                dataSet.remove(itinerary);
+                                notifyItemRemoved(position);
+
+                                Toast.makeText(context, R.string.deletedItineraryMessage, Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onError()
+                            {
+                                Toast.makeText(context, R.string.generic_error, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        kAlertDialog.dismissWithAnimation();
+                    })
+                    .show();
         });
     }
 

@@ -112,52 +112,6 @@ public class BackEndInterfaceTest
     }
 
     @Test
-    public void A22_storeEntityItineraryTest()
-    {
-        Itinerary itinerary = new Itinerary();
-
-        itinerary.setId("Test");
-        itinerary.setLanguage("italiano");
-        itinerary.setDescription("Descrizione fake.");
-        itinerary.setDate(Calendar.getInstance().toString());
-        itinerary.setIdCicerone("FAKE_USER");
-
-        List<Stage> stages = new Vector<>();
-        stages.add(new Stage("Colosseo", "Via address ...", new LatLng(30.221, 48.65265)));
-        stages.add(new Stage("Pianeta terra", "Via Lattea", new LatLng(74.24621, 16.65)));
-        stages.add(new Stage("Computer Point", "Via davanti la casa di William", new LatLng(18.235, 52.21985)));
-        itinerary.setStages(stages);
-
-        List<User> users = new Vector<>();
-        User user1 = new User();
-            user1.setId("user1");
-            user1.setName("User");  user1.setSurname("1");
-            user1.setProfileImageUrl("urlFake//:fwer5w6er51gw5erg16w5er1");
-        User user2 = new User();
-            user2.setId("user2");
-            user2.setName("User");  user2.setSurname("2");
-            user2.setProfileImageUrl("urlFake2//:fwer5w6er51gw5erg16w5er1");
-        users.add(user1);
-        users.add(user2);
-        itinerary.setParticipants(users);
-
-        BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener()
-        {
-            @Override
-            public void onSuccess()
-            {
-                assertTrue(true);
-            }
-
-            @Override
-            public void onError()
-            {
-                fail();
-            }
-        });
-    }
-
-    @Test
     public void B_storeField()
     {
         final String TEST = "TestStoreField";
@@ -234,16 +188,20 @@ public class BackEndInterfaceTest
     }
 
     @Test
-    public void getItineraryTest()
+    public void Z1_getItineraryTest()
     {
         Itinerary test = new Itinerary();
-        test.setId("Test");
+        test.setId("TestGet");
 
-        BackEndInterface.get().getEntity(test, new BackEndInterface.OnOperationCompleteListener() {
+        BackEndInterface.get().getEntity(test, new BackEndInterface.OnOperationCompleteListener()
+        {
             @Override
             public void onSuccess()
             {
-                assertEquals(test.getParticipants().get(0).getId(), "user1");
+                boolean success = test.getParticipants().get(0).getId().equals("user1")
+                        && test.getMaxParticipants() == 50
+                        && test.price == 10f;
+                assertTrue(success);
             }
 
             @Override
@@ -255,34 +213,57 @@ public class BackEndInterfaceTest
     }
 
     @Test
-    public void storeItineraryTest()
+    public void Z2_storeEntityItineraryTest()
     {
-        Itinerary test = new Itinerary();
-        test.setId("TestStore");
-        List<Stage> stages = new Vector<>();
-        Stage stage = new Stage();
-        stage.setCoordinates(new LatLng(12.6516, 165.532));
-        stages.add(stage);
-        test.setStages(stages);
+        Itinerary itinerary = new Itinerary();
 
-        BackEndInterface.get().storeEntity(test, new BackEndInterface.OnOperationCompleteListener() {
+        itinerary.setId("TestStore");
+        itinerary.setLanguage("italiano");
+        itinerary.setDescription("Descrizione fake.");
+        itinerary.setDate(Calendar.getInstance().toString());
+        itinerary.setIdCicerone("FAKE_USER");
+        itinerary.setMaxParticipants(50);
+        itinerary.setPrice(10f);
+
+        List<Stage> stages = new Vector<>();
+        stages.add(new Stage("Colosseo", "Via address ...", new LatLng(30.221, 48.65265)));
+        stages.add(new Stage("Pianeta terra", "Via Lattea", new LatLng(74.24621, 16.65)));
+        stages.add(new Stage("Computer Point", "Via davanti la casa di William", new LatLng(18.235, 52.21985)));
+        itinerary.setStages(stages);
+
+        List<User> users = new Vector<>();
+        User user1 = new User();
+        user1.setId("user1");
+        user1.setName("User");  user1.setSurname("1");
+        user1.setProfileImageUrl("urlFake//:fwer5w6er51gw5erg16w5er1");
+        User user2 = new User();
+        user2.setId("user2");
+        user2.setName("User");  user2.setSurname("2");
+        user2.setProfileImageUrl("urlFake2//:fwer5w6er51gw5erg16w5er1");
+        users.add(user1);
+        users.add(user2);
+        itinerary.setParticipants(users);
+
+        BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener()
+        {
             @Override
             public void onSuccess()
             {
-                Itinerary test2 = new Itinerary();
-                test2.setId("TestStore");
+                Itinerary it2 = new Itinerary();
+                it2.setId("TestStore");
 
-                BackEndInterface.get().getEntity(test2, new BackEndInterface.OnOperationCompleteListener() {
+                BackEndInterface.get().getEntity(it2, new BackEndInterface.OnOperationCompleteListener()
+                {
                     @Override
                     public void onSuccess()
                     {
-                        assertEquals(test2, test);
+                        assertEquals(itinerary, it2);
                     }
 
                     @Override
                     public void onError()
                     {
-                        fail();
+                        fail("Get entity failed.");
                     }
                 });
             }
@@ -290,13 +271,13 @@ public class BackEndInterfaceTest
             @Override
             public void onError()
             {
-                fail();
+                fail("Store entity failed.");
             }
         });
     }
 
     @Test
-    public void removeItineraryTest()
+    public void Z3_removeItineraryTest()
     {
         Itinerary test = new Itinerary();
         test.setId("TestStore");

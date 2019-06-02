@@ -3,6 +3,9 @@
     <string name="facebook_app_id">576559802747671</string>
     <string name="fb_login_protocol_scheme">fb576559802747671</string>
 
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+
     <string name="app_name">Cicerone</string>
     <string name="generic_error">Si è verificato un errore.</string>
 
@@ -74,6 +77,11 @@
     <!-- Itineraries List fragment -->
     <string name="noItineraries">Non ci sono itinerari.</string>
     <string name="noTrips">Non ci sono viaggi.</string>
+    <string name="edit">Modifica</string>
+    <string name="delete">Elimina</string>
+    <string name="deleteDialogTitle">Elimina itinerario</string>
+    <string name="deleteDialogMessage">Sei sicuro di voler eliminare l\'itinerario selezionato?</string>
+    <string name="deletedItineraryMessage">Itinerario eliminato con successo.</string>
     <string name="title_activity_itinerary">activity_itinerary</string>
 
     <!-- Google API -->

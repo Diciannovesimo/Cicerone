@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -13,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
-import com.gauravk.bubblenavigation.listener.BubbleNavigationChangeListener;
 import com.google.android.material.navigation.NavigationView;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -53,15 +51,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);*/
-
         //  Add home fragment
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.setCustomAnimations(R.anim.modal_in, R.anim.modal_out);
@@ -71,36 +60,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fragmentTransaction.add(R.id.fragmentsContainer, actualFragment).commit();
 
         BubbleNavigationConstraintView bottomNavigation = findViewById(R.id.bottomNavigationContainer);
-        bottomNavigation.setNavigationChangeListener(new BubbleNavigationChangeListener()
+        bottomNavigation.setNavigationChangeListener((view, position) ->
         {
-            @Override
-            public void onNavigationChanged(View view, int position)
+            FragmentTransaction fragmentTransaction1 = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction1.setCustomAnimations(R.anim.modal_in, R.anim.modal_out);
+
+            if(actualFragment != null)
+                fragmentTransaction1.remove(actualFragment);
+
+            switch (position)
             {
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.setCustomAnimations(R.anim.modal_in, R.anim.modal_out);
-
-                if(actualFragment != null)
-                    fragmentTransaction.remove(actualFragment);
-
-                switch (position)
-                {
-                    default:
-                    case BOTTOM_NAVIGATION_HOME:
-                        actualFragment = new HomeFragment();
-                        break;
-                    case BOTTOM_NAVIGATION_TRIPS:
-                        actualFragment = new TripsListFragment();
-                        break;
-                    case BOTTOM_NAVIGATION_ITINERARIES:
-                        actualFragment = new ItinerariesListFragment();
-                        break;
-                    case BOTTOM_NAVIGATION_PROFILE:
-                        actualFragment = new ProfileFragment();
-                        break;
-                }
-
-                fragmentTransaction.add(R.id.fragmentsContainer, actualFragment).commit();
+                default:
+                case BOTTOM_NAVIGATION_HOME:
+                    actualFragment = new HomeFragment();
+                    break;
+                case BOTTOM_NAVIGATION_TRIPS:
+                    actualFragment = new TripsListFragment();
+                    break;
+                case BOTTOM_NAVIGATION_ITINERARIES:
+                    actualFragment = new ItinerariesListFragment();
+                    break;
+                case BOTTOM_NAVIGATION_PROFILE:
+                    actualFragment = new ProfileFragment();
+                    break;
             }
+
+            fragmentTransaction1.add(R.id.fragmentsContainer, actualFragment).commit();
         });
 
         User user = AuthenticationManager.get().getUserLogged();

@@ -940,52 +940,46 @@ public class BackEndInterface
                     continue;
                 }
 
-                if(field.getClass().isPrimitive())
+                /*
+                      Convert string into correct type
+                 */
+
+                if(field.getType().equals(int.class))
                 {
-
-                    /*
-                            Convert string into correct type
-                     */
-
-                    if(field.getType().equals(int.class))
-                    {
-                        String value = fieldValue.getValue();
-                        if(value != null)
-                            field.set(entity, Integer.parseInt(value));
-                    }
-
-                    if(field.getType().equals(float.class))
-                    {
-                        String value = fieldValue.getValue();
-                        if(value != null)
-                            field.set(entity, Float.parseFloat(value));
-                    }
-
-                    if(field.getType().equals(double.class))
-                    {
-                        String value = fieldValue.getValue();
-                        if(value != null)
-                            field.set(entity, Double.parseDouble(value));
-                    }
-
-                    if(field.getType().equals(boolean.class))
-                    {
-                        String value = fieldValue.getValue();
-                        if(value != null)
-                            field.set(entity, Boolean.parseBoolean(value));
-                    }
+                    String value = fieldValue.getValue();
+                    if(value != null)
+                        field.set(entity, Integer.parseInt(value));
                 }
-                else
+
+                if(field.getType().equals(float.class))
                 {
-                    if(field.getType().equals(String.class))
-                    {
-                        String value = fieldValue.getValue();
-                        if(value != null)
-                            field.set(entity, value);
-                    }
-
-                    entity.setComplexTypedField(field, fieldValue.getValue());
+                    String value = fieldValue.getValue();
+                    if(value != null)
+                        field.set(entity, Float.parseFloat(value));
                 }
+
+                if(field.getType().equals(double.class))
+                {
+                    String value = fieldValue.getValue();
+                    if(value != null)
+                        field.set(entity, Double.parseDouble(value));
+                }
+
+                if(field.getType().equals(boolean.class))
+                {
+                    String value = fieldValue.getValue();
+                    if(value != null)
+                        field.set(entity, Boolean.parseBoolean(value));
+                }
+
+                if(field.getType().equals(String.class))
+                {
+                    String value = fieldValue.getValue();
+                    if(value != null)
+                        field.set(entity, value);
+                }
+
+                entity.setComplexTypedField(field, fieldValue.getValue());
             }
             catch (Exception e)
             {
