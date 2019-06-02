@@ -34,7 +34,7 @@ public class ObjectSharer
      *      Retrieve an object shared before.
      *
      *      @param key  Key of object you want to access
-     *      @return     Object with the corrisponding key.
+     *      @return     Object with the corresponding key.
      */
     public Object getSharedObject(String key)
     {
@@ -48,7 +48,7 @@ public class ObjectSharer
      */
     public void remove(String key)
     {
-        sharedObjects.remove( sharedObjects.get(key) );
+        sharedObjects.put(key, null);
     }
 
 }
