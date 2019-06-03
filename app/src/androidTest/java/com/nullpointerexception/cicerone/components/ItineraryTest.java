@@ -2,15 +2,24 @@ package com.nullpointerexception.cicerone.components;
 
 import androidx.test.rule.ActivityTestRule;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.nullpointerexception.cicerone.activities.SplashScreen;
 
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ItineraryTest
@@ -358,5 +367,82 @@ public class ItineraryTest
                 fail();
             }
         });
+    }
+
+    int count = 0;
+    //  TODO: Decommentare test ed avviarlo in singolo per generare itinerari.
+    //@Test
+    public void fillItineraries()
+    {
+        final int nItineraries = 10;
+
+        List<String> places = Arrays.asList("Milano", "Venezia", "Torino", "Londra", "Roma", "Barcellona", "Bari",
+                "Canosa di Puglia", "Bitritto", "Napoli", "New York City", "Berlino");
+
+        final String targetCiceroneId = "34CCpLlS9Eb6aTUcOXLvt5gh0cu1";
+
+        Random random = new Random();
+        for(int i = 0; i < nItineraries; i++)
+        {
+            Itinerary itinerary = new Itinerary();
+            itinerary.setCurrency("€");
+            Date currentDate = Calendar.getInstance().getTime();
+            currentDate.setMonth( currentDate.getMonth() + random.nextInt(3) );
+            currentDate.setDate( currentDate.getDate() + random.nextInt(10) );
+            itinerary.setDate(new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(currentDate));
+            itinerary.setIdCicerone(targetCiceroneId);
+            itinerary.setLanguage("Italiano");
+            String place = places.get( random.nextInt( places.size()-1 ));
+            itinerary.setLocation(place);
+            itinerary.setMeetingPlace(place);
+            itinerary.setMaxParticipants(random.nextInt(100));
+            itinerary.setPrice( (float) random.nextInt(5000) / 100f);
+            itinerary.setMeetingTime("23:" + random.nextInt(5) + "" + random.nextInt(9));
+
+            //  Participants
+            List<User> participants = new Vector<>();
+            int bound = random.nextInt(5);
+
+            for(int n = 0; n < bound; n++)
+            {
+                User user = new User();
+                user.setId("FAKE USER");
+                user.setName("Svil #" + n);
+                user.setProfileImageUrl("fakeUrl://sdfgwwerbwrgwergwergwebwe");
+                participants.add(user);
+            }
+
+            itinerary.setParticipants(participants);
+
+            //  Stages
+            List<Stage> stages = new Vector<>();
+            bound = random.nextInt(5);
+
+            for(int n = 0; n < bound; n++)
+            {
+                String loc = places.get( random.nextInt( places.size()-1 ));
+                LatLng coords = new LatLng((float) random.nextInt(10000) / 100f,
+                        (float) random.nextInt(10000) / 100f);
+                stages.add( new Stage(loc, loc, coords));
+            }
+
+            itinerary.setStages(stages);
+            itinerary.generateId();
+
+            BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener()
+            {
+                @Override
+                public void onSuccess()
+                {
+                    if(count == nItineraries)
+                        assertTrue(true);
+                    else
+                        count++;
+                }
+
+                @Override
+                public void onError() { fail(); }
+            });
+        }
     }
 }

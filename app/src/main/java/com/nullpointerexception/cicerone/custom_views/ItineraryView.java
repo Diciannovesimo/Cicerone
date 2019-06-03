@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -17,14 +18,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.ImageFetcher;
 import com.nullpointerexception.cicerone.components.Itinerary;
+import com.nullpointerexception.cicerone.components.ObjectSharer;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -58,6 +66,8 @@ public class ItineraryView extends FrameLayout
     private boolean stoppedScrollbars = false;
     /**   Indicates if this view is last element of a list */
     private boolean isLastElement = false;
+    /**   Indicates if this itinerary can be edited.   */
+    private boolean isEditAllowed = true;
 
     @SuppressLint("ClickableViewAccessibility")
     public ItineraryView(@NonNull Context context)
@@ -95,13 +105,16 @@ public class ItineraryView extends FrameLayout
                     setScaleY(1f);
                     setAlpha(1f);
 
-                    if( ! isCollapsed)
+                    if( ! isCollapsed && isEditAllowed)
                         collapse();
 
                     break;
 
                 case MotionEvent.ACTION_MOVE:
-                    checkTouchEventsWith(motionEvent);
+
+                    if(isEditAllowed)
+                        checkTouchEventsWith(motionEvent);
+
                     break;
 
                 case MotionEvent.ACTION_UP:
@@ -109,9 +122,10 @@ public class ItineraryView extends FrameLayout
                     setScaleY(1f);
                     setAlpha(1f);
 
-                    checkTouchEventsWith(motionEvent);
+                    if(isEditAllowed)
+                        checkTouchEventsWith(motionEvent);
 
-                    if(isCollapsed)
+                    if(isCollapsed || ! isEditAllowed)
                     {
                         if (onViewClickListener != null)
                             onViewClickListener.onViewClick();
@@ -129,7 +143,7 @@ public class ItineraryView extends FrameLayout
 
         setOnLongClickListener(view ->
         {
-            if( isCollapsed)
+            if( isCollapsed && isEditAllowed)
                 expand();
 
             return false;
@@ -226,16 +240,21 @@ public class ItineraryView extends FrameLayout
         city.setText(itinerary.getLocation());
 
         //Change date format
+        Date day = null;
         try
         {
-            Date day = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).parse(itinerary.getDate());
+            day = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).parse(itinerary.getDate());
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             String dayString = formatter.format(day);
             date.setText(dayString);
         }
-        catch (Exception e){
-            e.printStackTrace();
+        catch (Exception e)
+        {
+            Log.e("ItineraryView", e.toString());
         }
+
+        if(day != null)
+            isEditAllowed = day.after(Calendar.getInstance().getTime());
 
         meeting.setText(itinerary.getMeetingPlace() + " - " + itinerary.getMeetingTime());
         cicerone.setVisibility(GONE);
@@ -250,37 +269,58 @@ public class ItineraryView extends FrameLayout
             imageView.setLayoutParams(params);
         });
 
-        //  TODO: Add check time
-
         String keyword = itinerary.getLocation() + " " + getResources().getString(R.string.city);
 
         if(itinerary.getLocation().trim().equalsIgnoreCase("bitritto"))
             keyword = "corvo gigante bitritto";
 
-        new ImageFetcher().findSubject(keyword,
-        new ImageFetcher.OnImageFoundListener()
+        Drawable resource = (Drawable) ObjectSharer.get().getSharedObject("resource_" + keyword);
+        if(resource == null)
         {
-            @Override
-            public void onImageFound(String url)
-            {
-                Log.i("ImageFetcher", "Success! Link -->" + url);
+            String finalKeyword = keyword;
+            new ImageFetcher().findSubject(keyword,
+                    new ImageFetcher.OnImageFoundListener()
+                    {
+                        @Override
+                        public void onImageFound(String url)
+                        {
+                            Log.i("ImageFetcher", "Success! Link -->" + url);
 
-                if(city.getContext() instanceof Activity)
-                {
-                    ((Activity) city.getContext()).runOnUiThread(() ->
-                            Glide.with(city.getContext())
-                            .load(url)
-                            .transition(DrawableTransitionOptions.withCrossFade())
-                            .into(imageView));
-                }
-            }
+                            if(city.getContext() instanceof Activity)
+                            {
+                                ((Activity) city.getContext()).runOnUiThread(() ->
+                                        Glide.with(city.getContext())
+                                                .load(url)
+                                                .transition(DrawableTransitionOptions.withCrossFade())
+                                                .listener(new RequestListener<Drawable>()
+                                                {
+                                                    @Override
+                                                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource)
+                                                    {
+                                                        return false;
+                                                    }
 
-            @Override
-            public void onError()
-            {
-                Log.i("ImageFetcher", "Errore.");
-            }
-        });
+                                                    @Override
+                                                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource)
+                                                    {
+                                                        ObjectSharer.get().shareObject("resource_" + finalKeyword, resource);
+                                                        return false;
+                                                    }
+                                                })
+                                                .into(imageView));
+                            }
+                        }
+
+                        @Override
+                        public void onError()
+                        {
+                            Log.i("ImageFetcher", "Errore.");
+                        }
+                    });
+        }
+        else
+            imageView.setImageDrawable(resource);
+
     }
 
     public void setAsLastElement(boolean value)
