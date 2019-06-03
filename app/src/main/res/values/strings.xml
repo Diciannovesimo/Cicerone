@@ -9,6 +9,8 @@
     <string name="app_name">Cicerone</string>
     <string name="generic_error">Si è verificato un errore.</string>
 
+    <string name="city">città</string>
+
     <!-- LoginActivity -->
     <string name="title_activity_login">LoginActivity</string>
     <string name="emailTextFieldHint">Email</string>

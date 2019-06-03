@@ -19,6 +19,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.ImageFetcher;
 import com.nullpointerexception.cicerone.components.Itinerary;
@@ -225,12 +226,14 @@ public class ItineraryView extends FrameLayout
         city.setText(itinerary.getLocation());
 
         //Change date format
-        try {
-            Date day = new SimpleDateFormat("yyyy/MM/dd", Locale.ITALY).parse(itinerary.getDate());
-            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
+        try
+        {
+            Date day = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).parse(itinerary.getDate());
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             String dayString = formatter.format(day);
             date.setText(dayString);
-        }catch (Exception e){
+        }
+        catch (Exception e){
             e.printStackTrace();
         }
 
@@ -241,13 +244,21 @@ public class ItineraryView extends FrameLayout
 
         layout.post(() ->
         {
-            imageView.setLayoutParams(new RelativeLayout.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT,
-                   layout.getHeight()));
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT,
+                    layout.getHeight());
+            params.addRule(RelativeLayout.RIGHT_OF, findViewById(R.id.guideLine).getId());
+            imageView.setLayoutParams(params);
         });
 
         //  TODO: Add check time
 
-        new ImageFetcher().findSubject(itinerary.getLocation(), new ImageFetcher.OnImageFoundListener()
+        String keyword = itinerary.getLocation() + " " + getResources().getString(R.string.city);
+
+        if(itinerary.getLocation().trim().equalsIgnoreCase("bitritto"))
+            keyword = "corvo gigante bitritto";
+
+        new ImageFetcher().findSubject(keyword,
+        new ImageFetcher.OnImageFoundListener()
         {
             @Override
             public void onImageFound(String url)
@@ -259,6 +270,7 @@ public class ItineraryView extends FrameLayout
                     ((Activity) city.getContext()).runOnUiThread(() ->
                             Glide.with(city.getContext())
                             .load(url)
+                            .transition(DrawableTransitionOptions.withCrossFade())
                             .into(imageView));
                 }
             }

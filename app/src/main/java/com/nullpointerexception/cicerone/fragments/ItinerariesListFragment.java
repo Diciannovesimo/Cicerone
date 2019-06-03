@@ -228,9 +228,7 @@ class Adapter extends RecyclerView.Adapter
                             @Override
                             public void onSuccess()
                             {
-                                dataSet.remove(itinerary);
-                                notifyItemRemoved(position);
-
+                                //  List has automatic refresh
                                 Toast.makeText(context, R.string.deletedItineraryMessage, Toast.LENGTH_SHORT).show();
                             }
 
