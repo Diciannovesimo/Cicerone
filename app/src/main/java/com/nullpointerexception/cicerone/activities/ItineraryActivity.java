@@ -42,7 +42,6 @@ import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.googleAutocompletationField;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -392,7 +391,7 @@ public class ItineraryActivity extends AppCompatActivity {
                         mLuogo.setText(place.getName());
                         break;
                     case 2:
-                        mPuntoIncontro.setText(place.getAddress());
+                        mPuntoIncontro.setText(place.getName());
                         break;
                     case 3:
                         stage = new Stage(place.getName(), place.getAddress(), place.getLatLng());
@@ -490,11 +489,11 @@ public class ItineraryActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
 
-                        DateFormat dateFormat = new SimpleDateFormat("hh:mm", Locale.ITALY);
-
                         try {
-                            Date date = dateFormat.parse(mOra.getText().toString());
-                            new_itinerary.setMeetingTime(date.toString());
+                            Date time = new SimpleDateFormat("hh:mm", Locale.ITALY).parse(mOra.getText().toString());
+                            SimpleDateFormat formatter = new SimpleDateFormat("hh:mm", Locale.ITALY);
+                            String timeString = formatter.format(time);
+                            new_itinerary.setMeetingTime(timeString);
                         }catch (Exception e){
                             e.printStackTrace();
                         }
