@@ -42,6 +42,7 @@ import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.googleAutocompletationField;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -489,7 +490,14 @@ public class ItineraryActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
 
-                        new_itinerary.setMeetingTime(mOra.getText().toString());
+                        DateFormat dateFormat = new SimpleDateFormat("hh:mm", Locale.ITALY);
+
+                        try {
+                            Date date = dateFormat.parse(mOra.getText().toString());
+                            new_itinerary.setMeetingTime(date.toString());
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
 
                         if (!mMaxPart.getText().toString().isEmpty())
                             new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
@@ -548,7 +556,14 @@ public class ItineraryActivity extends AppCompatActivity {
                                     e.printStackTrace();
                                 }
 
-                                new_itinerary.setMeetingTime(mOra.getText().toString());
+                                try {
+                                    Date time = new SimpleDateFormat("hh:mm", Locale.ITALY).parse(mOra.getText().toString());
+                                    SimpleDateFormat formatter = new SimpleDateFormat("hh:mm", Locale.ITALY);
+                                    String timeString = formatter.format(time);
+                                    new_itinerary.setMeetingTime(timeString);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
 
                                 if (!mMaxPart.getText().toString().isEmpty())
                                     new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
