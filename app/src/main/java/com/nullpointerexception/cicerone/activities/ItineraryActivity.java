@@ -566,7 +566,7 @@ public class ItineraryActivity extends AppCompatActivity {
                             String dayString = formatter.format(day);
                             new_itinerary.setDate(dayString);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            Log.e(TAG, e.toString());
                         }
 
                         try {
@@ -575,7 +575,7 @@ public class ItineraryActivity extends AppCompatActivity {
                             String timeString = formatter.format(time);
                             new_itinerary.setMeetingTime(timeString);
                         }catch (Exception e){
-                            e.printStackTrace();
+                            Log.e(TAG, e.toString());
                         }
 
                         if (!mMaxPart.getText().toString().isEmpty())
@@ -599,21 +599,58 @@ public class ItineraryActivity extends AppCompatActivity {
 
                         new_itinerary.setStages(placeInterface);
 
-                        //Load the itinerary on Firebase DB
-                        BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                        final Itinerary checkItinerary = new Itinerary();
+                        checkItinerary.setIdCicerone(new_itinerary.getIdCicerone());
+                        checkItinerary.setDate(new_itinerary.getDate());
+                        checkItinerary.setMeetingTime(new_itinerary.getMeetingTime());
+                        checkItinerary.generateId();
+
+                        //TODO: Vedere con Luca questo metodo
+                        //Check if the itinerary already exist
+                        BackEndInterface.get().getEntity(checkItinerary, new BackEndInterface.OnOperationCompleteListener() {
                             @Override
                             public void onSuccess() {
-
-                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
-                                finish();
+                                Toast.makeText(getApplicationContext(), "L'itinerario esiste già", Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onError() {
-                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
+                                //Load the itinerary on Firebase DB
+                                BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                                    @Override
+                                    public void onSuccess() {
 
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
                             }
                         });
+
+                        /*
+                        //Load the itinerary on Firebase DB
+                                BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                                    @Override
+                                    public void onSuccess() {
+
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
+                         */
+
                         return true;
                     } else {
                         BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
@@ -632,7 +669,7 @@ public class ItineraryActivity extends AppCompatActivity {
                                     String dayString = formatter.format(day);
                                     new_itinerary.setDate(dayString);
                                 } catch (Exception e) {
-                                    e.printStackTrace();
+                                    Log.e(TAG, e.toString());
                                 }
 
                                 try {
@@ -641,7 +678,7 @@ public class ItineraryActivity extends AppCompatActivity {
                                     String timeString = formatter.format(time);
                                     new_itinerary.setMeetingTime(timeString);
                                 }catch (Exception e){
-                                    e.printStackTrace();
+                                    Log.e(TAG, e.toString());
                                 }
 
                                 if (!mMaxPart.getText().toString().isEmpty())
@@ -717,7 +754,7 @@ public class ItineraryActivity extends AppCompatActivity {
             String dayString = formatter.format(day);
             mData.setText(dayString);
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e(TAG, e.toString());
         }
 
         mOra.setText(itinerary.getMeetingTime());
@@ -872,24 +909,6 @@ public class ItineraryActivity extends AppCompatActivity {
             button.setTitle("modifica");
         else
             button.setTitle("crea");
-    }
-
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case 1: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
     }
 
     public boolean checkLocationPermission()
