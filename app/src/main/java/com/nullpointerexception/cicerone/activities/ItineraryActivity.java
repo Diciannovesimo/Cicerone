@@ -1,9 +1,11 @@
 package com.nullpointerexception.cicerone.activities;
 
+import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,11 +25,19 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
@@ -42,7 +52,6 @@ import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.googleAutocompletationField;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +63,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
+
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
  *      ItineraryActivity
@@ -68,7 +79,7 @@ public class ItineraryActivity extends AppCompatActivity {
     private EditText mLuogo, mPuntoIncontro, mData, mOra, mMaxPart, mLingua, mPlace, mPlaceDesc;
     private ExtendedEditText mDescrizione;
     private studio.carbonylgroup.textfieldboxes.ExtendedEditText mCompenso;
-    private ImageView mAddStage, mRemoveStage;
+    private ImageView mAddStage, mRemoveStage, findPosition;
     private TextView placeName_tv, placeAddress_tv, placeDescription_tv, listStage_title, errorMsg_tv;
     private TextFieldBoxes luogo_box, punto_box, data_box, orario_box, partecipanti_box, place_box, lingua_box;
     private com.kinda.mtextfield.TextFieldBoxes descrizione_itinerario_box, descrizione_tappa_box;
@@ -94,6 +105,11 @@ public class ItineraryActivity extends AppCompatActivity {
     Calendar calendar;
     private DatePickerDialog dpd;
     private String birthdayString;
+
+    //GPS permission
+    private boolean gpsPermission = false;
+
+    private PlaceLikelihood MaxPlaceLikelihood;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -131,6 +147,11 @@ public class ItineraryActivity extends AppCompatActivity {
         //Initialize Google Places API
         Places.initialize(getApplicationContext(), getResources().getString(R.string.place_KEY));
         fields = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG);
+        PlacesClient placesClient = Places.createClient(this);
+
+        // Use the builder to create a FindCurrentPlaceRequest.
+        FindCurrentPlaceRequest request =
+                FindCurrentPlaceRequest.builder(fields).build();
 
         //Initialize spinner
         spinner = findViewById(R.id.spinner_valute);
@@ -223,6 +244,7 @@ public class ItineraryActivity extends AppCompatActivity {
             mPlaceDesc = mView.findViewById(R.id.placeDesc_et);
             place_box = mView.findViewById(R.id.place_box);
             create_stage = mView.findViewById(R.id.createStage_btn);
+            findPosition = mView.findViewById(R.id.findPosition);
 
             mPlace.setEnabled(false);
 
@@ -243,6 +265,61 @@ public class ItineraryActivity extends AppCompatActivity {
                         AutocompleteActivityMode.FULLSCREEN, fields)
                         .build(v1.getContext());
                 startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+            });
+
+            //Listener to capture user's position
+            findPosition.setOnClickListener(v14 -> {
+
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+
+                gpsPermission = checkLocationPermission();
+
+                if(gpsPermission) {
+
+                    if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
+                        placeResponse.addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                FindCurrentPlaceResponse response = task.getResult();
+                                MaxPlaceLikelihood = null;
+                                int counter = 0;
+
+                                for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+                                    if(counter == 0)
+                                        MaxPlaceLikelihood = placeLikelihood;
+
+                                    counter++;
+
+                                    if(MaxPlaceLikelihood.getLikelihood() <= placeLikelihood.getLikelihood())
+                                        MaxPlaceLikelihood = placeLikelihood;
+
+                                    Log.i(TAG, String.format("Place '%s' has likelihood: %f",
+                                            placeLikelihood.getPlace().getName(),
+                                            placeLikelihood.getLikelihood()));
+                                }
+                                //Set the name of Stage in EditText
+                                mPlace.setText(MaxPlaceLikelihood.getPlace().getName());
+                                Log.i(TAG, MaxPlaceLikelihood.getPlace().getName());
+                                //Set attributes of Place in stage
+                                stage = new Stage();
+                                stage.setName(MaxPlaceLikelihood.getPlace().getName());
+                                stage.setCoordinates(MaxPlaceLikelihood.getPlace().getLatLng());
+                                Log.i(TAG, MaxPlaceLikelihood.getPlace().getLatLng().toString());
+                                stage.setAddress(MaxPlaceLikelihood.getPlace().getAddress());
+                                Log.i(TAG, MaxPlaceLikelihood.getPlace().getAddress());
+                            } else {
+                                Exception exception = task.getException();
+                                if (exception instanceof ApiException) {
+                                    ApiException apiException = (ApiException) exception;
+                                    Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+                                }
+                            }
+                        });
+                    }
+                }else {
+                    ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                }
+
             });
 
             //Check if the number of character in description field is more than 250 character
@@ -394,7 +471,7 @@ public class ItineraryActivity extends AppCompatActivity {
                         mLuogo.setText(place.getName());
                         break;
                     case 2:
-                        mPuntoIncontro.setText(place.getAddress());
+                        mPuntoIncontro.setText(place.getName());
                         break;
                     case 3:
                         stage = new Stage(place.getName(), place.getAddress(), place.getLatLng());
@@ -492,11 +569,11 @@ public class ItineraryActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
 
-                        DateFormat dateFormat = new SimpleDateFormat("hh:mm", Locale.ITALY);
-
                         try {
-                            Date date = dateFormat.parse(mOra.getText().toString());
-                            new_itinerary.setMeetingTime(date.toString());
+                            Date time = new SimpleDateFormat("HH:mm", Locale.ITALY).parse(mOra.getText().toString());
+                            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.ITALY);
+                            String timeString = formatter.format(time);
+                            new_itinerary.setMeetingTime(timeString);
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -559,8 +636,8 @@ public class ItineraryActivity extends AppCompatActivity {
                                 }
 
                                 try {
-                                    Date time = new SimpleDateFormat("hh:mm", Locale.ITALY).parse(mOra.getText().toString());
-                                    SimpleDateFormat formatter = new SimpleDateFormat("hh:mm", Locale.ITALY);
+                                    Date time = new SimpleDateFormat("HH:mm", Locale.ITALY).parse(mOra.getText().toString());
+                                    SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.ITALY);
                                     String timeString = formatter.format(time);
                                     new_itinerary.setMeetingTime(timeString);
                                 }catch (Exception e){
@@ -795,6 +872,31 @@ public class ItineraryActivity extends AppCompatActivity {
             button.setTitle("modifica");
         else
             button.setTitle("crea");
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    public boolean checkLocationPermission()
+    {
+        String permission = "android.permission.ACCESS_FINE_LOCATION";
+        int res = this.checkCallingOrSelfPermission(permission);
+        return (res == PackageManager.PERMISSION_GRANTED);
     }
 
     @Override
