@@ -568,8 +568,8 @@ public class ItineraryActivity extends AppCompatActivity {
                         }
 
                         try {
-                            Date time = new SimpleDateFormat("hh:mm", Locale.ITALY).parse(mOra.getText().toString());
-                            SimpleDateFormat formatter = new SimpleDateFormat("hh:mm", Locale.ITALY);
+                            Date time = new SimpleDateFormat("HH:mm", Locale.ITALY).parse(mOra.getText().toString());
+                            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.ITALY);
                             String timeString = formatter.format(time);
                             new_itinerary.setMeetingTime(timeString);
                         }catch (Exception e){
@@ -634,8 +634,8 @@ public class ItineraryActivity extends AppCompatActivity {
                                 }
 
                                 try {
-                                    Date time = new SimpleDateFormat("hh:mm", Locale.ITALY).parse(mOra.getText().toString());
-                                    SimpleDateFormat formatter = new SimpleDateFormat("hh:mm", Locale.ITALY);
+                                    Date time = new SimpleDateFormat("HH:mm", Locale.ITALY).parse(mOra.getText().toString());
+                                    SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.ITALY);
                                     String timeString = formatter.format(time);
                                     new_itinerary.setMeetingTime(timeString);
                                 }catch (Exception e){
