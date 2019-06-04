@@ -96,7 +96,8 @@ public class ItineraryActivity extends AppCompatActivity {
     private String birthdayString;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_itinerary);
 
@@ -104,7 +105,8 @@ public class ItineraryActivity extends AppCompatActivity {
         initUI();
 
         //Receiver data from intent if the user wants to edit an itinerary
-        if(ObjectSharer.get().getSharedObject("edit_itinerary") != null) {
+        if(ObjectSharer.get().getSharedObject("edit_itinerary") != null)
+        {
             edit_mode = true;
             itinerary = (Itinerary)ObjectSharer.get().getSharedObject("edit_itinerary");
             setTextField(itinerary);
@@ -650,25 +652,29 @@ public class ItineraryActivity extends AppCompatActivity {
         //Initialize spinner
         spinner = findViewById(R.id.spinner_valute);
         spinner.setItems("€ Euro", "$ Dollaro", "£ Sterlina");
-        switch (itinerary.getCurrency()) {
-            case "€":
-                spinner.setSelectedIndex(0);
-                break;
-            case "$":
-                spinner.setSelectedIndex(1);
-                break;
-            case "£":
-                spinner.setSelectedIndex(2);
-                break;
-        }
+        if(itinerary.getCurrency() != null)
+            switch (itinerary.getCurrency())
+            {
+                case "€":
+                    spinner.setSelectedIndex(0);
+                    break;
+                case "$":
+                    spinner.setSelectedIndex(1);
+                    break;
+                case "£":
+                    spinner.setSelectedIndex(2);
+                    break;
+            }
 
         mDescrizione.setText(itinerary.getDescription());
 
+        if(itinerary.getStages() != null)
         for(int i = 0; i < itinerary.getStages().size(); ++i)
             tappe.put(itinerary.getStages().get(i).getName(), itinerary.getStages().get(i));
 
         //Creo nuovi Layout tappe
-        if(tappe.size() > 0) {
+        if(tappe.size() > 0)
+        {
             listStage_title.setVisibility(View.GONE);
 
             for (Map.Entry<String, Stage> entry : tappe.entrySet()) {
@@ -700,11 +706,12 @@ public class ItineraryActivity extends AppCompatActivity {
     }
 
     /**
-     * Check if all fields are compiled correctly.
+     *      Check if all fields are compiled correctly.
      *
-     * @return true if all fields are successfully checked, false if there's a problem
+     *      @return true if all fields are successfully checked, false if there's a problem
      */
-    private boolean checkField() {
+    private boolean checkField()
+    {
         boolean alright = true;
 
         if(mLuogo.getText().toString().isEmpty()) {

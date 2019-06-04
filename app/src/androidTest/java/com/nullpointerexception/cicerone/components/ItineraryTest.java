@@ -369,8 +369,32 @@ public class ItineraryTest
         });
     }
 
+    @Test
+    public void generateIdTest()
+    {
+        Itinerary itinerary = new Itinerary();
+        itinerary.setIdCicerone("34CCpLlS9Eb6aTUcOXLvt5gh0cu1");
+        itinerary.setDate("2019-06-04");
+        itinerary.setMeetingTime("20:30");
+        itinerary.generateId();
+
+        assertEquals( itinerary.getId(), "34CCpLlS9Eb6aTUcOXLvt5gh0cu12019-06-0420:30");
+    }
+
+    @Test
+    public void getFieldsFromIdTest()
+    {
+        Itinerary itinerary = new Itinerary();
+        itinerary.setId("34CCpLlS9Eb6aTUcOXLvt5gh0cu12019-06-0420:30");
+        itinerary.getFieldsFromId();
+
+        assertEquals( itinerary.getIdCicerone(), "34CCpLlS9Eb6aTUcOXLvt5gh0cu1");
+        assertEquals( itinerary.getDate(), "2019-06-04" );
+        assertEquals( itinerary.getMeetingTime(), "20:30" );
+    }
+
     int count = 0;
-    //  TODO: Decommentare test ed avviarlo in singolo per generare itinerari.
+    //  TODO: Decommentare test e avviarlo in singolo in modalità debug con breakpoint a storeEntity per generare itinerari.
     //@Test
     public void fillItineraries()
     {
@@ -388,7 +412,7 @@ public class ItineraryTest
             itinerary.setCurrency("€");
             Date currentDate = Calendar.getInstance().getTime();
             currentDate.setMonth( currentDate.getMonth() + random.nextInt(3) );
-            currentDate.setDate( currentDate.getDate() + random.nextInt(10) );
+            currentDate.setDate( random.nextInt(20) );
             itinerary.setDate(new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(currentDate));
             itinerary.setIdCicerone(targetCiceroneId);
             itinerary.setLanguage("Italiano");
@@ -397,7 +421,8 @@ public class ItineraryTest
             itinerary.setMeetingPlace(place);
             itinerary.setMaxParticipants(random.nextInt(100));
             itinerary.setPrice( (float) random.nextInt(5000) / 100f);
-            itinerary.setMeetingTime("23:" + random.nextInt(5) + "" + random.nextInt(9));
+            itinerary.setMeetingTime("23:" + (10 + random.nextInt(49)));
+            itinerary.setDescription("A little trip in " + place + ", hope you will like it!");
 
             //  Participants
             List<User> participants = new Vector<>();
@@ -407,7 +432,7 @@ public class ItineraryTest
             {
                 User user = new User();
                 user.setId("FAKE USER");
-                user.setName("Svil #" + n);
+                user.setName("User #" + n);
                 user.setProfileImageUrl("fakeUrl://sdfgwwerbwrgwergwergwebwe");
                 participants.add(user);
             }
@@ -416,7 +441,7 @@ public class ItineraryTest
 
             //  Stages
             List<Stage> stages = new Vector<>();
-            bound = random.nextInt(5);
+            bound = random.nextInt(5) + 1;
 
             for(int n = 0; n < bound; n++)
             {

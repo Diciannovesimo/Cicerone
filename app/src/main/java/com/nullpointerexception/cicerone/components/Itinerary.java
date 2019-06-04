@@ -1,5 +1,6 @@
 package com.nullpointerexception.cicerone.components;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
@@ -145,18 +146,42 @@ public class Itinerary extends StorableEntity implements ListOfStorables
         this.description = description;
     }
 
+    /**
+     *      Generates an id based on its three attributes idCicerone, date and meetingTime
+     */
     public void generateId()
     {
         id = idCicerone + date + meetingTime;
         id = id.replace("/", "-").replace(".", "~");
     }
 
+    /**
+     *      Get attributes idCicerone, date and meetingTime parsing id
+     */
+    public void getFieldsFromId()
+    {
+        if(id == null || id.isEmpty())
+            return;
+
+        String id = this.id.replace("-", "/").replace("~", ".");
+
+        idCicerone = id.substring(0, id.indexOf("/")-4);
+        date = id.substring(idCicerone.length(), idCicerone.length() + 10);
+        meetingTime = id.substring( idCicerone.length() + date.length() );
+    }
+
+    /**
+     *      Implementation of its superclass method
+     */
     @Override
     public String getId()
     {
         return id;
     }
 
+    /**
+     *      Implementation of its superclass method
+     */
     @Override
     public Object addNewInstanceInto(String fieldName)
     {
@@ -182,6 +207,15 @@ public class Itinerary extends StorableEntity implements ListOfStorables
         }
 
         return null;
+    }
+
+    /**
+     *      Implementation of its superclass method
+     */
+    @Override
+    public List<String> getIgnoredFields()
+    {
+        return Arrays.asList("id", "idCicerone", "date", "meetingTime");
     }
 
     @Override

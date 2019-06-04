@@ -181,6 +181,9 @@ public class User extends StorableEntity implements StorableAsField
         return map;
     }
 
+    /**
+     *      Implementation of its superclass method
+     */
     @Override
     public void restoreId(String id)
     {

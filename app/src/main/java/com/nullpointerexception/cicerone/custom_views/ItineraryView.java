@@ -271,12 +271,15 @@ public class ItineraryView extends FrameLayout
 
         String keyword = itinerary.getLocation() + " " + getResources().getString(R.string.city);
 
-        if(itinerary.getLocation().trim().equalsIgnoreCase("bitritto"))
+        if(itinerary.getLocation() != null &&
+                itinerary.getLocation().trim().equalsIgnoreCase("bitritto"))
             keyword = "corvo gigante bitritto";
 
         Drawable resource = (Drawable) ObjectSharer.get().getSharedObject("resource_" + keyword);
         if(resource == null)
         {
+            imageView.setImageDrawable(null);
+
             String finalKeyword = keyword;
             new ImageFetcher().findSubject(keyword,
                     new ImageFetcher.OnImageFoundListener()

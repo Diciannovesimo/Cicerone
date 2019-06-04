@@ -253,7 +253,6 @@ public class BackEndInterface
 
                         if(fieldValue.isAList())
                         {
-                            Log.i(TAG, fieldName + ": List detected");
 
                             List<FieldValue> fieldValues = new Vector<>();
 
@@ -292,8 +291,6 @@ public class BackEndInterface
                         }
                         if(fieldValue.isSubfield())
                         {
-                            Log.i(TAG, fieldName + ": SubField detected");
-
                             Map<String, String> map = new HashMap<>();
 
                             for(DataSnapshot dsChild : ds.getChildren())
@@ -324,7 +321,6 @@ public class BackEndInterface
                         }
                         else
                         {
-                            Log.i(TAG, fieldName + ": Just a normal string");
                             fields.put(fieldName, new FieldValue( getValue(ds, fieldValue)) );
                         }
                     }
@@ -334,13 +330,14 @@ public class BackEndInterface
                     }
                 }
 
+                /*
                 Log.i(TAG, "Fields Map:");
                 for(String key : fields.keySet())
                 {
                     if(fields.get(key) != null)
                         Log.i(TAG, "\"" + key + "\": " + fields.get(key).toString());
                 }
-                Log.i(TAG, "------------");
+                Log.i(TAG, "------------");*/
 
                 setFields(entity, fields);
 
@@ -396,6 +393,7 @@ public class BackEndInterface
                     Itinerary itinerary = new Itinerary();
                     itinerary.setId(ds.getKey());
                     getEntityFrom(itinerary, ds);
+                    itinerary.getFieldsFromId();
                     itinerariesList.add(itinerary);
                 }
 
@@ -436,8 +434,6 @@ public class BackEndInterface
 
                 if(fieldValue.isAList())
                 {
-                    Log.i(TAG, fieldName + ": List detected");
-
                     List<FieldValue> fieldValues = new Vector<>();
 
                     for(DataSnapshot dsChild1 : ds.getChildren())
