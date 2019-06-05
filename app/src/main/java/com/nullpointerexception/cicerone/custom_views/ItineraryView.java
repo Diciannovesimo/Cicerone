@@ -287,8 +287,6 @@ public class ItineraryView extends FrameLayout
                         @Override
                         public void onImageFound(String url)
                         {
-                            Log.i("ImageFetcher", "Success! Link -->" + url);
-
                             if(city.getContext() instanceof Activity)
                             {
                                 ((Activity) city.getContext()).runOnUiThread(() ->

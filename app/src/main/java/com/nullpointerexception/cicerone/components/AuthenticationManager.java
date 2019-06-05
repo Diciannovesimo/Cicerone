@@ -509,7 +509,7 @@ public class AuthenticationManager
             this.onLoginResultListener = onLoginResultListener;
         }
 
-        private OnLoginResultListener getOnLoginResultListener() { return onLoginResultListener; }
+        public OnLoginResultListener getOnLoginResultListener() { return onLoginResultListener; }
 
         /**
          *      Add an implementation for the method called after a login result.

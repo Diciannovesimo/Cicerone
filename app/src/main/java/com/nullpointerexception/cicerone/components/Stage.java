@@ -75,7 +75,9 @@ public class Stage implements StorableAsField
     @Override
     public void restoreId(String id)
     {
-        id = id.replace(" ", "");
+        id = id.replace(" ", "")
+                .replace("/", "")
+                .replace("\\", "");
         double lat = Double.parseDouble( id.substring(id.indexOf("(")+1, id.indexOf(",")) );
         double lng = Double.parseDouble( id.substring(id.indexOf(",")+1, id.indexOf(")")) );
         this.coordinates = new LatLng(lat, lng);
