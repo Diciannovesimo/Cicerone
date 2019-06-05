@@ -602,118 +602,119 @@ public class ItineraryActivity extends AppCompatActivity {
                         final Itinerary checkItinerary = new Itinerary();
                         checkItinerary.setId(new_itinerary.getId());
 
-                        //TODO: Vedere con Luca questo metodo
-                        //Check if the itinerary already exist
                         BackEndInterface.get().getEntity(checkItinerary, new BackEndInterface.OnOperationCompleteListener() {
                             @Override
                             public void onSuccess() {
-                                Toast.makeText(getApplicationContext(), "L'itinerario esiste già", Toast.LENGTH_SHORT).show();
+                                if(checkItinerary.getLocation() != null && !checkItinerary.getLocation().isEmpty()) {
+                                    Toast.makeText(getApplicationContext(), "L'itinerario inserito è già esistente", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    //Load the itinerary on Firebase DB
+                                    BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
+                                            finish();
+                                        }
+
+                                        @Override
+                                        public void onError() {
+                                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
                             }
 
                             @Override
                             public void onError() {
-                                //Load the itinerary on Firebase DB
-                                BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                                    @Override
-                                    public void onSuccess() {
 
-                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
-                                        finish();
-                                    }
-
-                                    @Override
-                                    public void onError() {
-                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
-
-                                    }
-                                });
                             }
                         });
 
-                        /*
-                        //Load the itinerary on Firebase DB
-                                BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                                    @Override
-                                    public void onSuccess() {
-
-                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_create_itinerary_toast), Toast.LENGTH_SHORT).show();
-                                        finish();
-                                    }
-
-                                    @Override
-                                    public void onError() {
-                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
-
-                                    }
-                                });
-                         */
-
                         return true;
                     } else {
+                        Itinerary new_itinerary = new Itinerary();
+
+                        //Inserimento specifiche nell'itinerario
+                        new_itinerary.setLocation(mLuogo.getText().toString());
+                        new_itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
+
+                        //Formatting date
+                        try {
+                            Date day = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).parse(mData.getText().toString());
+                            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.ITALY);
+                            String dayString = formatter.format(day);
+                            new_itinerary.setDate(dayString);
+                        } catch (Exception e) {
+                            Log.e(TAG, e.toString());
+                        }
+
+                        try {
+                            Date time = new SimpleDateFormat("HH:mm", Locale.ITALY).parse(mOra.getText().toString());
+                            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.ITALY);
+                            String timeString = formatter.format(time);
+                            new_itinerary.setMeetingTime(timeString);
+                        }catch (Exception e){
+                            Log.e(TAG, e.toString());
+                        }
+
+                        if (!mMaxPart.getText().toString().isEmpty())
+                            new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
+
+                        new_itinerary.setLanguage(mLingua.getText().toString().trim());
+                        new_itinerary.setCurrency(currency);
+                        new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
+                        new_itinerary.generateId();
+
+                        if (!mCompenso.getText().toString().equals(""))
+                            new_itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
+
+                        new_itinerary.setDescription(mDescrizione.getText().toString());
+
+                        //Creao lista adatta per il passaggio dei dati alla BackEndInterface
+                        List<Stage> placeInterface = new ArrayList<>();
+
+                        for (Map.Entry<String, Stage> entry : tappe.entrySet())
+                            placeInterface.add(entry.getValue());
+
+                        new_itinerary.setStages(placeInterface);
+
+                        final Itinerary checkItinerary = new Itinerary();
+                        checkItinerary.setId(new_itinerary.getId());
+
                         BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
                             @Override
                             public void onSuccess() {
-                                Itinerary new_itinerary = new Itinerary();
-
-                                //Inserimento specifiche nell'itinerario
-                                new_itinerary.setLocation(mLuogo.getText().toString());
-                                new_itinerary.setMeetingPlace(mPuntoIncontro.getText().toString());
-
-                                //Formatting date
-                                try {
-                                    Date day = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).parse(mData.getText().toString());
-                                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.ITALY);
-                                    String dayString = formatter.format(day);
-                                    new_itinerary.setDate(dayString);
-                                } catch (Exception e) {
-                                    Log.e(TAG, e.toString());
-                                }
-
-                                try {
-                                    Date time = new SimpleDateFormat("HH:mm", Locale.ITALY).parse(mOra.getText().toString());
-                                    SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.ITALY);
-                                    String timeString = formatter.format(time);
-                                    new_itinerary.setMeetingTime(timeString);
-                                }catch (Exception e){
-                                    Log.e(TAG, e.toString());
-                                }
-
-                                if (!mMaxPart.getText().toString().isEmpty())
-                                    new_itinerary.setMaxParticipants(Integer.parseInt(mMaxPart.getText().toString()));
-
-                                new_itinerary.setLanguage(mLingua.getText().toString().trim());
-                                new_itinerary.setCurrency(currency);
-                                new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
-                                new_itinerary.generateId();
-
-                                if (!mCompenso.getText().toString().equals(""))
-                                    new_itinerary.setPrice(Float.parseFloat(mCompenso.getText().toString()));
-
-                                new_itinerary.setDescription(mDescrizione.getText().toString());
-
-                                //Creao lista adatta per il passaggio dei dati alla BackEndInterface
-                                List<Stage> placeInterface = new ArrayList<>();
-
-                                for (Map.Entry<String, Stage> entry : tappe.entrySet())
-                                    placeInterface.add(entry.getValue());
-
-                                new_itinerary.setStages(placeInterface);
-
-                                BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                                BackEndInterface.get().getEntity(checkItinerary, new BackEndInterface.OnOperationCompleteListener() {
                                     @Override
                                     public void onSuccess() {
-                                        ObjectSharer.get().shareObject("new_itinerary", new_itinerary);
+                                        if(checkItinerary.getLocation() != null && !checkItinerary.getLocation().isEmpty()) {
+                                            Toast.makeText(getApplicationContext(), "L'itinerario inserito è già esistente", Toast.LENGTH_SHORT).show();
+                                            BackEndInterface.get().storeEntity(itinerary);
 
-                                        //Delete received itinerary
-                                        ObjectSharer.get().remove("edit_itinerary");
+                                        } else {
+                                            //Remove the itinerary from DB
+                                            BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    ObjectSharer.get().shareObject("new_itinerary", new_itinerary);
 
-                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_edit_toast), Toast.LENGTH_SHORT).show();
-                                        finish();
+                                                    //Delete received itinerary
+                                                    ObjectSharer.get().remove("edit_itinerary");
+
+                                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_edit_toast), Toast.LENGTH_SHORT).show();
+                                                    finish();
+                                                }
+
+                                                @Override
+                                                public void onError() {
+                                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        }
                                     }
 
                                     @Override
                                     public void onError() {
-                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.failure_edit_toast), Toast.LENGTH_SHORT).show();
 
                                     }
                                 });
@@ -721,7 +722,7 @@ public class ItineraryActivity extends AppCompatActivity {
 
                             @Override
                             public void onError() {
-                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.connection_error), Toast.LENGTH_SHORT).show();
+
                             }
                         });
                     }
