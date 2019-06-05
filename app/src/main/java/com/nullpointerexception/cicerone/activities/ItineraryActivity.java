@@ -600,10 +600,7 @@ public class ItineraryActivity extends AppCompatActivity {
                         new_itinerary.setStages(placeInterface);
 
                         final Itinerary checkItinerary = new Itinerary();
-                        checkItinerary.setIdCicerone(new_itinerary.getIdCicerone());
-                        checkItinerary.setDate(new_itinerary.getDate());
-                        checkItinerary.setMeetingTime(new_itinerary.getMeetingTime());
-                        checkItinerary.generateId();
+                        checkItinerary.setId(new_itinerary.getId());
 
                         //TODO: Vedere con Luca questo metodo
                         //Check if the itinerary already exist
