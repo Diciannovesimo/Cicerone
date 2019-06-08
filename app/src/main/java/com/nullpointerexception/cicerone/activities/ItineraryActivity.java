@@ -632,6 +632,12 @@ public class ItineraryActivity extends AppCompatActivity {
 
                         return true;
                     } else {
+
+                        mLuogo.setEnabled(false);
+                        mData.setEnabled(false);
+                        data_box.setEnabled(false);
+                        orario_box.setEnabled(false);
+                        
                         Itinerary new_itinerary = new Itinerary();
 
                         //Inserimento specifiche nell'itinerario
