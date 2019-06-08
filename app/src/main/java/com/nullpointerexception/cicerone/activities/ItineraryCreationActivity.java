@@ -67,15 +67,15 @@ import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
- *      ItineraryActivity
+ *      ItineraryCreationActivity
  *
  *      Activity where user can create a new Itinerary.
  *
  *      @author Claudio
  */
-public class ItineraryActivity extends AppCompatActivity {
+public class ItineraryCreationActivity extends AppCompatActivity {
 
-    private static final String TAG = "ItineraryActivity";
+    private static final String TAG = "It_CreationActivity";
     private EditText mLuogo, mPuntoIncontro, mData, mOra, mMaxPart, mLingua, mPlace, mPlaceDesc;
     private ExtendedEditText mDescrizione;
     private studio.carbonylgroup.textfieldboxes.ExtendedEditText mCompenso;
@@ -209,7 +209,7 @@ public class ItineraryActivity extends AppCompatActivity {
             int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
             int minute = mcurrentTime.get(Calendar.MINUTE);
             TimePickerDialog mTimePicker;
-            mTimePicker = new TimePickerDialog(ItineraryActivity.this, R.style.DialogTheme, (timePicker, selectedHour, selectedMinute) -> {
+            mTimePicker = new TimePickerDialog(ItineraryCreationActivity.this, R.style.DialogTheme, (timePicker, selectedHour, selectedMinute) -> {
                 String text = "";
                 text += selectedHour;
                 text += ":";
@@ -235,7 +235,7 @@ public class ItineraryActivity extends AppCompatActivity {
         mAddStage.setOnClickListener(v -> {
 
             //New layout for place's dialog
-            AlertDialog.Builder mBuilder = new AlertDialog.Builder(ItineraryActivity.this);
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(ItineraryCreationActivity.this);
             View mView = getLayoutInflater().inflate(R.layout.activity_dialog_tappe, null);
 
             //Init field of place's layout
@@ -633,11 +633,6 @@ public class ItineraryActivity extends AppCompatActivity {
                         return true;
                     } else {
 
-                        mLuogo.setEnabled(false);
-                        mData.setEnabled(false);
-                        data_box.setEnabled(false);
-                        orario_box.setEnabled(false);
-                        
                         Itinerary new_itinerary = new Itinerary();
 
                         //Inserimento specifiche nell'itinerario
@@ -748,6 +743,13 @@ public class ItineraryActivity extends AppCompatActivity {
      * Reads data from itinerary and sets them in the right EditText
      */
     private void setTextField(Itinerary itinerary) {
+        //disable the following fields
+        mLuogo.setEnabled(false);
+        luogo_box.setEnabled(false);
+        mData.setEnabled(false);
+        data_box.setEnabled(false);
+        orario_box.setEnabled(false);
+
         mLuogo.setText(itinerary.getLocation());
         mPuntoIncontro.setText(itinerary.getMeetingPlace());
 

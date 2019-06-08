@@ -21,7 +21,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
-import com.nullpointerexception.cicerone.activities.ItineraryActivity;
+import com.nullpointerexception.cicerone.activities.ItineraryCreationActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
@@ -139,7 +139,7 @@ public class ItinerariesListFragment extends Fragment
         recyclerView.setAdapter(adapter);
 
         newItineraryButton.setOnClickListener(view1 ->
-                startActivityForResult(new Intent(getActivity(), ItineraryActivity.class), 0));
+                startActivityForResult(new Intent(getActivity(), ItineraryCreationActivity.class), 0));
 
         return view;
     }
@@ -208,7 +208,7 @@ class Adapter extends RecyclerView.Adapter
         {
             Context context = viewHolder.getView().getContext();
             ObjectSharer.get().shareObject("edit_itinerary", dataSet.get(position));
-            context.startActivity(new Intent(context, ItineraryActivity.class));
+            context.startActivity(new Intent(context, ItineraryCreationActivity.class));
         });
 
         viewHolder.getView().setOnDeleteButtonClickListener(() ->
