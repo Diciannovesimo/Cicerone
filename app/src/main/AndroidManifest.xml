@@ -22,7 +22,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".activities.DialogTappe" />
         <activity
-            android:name=".activities.ItineraryActivity"
+            android:name=".activities.ItineraryCreationActivity"
             android:label="@string/title_activity_itinerary"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
