@@ -61,4 +61,5 @@ public class SplashScreen extends AppCompatActivity
             }
         }, 10000);
     }
+
 }

@@ -20,6 +20,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
 import com.nullpointerexception.cicerone.fragments.HomeFragment;
 import com.nullpointerexception.cicerone.fragments.ItinerariesListFragment;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /*
             Vars
      */
+    private Toolbar toolbar;
     private Fragment actualFragment;
 
     @Override
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //  Add home fragment
@@ -90,17 +92,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         User user = AuthenticationManager.get().getUserLogged();
 
+        ProfileDrawerItem profileDrawerItem = new ProfileDrawerItem().withName(user != null? user.getDisplayName(): "")
+                .withEmail(user != null? user.getEmail(): "");
+
+        if (user != null)
+        {
+            new ProfileImageFetcher(getApplicationContext())
+                    .fetchImageOf(user, drawable ->
+                    {
+                        profileDrawerItem.withIcon(drawable);
+                        drawMenuWith(profileDrawerItem);
+                    });
+        }
+
+        drawMenuWith(profileDrawerItem);
+
+    }
+
+    public void drawMenuWith(ProfileDrawerItem profileDrawerItem)
+    {
         Drawer result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withAccountHeader(new AccountHeaderBuilder()
                         .withActivity(this)
                         .addProfiles
-                        (
-                                new ProfileDrawerItem().withName(user != null? user.getDisplayName(): "")
-                                        .withEmail(user != null? user.getEmail(): "")
-                                        .withIcon(getResources().getDrawable(R.drawable.ic_profile))
-                        )
+                                (
+                                        profileDrawerItem
+                                )
                         .withSelectionListEnabled(false)
                         .build()
                 )

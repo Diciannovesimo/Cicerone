@@ -36,6 +36,7 @@ public class HomeFragment extends Fragment
         if(AuthenticationManager.get().getUserLogged() != null)
             ((TextView) view.findViewById(R.id.welcomeText)).setText(
                     "Ciao, " + AuthenticationManager.get().getUserLogged().getName() + " !");
+
         return view;
     }
 }

@@ -21,18 +21,18 @@ public class User extends StorableEntity implements StorableAsField
 {
     /**  Id of account (generally provided by FireBase)   */
     protected String id,
-    /** Email of account */
-    email,
-    /** URL of profile picture */
-    profileImageUrl,
-    /** Name of user */
-    name,
-    /** Surname of user */
-    surname,
-    /** Birth date of user */
-    dateBirth,
-    /** Phone number of user */
-    phoneNumber;
+                    /** Email of account */
+                    email,
+                    /** URL of profile picture */
+                    profileImageUrl,
+                    /** Name of user */
+                    name,
+                    /** Surname of user */
+                    surname,
+                    /** Birth date of user */
+                    dateBirth,
+                    /** Phone number of user */
+                    phoneNumber;
 
     public User() {}
 

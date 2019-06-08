@@ -403,7 +403,8 @@ public class ItineraryTest
         List<String> places = Arrays.asList("Milano", "Venezia", "Torino", "Londra", "Roma", "Barcellona", "Bari",
                 "Canosa di Puglia", "Bitritto", "Napoli", "New York City", "Berlino");
 
-        final String targetCiceroneId = "34CCpLlS9Eb6aTUcOXLvt5gh0cu1";
+        final String targetCiceroneId = "fQv6mnTt6BTnuULNhv1DeasBOuL2";
+        //  34CCpLlS9Eb6aTUcOXLvt5gh0cu1    (Luca account Google)
 
         Random random = new Random();
         for(int i = 0; i < nItineraries; i++)
