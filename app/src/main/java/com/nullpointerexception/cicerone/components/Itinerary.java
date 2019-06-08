@@ -1,7 +1,9 @@
 package com.nullpointerexception.cicerone.components;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Vector;
 
@@ -12,7 +14,7 @@ import java.util.Vector;
  *
  *      @author Luca
  */
-public class Itinerary extends StorableEntity implements ListOfStorables
+public class Itinerary extends StorableEntity implements StorableAsField, ListOfStorables
 {
     /**   Id of itinerary  */
     protected String id,
@@ -41,6 +43,9 @@ public class Itinerary extends StorableEntity implements ListOfStorables
 
     /**   List of stages that will be visited into this itinerary  */
     protected List<Stage> stages;
+
+    /**   List of stages proposed from users to this itinerary  */
+    protected List<Stage> proposedStages;
 
     /**   List of users that will participate to this itinerary  */
     protected List<User> participants;
@@ -138,6 +143,14 @@ public class Itinerary extends StorableEntity implements ListOfStorables
         this.stages = stages;
     }
 
+    public List<Stage> getProposedStages() {
+        return proposedStages;
+    }
+
+    public void setProposedStages(List<Stage> proposedStages) {
+        this.proposedStages = proposedStages;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -195,6 +208,16 @@ public class Itinerary extends StorableEntity implements ListOfStorables
             stages.add(stage);
             return stage;
         }
+        else if(fieldName.equals("proposedStages"))
+        {
+            Stage stage = new Stage();
+
+            if(proposedStages == null)
+                proposedStages = new Vector<>();
+
+            proposedStages.add(stage);
+            return stage;
+        }
         else if(fieldName.equals("participants"))
         {
             User user = new User();
@@ -219,7 +242,36 @@ public class Itinerary extends StorableEntity implements ListOfStorables
     }
 
     @Override
-    public boolean equals(Object o) {
+    public String getFieldId()
+    {
+        return id;
+    }
+
+    @Override
+    public Map<String, String> getSubFields()
+    {
+        Map<String, String> subFields = new HashMap<>();
+
+        subFields.put("location", location);
+
+        return subFields;
+    }
+
+    @Override
+    public void restoreId(String id)
+    {
+        this.id = id;
+    }
+
+    @Override
+    public void restoreSubFields(Map<String, String> subFields)
+    {
+        location = subFields.get("location");
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Itinerary itinerary = (Itinerary) o;
@@ -235,11 +287,13 @@ public class Itinerary extends StorableEntity implements ListOfStorables
                 Objects.equals(getCurrency(), itinerary.getCurrency()) &&
                 Objects.equals(getDescription(), itinerary.getDescription()) &&
                 Objects.equals(getStages(), itinerary.getStages()) &&
+                Objects.equals(getProposedStages(), itinerary.getProposedStages()) &&
                 Objects.equals(getParticipants(), itinerary.getParticipants());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getIdCicerone(), getLocation(), getDate(), getMeetingPlace(), getMeetingTime(), getLanguage(), getCurrency(), getDescription(), getPrice(), getMaxParticipants(), getStages(), getParticipants());
+    public int hashCode()
+    {
+        return Objects.hash(getId(), getIdCicerone(), getLocation(), getDate(), getMeetingPlace(), getMeetingTime(), getLanguage(), getCurrency(), getDescription(), getPrice(), getMaxParticipants(), getStages(), getProposedStages(), getParticipants());
     }
 }

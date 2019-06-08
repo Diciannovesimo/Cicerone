@@ -230,6 +230,7 @@ public class BackEndInterfaceTest
         stages.add(new Stage("Pianeta terra", "Via Lattea", new LatLng(74.24621, 16.65)));
         stages.add(new Stage("Computer Point", "Via davanti la casa di William", new LatLng(18.235, 52.21985)));
         itinerary.setStages(stages);
+        itinerary.setProposedStages(stages);
 
         List<User> users = new Vector<>();
         User user1 = new User();

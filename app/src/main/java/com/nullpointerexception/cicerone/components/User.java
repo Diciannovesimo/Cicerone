@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Vector;
 
 /**
  *      User
@@ -17,7 +18,7 @@ import java.util.Objects;
  *
  *      @author Luca
  */
-public class User extends StorableEntity implements StorableAsField
+public class User extends StorableEntity implements StorableAsField, ListOfStorables
 {
     /**  Id of account (generally provided by FireBase)   */
     protected String id,
@@ -33,6 +34,9 @@ public class User extends StorableEntity implements StorableAsField
                     dateBirth,
                     /** Phone number of user */
                     phoneNumber;
+
+    /**   List of itineraries which this user have or is participating.  */
+    protected List<Itinerary> itineraries;
 
     public User() {}
 
@@ -118,6 +122,14 @@ public class User extends StorableEntity implements StorableAsField
 
     public String getPhoneNumber() {
         return phoneNumber;
+    }
+
+    public List<Itinerary> getItineraries() {
+        return itineraries;
+    }
+
+    public void setItineraries(List<Itinerary> itineraries) {
+        this.itineraries = itineraries;
     }
 
     public void setId(String id) {
@@ -226,7 +238,26 @@ public class User extends StorableEntity implements StorableAsField
     }
 
     @Override
-    public boolean equals(Object o) {
+    public Object addNewInstanceInto(String fieldName)
+    {
+
+        if(fieldName.equals("itineraries"))
+        {
+            Itinerary itinerary = new Itinerary();
+
+            if(itineraries == null)
+                itineraries = new Vector<>();
+
+            itineraries.add(itinerary);
+            return itinerary;
+        }
+
+        return null;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
@@ -236,11 +267,13 @@ public class User extends StorableEntity implements StorableAsField
                 Objects.equals(getName(), user.getName()) &&
                 Objects.equals(getSurname(), user.getSurname()) &&
                 Objects.equals(getDateBirth(), user.getDateBirth()) &&
-                Objects.equals(getPhoneNumber(), user.getPhoneNumber());
+                Objects.equals(getPhoneNumber(), user.getPhoneNumber()) &&
+                Objects.equals(getItineraries(), user.getItineraries());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getEmail(), getProfileImageUrl(), getName(), getSurname(), getDateBirth(), getPhoneNumber());
+    public int hashCode()
+    {
+        return Objects.hash(getId(), getEmail(), getProfileImageUrl(), getName(), getSurname(), getDateBirth(), getPhoneNumber(), getItineraries());
     }
 }

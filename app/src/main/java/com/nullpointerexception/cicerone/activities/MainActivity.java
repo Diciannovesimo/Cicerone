@@ -106,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         drawMenuWith(profileDrawerItem);
-
     }
 
     public void drawMenuWith(ProfileDrawerItem profileDrawerItem)
