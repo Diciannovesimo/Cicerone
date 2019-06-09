@@ -74,16 +74,34 @@
                 android:gravity="center_vertical"
                 android:text="" />
 
-            <TextView
-                android:id="@+id/ciceroneLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="2sp"
-                android:drawableLeft="@drawable/ic_profile"
-                android:drawablePadding="10sp"
-                android:drawableTint="#777"
-                android:gravity="center_vertical"
-                android:text="" />
+            <LinearLayout
+                android:id="@+id/ciceroneInfoContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="5sp">
+
+                <com.mikhaellopez.circularimageview.CircularImageView
+                    android:id="@+id/ciceroneIcon"
+                    android:layout_width="32sp"
+                    android:layout_height="32sp"
+                    app:srcCompat="@drawable/ic_profile"
+                    app:civ_border_color="#eeeeee"
+                    app:civ_border_width="1dp"
+                    app:civ_shadow="true"
+                    app:civ_shadow_radius="2"/>
+
+                <TextView
+                    android:id="@+id/ciceroneLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical"
+                    android:textStyle="italic"
+                    android:text="" />
+
+            </LinearLayout>
+
 
         </LinearLayout>
         </RelativeLayout>

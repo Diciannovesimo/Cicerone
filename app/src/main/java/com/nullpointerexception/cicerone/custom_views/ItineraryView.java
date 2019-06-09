@@ -30,6 +30,7 @@ import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.ImageFetcher;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
+import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -67,6 +68,8 @@ public class ItineraryView extends FrameLayout
     /**   Indicates if this view is last element of a list */
     private boolean isLastElement = false;
     /**   Indicates if this itinerary can be edited.   */
+    private boolean editable = true;
+    /**   Indicates if this itinerary is in condition to be edited.   */
     private boolean isEditAllowed = true;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -253,21 +256,29 @@ public class ItineraryView extends FrameLayout
             Log.e("ItineraryView", e.toString());
         }
 
-        if(day != null)
+        if(day != null && editable)
             isEditAllowed = day.after(Calendar.getInstance().getTime());
 
         meeting.setText(itinerary.getMeetingPlace() + " - " + itinerary.getMeetingTime());
-        cicerone.setVisibility(GONE);
 
-        View layout = findViewById(R.id.layout);
-
-        layout.post(() ->
+        if(itinerary.getCicerone().getDisplayName() != null
+            && !itinerary.getCicerone().getDisplayName()
+                .replace(" ", "")
+                .replace("null", "").isEmpty())
         {
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT,
-                    layout.getHeight());
-            params.addRule(RelativeLayout.RIGHT_OF, findViewById(R.id.guideLine).getId());
-            imageView.setLayoutParams(params);
-        });
+            cicerone.setText(itinerary.getCicerone().getDisplayName() + " ");
+            new ProfileImageFetcher(cicerone.getContext())
+                    .fetchImageOf(itinerary.getCicerone(), drawable ->
+                    {
+                        ImageView icon = findViewById(R.id.ciceroneIcon);
+                        icon.setImageDrawable(drawable);
+                        refreshSize();
+                    });
+        }
+        else
+            findViewById(R.id.ciceroneInfoContainer).setVisibility(GONE);
+
+        refreshSize();
 
         String keyword = itinerary.getLocation() + " " + getResources().getString(R.string.city);
 
@@ -322,6 +333,24 @@ public class ItineraryView extends FrameLayout
         else
             imageView.setImageDrawable(resource);
 
+    }
+
+    private void refreshSize()
+    {
+        View layout = findViewById(R.id.layout);
+        layout.post(() ->
+        {
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT,
+                    layout.getHeight());
+            params.addRule(RelativeLayout.RIGHT_OF, findViewById(R.id.guideLine).getId());
+            imageView.setLayoutParams(params);
+        });
+    }
+
+    public void setEditable(boolean editable)
+    {
+        this.editable = editable;
+        isEditAllowed = editable;
     }
 
     public void setAsLastElement(boolean value)

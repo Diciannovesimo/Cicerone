@@ -46,7 +46,7 @@ public class ItinerariesListFragment extends Fragment
             Vars
      */
     private RecyclerView.LayoutManager layoutManager;
-    private Adapter adapter;
+    private ItinerariesAdapter adapter;
     private List<Itinerary> itineraries = new Vector<>();
 
     public ItinerariesListFragment() { }
@@ -122,10 +122,8 @@ public class ItinerariesListFragment extends Fragment
                     public void onError() 
                     {
                         if(getActivity() != null)
-                            getActivity().runOnUiThread(() -> 
-                            {
-                                Toast.makeText(getContext(), R.string.generic_error, Toast.LENGTH_SHORT).show();
-                            });
+                            getActivity().runOnUiThread(() ->
+                                    Toast.makeText(getContext(), R.string.generic_error, Toast.LENGTH_SHORT).show());
                     }
                 });
 
@@ -135,7 +133,7 @@ public class ItinerariesListFragment extends Fragment
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(recyclerView.getContext());
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new Adapter(itineraries);
+        adapter = new ItinerariesAdapter(itineraries);
         recyclerView.setAdapter(adapter);
 
         newItineraryButton.setOnClickListener(view1 ->
@@ -174,11 +172,11 @@ public class ItinerariesListFragment extends Fragment
 
 }
 
-class Adapter extends RecyclerView.Adapter
+class ItinerariesAdapter extends RecyclerView.Adapter
 {
     private List<Itinerary> dataSet;
 
-    Adapter(List<Itinerary> dataSet)
+    ItinerariesAdapter(List<Itinerary> dataSet)
     {
         this.dataSet = dataSet;
     }

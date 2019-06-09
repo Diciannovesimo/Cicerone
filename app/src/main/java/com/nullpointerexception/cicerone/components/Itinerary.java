@@ -18,8 +18,6 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
 {
     /**   Id of itinerary  */
     protected String id,
-    /**   Id of cicerone which have created this itinerary  */
-            idCicerone,
     /**   City of itinerary  */
             location,
     /**   Date when itinerary will be done  */
@@ -34,6 +32,9 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
             currency,
     /**   Description of itinerary  */
             description;
+
+    /**   Cicerone which have created this itinerary  */
+    protected User cicerone = new User();
 
     /**   Price to pay to Cicerone to participate to this itinerary  */
     protected float price;
@@ -54,12 +55,12 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
         this.id = id;
     }
 
-    public String getIdCicerone() {
-        return idCicerone;
+    public User getCicerone() {
+        return cicerone;
     }
 
-    public void setIdCicerone(String idCicerone) {
-        this.idCicerone = idCicerone;
+    public void setCicerone(User cicerone) {
+        this.cicerone = cicerone;
     }
 
     public String getLocation() {
@@ -164,7 +165,10 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
      */
     public void generateId()
     {
-        id = idCicerone + date + meetingTime;
+        if(cicerone == null)
+            cicerone = new User();
+
+        id = cicerone.getId() + date + meetingTime;
         id = id.replace("/", "-").replace(".", "~");
     }
 
@@ -178,9 +182,10 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
 
         String id = this.id.replace("-", "/").replace("~", ".");
 
-        idCicerone = id.substring(0, id.indexOf("/")-4);
-        date = id.substring(idCicerone.length(), idCicerone.length() + 10);
-        meetingTime = id.substring( idCicerone.length() + date.length() );
+        cicerone = new User();
+        cicerone.setId(id.substring(0, id.indexOf("/")-4));
+        date = id.substring(cicerone.getId().length(), cicerone.getId().length() + 10);
+        meetingTime = id.substring( cicerone.getId().length() + date.length() );
     }
 
     /**
@@ -238,7 +243,7 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
     @Override
     public List<String> getIgnoredFields()
     {
-        return Arrays.asList("id", "idCicerone", "date", "meetingTime");
+        return Arrays.asList("id", "date", "meetingTime");
     }
 
     @Override
@@ -278,7 +283,6 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
         return Float.compare(itinerary.getPrice(), getPrice()) == 0 &&
                 getMaxParticipants() == itinerary.getMaxParticipants() &&
                 Objects.equals(getId(), itinerary.getId()) &&
-                Objects.equals(getIdCicerone(), itinerary.getIdCicerone()) &&
                 Objects.equals(getLocation(), itinerary.getLocation()) &&
                 Objects.equals(getDate(), itinerary.getDate()) &&
                 Objects.equals(getMeetingPlace(), itinerary.getMeetingPlace()) &&
@@ -286,14 +290,14 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
                 Objects.equals(getLanguage(), itinerary.getLanguage()) &&
                 Objects.equals(getCurrency(), itinerary.getCurrency()) &&
                 Objects.equals(getDescription(), itinerary.getDescription()) &&
+                Objects.equals(getCicerone(), itinerary.getCicerone()) &&
                 Objects.equals(getStages(), itinerary.getStages()) &&
                 Objects.equals(getProposedStages(), itinerary.getProposedStages()) &&
                 Objects.equals(getParticipants(), itinerary.getParticipants());
     }
 
     @Override
-    public int hashCode()
-    {
-        return Objects.hash(getId(), getIdCicerone(), getLocation(), getDate(), getMeetingPlace(), getMeetingTime(), getLanguage(), getCurrency(), getDescription(), getPrice(), getMaxParticipants(), getStages(), getProposedStages(), getParticipants());
+    public int hashCode() {
+        return Objects.hash(getId(), getLocation(), getDate(), getMeetingPlace(), getMeetingTime(), getLanguage(), getCurrency(), getDescription(), getCicerone(), getPrice(), getMaxParticipants(), getStages(), getProposedStages(), getParticipants());
     }
 }

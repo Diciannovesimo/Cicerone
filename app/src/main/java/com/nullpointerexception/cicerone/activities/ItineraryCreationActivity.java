@@ -583,7 +583,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
 
                         new_itinerary.setLanguage(mLingua.getText().toString().trim());
                         new_itinerary.setCurrency(currency);
-                        new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
+                        new_itinerary.setCicerone( AuthenticationManager.get().getUserLogged() );
                         new_itinerary.generateId();
 
                         if (!mCompenso.getText().toString().equals(""))
@@ -663,7 +663,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
 
                         new_itinerary.setLanguage(mLingua.getText().toString().trim());
                         new_itinerary.setCurrency(currency);
-                        new_itinerary.setIdCicerone(AuthenticationManager.get().getUserLogged().getId());
+                        new_itinerary.setCicerone( AuthenticationManager.get().getUserLogged() );
                         new_itinerary.generateId();
 
                         if (!mCompenso.getText().toString().equals(""))

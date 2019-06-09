@@ -136,6 +136,12 @@ dependencies
             implementation 'com.github.bumptech.glide:glide:4.9.0'
             annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 
+            /*
+                    CircularImageView
+                    https://github.com/lopspower/CircularImageView
+             */
+            implementation 'com.mikhaellopez:circularimageview:3.2.0'
+
         }
 
 apply plugin: 'com.google.gms.google-services'

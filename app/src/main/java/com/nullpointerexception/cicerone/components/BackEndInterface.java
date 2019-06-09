@@ -293,7 +293,9 @@ public class BackEndInterface
                         {
                             Map<String, String> map = new HashMap<>();
 
-                            for(DataSnapshot dsChild : ds.getChildren())
+                            StorableAsField saf = fieldValue.getSubField();
+
+                            for(DataSnapshot dsChild : ds.child(saf.getFieldId()).getChildren())
                             {
                                 String subFieldName = dsChild.getKey();
 
@@ -329,15 +331,6 @@ public class BackEndInterface
                         Log.e(TAG, "getEntity Error: " + e.toString());
                     }
                 }
-
-                /*
-                Log.i(TAG, "Fields Map:");
-                for(String key : fields.keySet())
-                {
-                    if(fields.get(key) != null)
-                        Log.i(TAG, "\"" + key + "\": " + fields.get(key).toString());
-                }
-                Log.i(TAG, "------------");*/
 
                 setFields(entity, fields);
 
@@ -803,7 +796,7 @@ public class BackEndInterface
                 if(ignore)
                     continue;
 
-                if(field.getDeclaringClass().isAssignableFrom(StorableAsField.class) )
+                if( value instanceof StorableAsField )
                 {
                     StorableAsField saf = (StorableAsField) value;
                     result.put(field.getName(), new FieldValue(saf));
