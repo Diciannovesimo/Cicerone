@@ -93,5 +93,11 @@
 
     <!-- ItinerayEditActivity -->
     <string name="time_picker">Scegli l\'ora</string>
+    <string name="ParticipantsActivity">ParticipantsActivity</string>
+    <string name="title_activity_vito">vito</string>
+    <string name="title_activity_participants">ParticipantsActivity</string>
 
+    <!-- ParticipantsActivity -->
+    <string name="title_ParticipantsActivity">Lista partecipanti</string>
+    <string name="title_activity_proposed_stage">ProposedStageActivity</string>
 </resources>
