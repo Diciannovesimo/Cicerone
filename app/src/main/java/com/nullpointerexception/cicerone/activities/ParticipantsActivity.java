@@ -5,8 +5,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -56,7 +54,6 @@ public class ParticipantsActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.title_ParticipantsActivity);
         setSupportActionBar(toolbar);
-
 
         //Check if actionbar is initialized
         if(getSupportActionBar() != null)
@@ -128,14 +125,13 @@ public class ParticipantsActivity extends AppCompatActivity {
 
         itinerary.setStages(listPlace_test);
 
-        itinerary.setParticipants(participants);
 
-        recyclerView = findViewById(R.id.RecyclerView_Participants);
+        recyclerView = findViewById(R.id.RecyclerView_ProposedStage);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        Adapter adapter = new Adapter(getApplicationContext(), itinerary.getParticipants());
+        AdapterPartecipants adapter = new AdapterPartecipants(getApplicationContext(), itinerary.getParticipants());
         recyclerView.setAdapter(adapter);
 
 
@@ -151,13 +147,13 @@ public class ParticipantsActivity extends AppCompatActivity {
 
 
 
-class Adapter extends RecyclerView.Adapter <Adapter.MyViewHolder>{
+class AdapterPartecipants extends RecyclerView.Adapter <AdapterPartecipants.MyViewHolder>{
 
     private Context context;
     private List<User> participants;
     private LayoutInflater inflater;
 
-    public Adapter(Context appContext,List<User> participants)
+    public AdapterPartecipants(Context appContext,List<User> participants)
     {
         this.context = appContext;
         this.participants = participants;

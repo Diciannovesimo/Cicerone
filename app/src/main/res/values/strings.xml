@@ -98,6 +98,9 @@
     <string name="title_activity_participants">ParticipantsActivity</string>
 
     <!-- ParticipantsActivity -->
-    <string name="title_ParticipantsActivity">Lista partecipanti</string>
+    <string name="title_ParticipantsActivity">Partecipanti</string>
+
+    <!-- ProposedStageActivity -->
     <string name="title_activity_proposed_stage">ProposedStageActivity</string>
+    <string name="title_ProposedStageActivity">Tappe proposte</string>
 </resources>

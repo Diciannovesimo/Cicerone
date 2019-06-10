@@ -1,7 +1,6 @@
 package com.nullpointerexception.cicerone.fragments;
 
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,10 +13,11 @@ import androidx.fragment.app.Fragment;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.activities.ParticipantsActivity;
+import com.nullpointerexception.cicerone.activities.ProposedStageActivity;
 
 public class ProfileFragment extends Fragment
 {
-    private Button button;
+    private Button button1, button2;
 
     public ProfileFragment() { }
 
@@ -29,13 +29,24 @@ public class ProfileFragment extends Fragment
         if(getActivity() != null && ((MainActivity) getActivity()).getSupportActionBar() != null)
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.menu_profile);
 
-        button = view.findViewById(R.id.button2);
+        button1 = view.findViewById(R.id.button1);
 
-        button.setOnClickListener(new View.OnClickListener() {
+        button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 startActivity(new Intent(v.getContext(), ParticipantsActivity.class));
+
+            }
+        });
+
+        button2 = view.findViewById(R.id.button2);
+
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(v.getContext(), ProposedStageActivity.class));
 
             }
         });
