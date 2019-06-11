@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/travel"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:alpha="0.5"
+        app:srcCompat="@drawable/filter"/>
+
+    <LinearLayout
+        android:id="@+id/findItineraryBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="20sp"
+                android:text="@string/newTripLabel1"
+                android:textColor="#fff"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/newTripFindLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20sp"
+                android:layout_marginRight="20sp"
+                android:alpha="0.9"
+                android:background="@drawable/button_background"
+                android:drawableLeft="@drawable/ic_search"
+                android:drawablePadding="5sp"
+                android:elevation="2sp"
+                android:gravity="center_vertical"
+                android:hint="@string/newTripField1"
+                android:padding="9sp"
+                android:textColor="#777"
+                android:textColorHint="#77000000" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_margin="20sp"
+                android:text="@string/newTripLabel2"
+                android:textColor="#fff"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/newTripInsertDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20sp"
+                android:layout_marginRight="20sp"
+                android:alpha="0.9"
+                android:background="@drawable/button_background"
+                android:drawableLeft="@drawable/ic_date"
+                android:drawablePadding="5sp"
+                android:elevation="2sp"
+                android:gravity="center_vertical"
+                android:hint="@string/newTripField2"
+                android:padding="9sp"
+                android:textColor="#777"
+                android:textColorHint="#77000000" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5">
+
+            <TextView
+                android:id="@+id/startSearchButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20sp"
+                android:layout_marginRight="20sp"
+                android:paddingLeft="18sp"
+                android:paddingRight="18sp"
+                android:paddingTop="9sp"
+                android:paddingBottom="9sp"
+                android:text="@string/search"
+                android:gravity="center_vertical"
+                android:textColor="#777"
+                android:background="@drawable/button_background"
+                android:layout_gravity="center"
+                android:elevation="2sp"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

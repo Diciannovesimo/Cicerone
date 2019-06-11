@@ -1,6 +1,7 @@
 package com.nullpointerexception.cicerone.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.activities.FindItineraryActivty;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Itinerary;
@@ -86,6 +88,8 @@ public class TripsListFragment extends Fragment
             @Override
             public void onError() { }
         });
+
+        findItineraryFab.setOnClickListener(v -> startActivity(new Intent(getContext(), FindItineraryActivty.class)));
 
         return view;
     }

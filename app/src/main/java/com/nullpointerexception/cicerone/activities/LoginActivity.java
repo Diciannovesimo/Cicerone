@@ -160,11 +160,7 @@ public class LoginActivity extends AppCompatActivity
          */
 
         //  Prevent user to scroll background image
-        imageScroller.setOnTouchListener(new View.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) { return true; }
-        });
+        imageScroller.setOnTouchListener((view, motionEvent) -> true);
 
         //  Make registration TextView underlined
         SpannableString content = new SpannableString(getResources().getString(R.string.loginText2));
