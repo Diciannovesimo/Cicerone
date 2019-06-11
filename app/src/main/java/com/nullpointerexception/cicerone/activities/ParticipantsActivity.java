@@ -124,9 +124,9 @@ public class ParticipantsActivity extends AppCompatActivity {
         listPlace_test.add(stage3);
 
         itinerary.setStages(listPlace_test);
+        itinerary.setParticipants(participants);
 
-
-        recyclerView = findViewById(R.id.RecyclerView_ProposedStage);
+        recyclerView = findViewById(R.id.RecyclerView_Participants);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -175,7 +175,6 @@ class AdapterPartecipants extends RecyclerView.Adapter <AdapterPartecipants.MyVi
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.name.setText(participants.get(position).getName());
         holder.surname.setText(participants.get(position).getSurname());
-        //holder.contorno.setImageResource(R.drawable.contornovero);
 
 
         new ProfileImageFetcher(context).fetchImageOf(participants.get(position), drawable ->
@@ -204,7 +203,7 @@ class AdapterPartecipants extends RecyclerView.Adapter <AdapterPartecipants.MyVi
     public class MyViewHolder extends RecyclerView.ViewHolder{
 
         TextView name, surname;
-        ImageView imgProfile, contorno;
+        ImageView imgProfile;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -212,7 +211,6 @@ class AdapterPartecipants extends RecyclerView.Adapter <AdapterPartecipants.MyVi
             name = (TextView) itemView.findViewById(R.id.textView_Name);
             surname = (TextView) itemView.findViewById(R.id.textView_Surname);
             imgProfile = (ImageView) itemView.findViewById(R.id.imageView_ProfileImage);
-            //contorno = (ImageView) itemView.findViewById(R.id.imageView_Contorno);
 
         }
     }

@@ -76,7 +76,8 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:drawableLeft="@drawable/ic_plus_green"
-            android:text=" Aggiungi tappa                                "
+            android:text=" Aggiungi tappa            "
+            android:textSize="18sp"
             android:textColor="#FF5500" />
 
         <ImageButton
@@ -86,4 +87,5 @@
             android:layout_weight="1"
             app:srcCompat="@drawable/ic_placeholder" />
     </LinearLayout>
+
 </LinearLayout>

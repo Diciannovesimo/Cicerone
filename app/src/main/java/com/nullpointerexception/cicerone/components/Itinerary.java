@@ -1,5 +1,6 @@
 package com.nullpointerexception.cicerone.components;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +50,7 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
     protected List<Stage> proposedStages;
 
     /**   List of users that will participate to this itinerary  */
-    protected List<User> participants;
+    protected List<User> participants = new ArrayList<>();
 
     public void setId(String id) {
         this.id = id;

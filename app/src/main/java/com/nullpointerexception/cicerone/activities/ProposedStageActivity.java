@@ -24,7 +24,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Itinerary;
+import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.User;
@@ -43,7 +45,7 @@ import java.util.List;
 public class ProposedStageActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private List<Stage> listPlace_test = new ArrayList<Stage>();
+    private List<Stage> proposedStage = new ArrayList<Stage>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,45 +59,28 @@ public class ProposedStageActivity extends AppCompatActivity {
         toolbar.setTitle(R.string.title_ProposedStageActivity);
         setSupportActionBar(toolbar);
 
-        //Creazione itinerario
+
         Itinerary itinerary = new Itinerary();
+        /*
+        itinerary.setId("fQv6mnTt6BTnuULNhv1DeasBOuL22019-06-1310:00");
+        BackEndInterface.get().getEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+            @Override
+            public void onSuccess() {
 
-        itinerary.setDate("2019/06/13");
-        itinerary.setMeetingTime("10:00");
-        itinerary.setLocation("Bari");
-        itinerary.setMeetingPlace("Corso Cavour");
-        itinerary.setCurrency("€");
-        itinerary.setDescription("È il nono comune italiano per popolazione, terzo del Mezzogiorno dopo Napoli e Palermo. La sua area metropolitana è la sesta d'Italia con quasi 1 300 000 abitanti[4].\n" +
-                "\n" +
-                "È nota anche per essere la città nella quale riposano le reliquie di San Nicola. Tale condizione ha reso Bari e la sua basilica uno dei centri prediletti dalla Chiesa ortodossa in Occidente e anche un importante centro di comunicazione interconfessionale tra l'Ortodossia e il Cattolicesimo.");
-        itinerary.setLanguage("Italiano");
+            }
 
-        Stage stage1 = new Stage();
-        Stage stage2 = new Stage();
-        Stage stage3 = new Stage();
+            @Override
+            public void onError() {
 
-        stage1.setAddress("Corso Italia, 15, 70122 Bari BA, Italy");
-        stage1.setDescription("prova2");
-        stage1.setName("Multicinema Galleria");
-        stage1.setCoordinates(new LatLng(41.1187193, 16.8664923));
-
-        stage2.setAddress("Corso Cavour, 12, 70122 Bari BA, Italy");
-        stage2.setDescription("prova1");
-        stage2.setName("Teatro Petruzzelli");
-        stage2.setCoordinates(new LatLng(41.123568, 16.8709473));
-
-        stage3.setAddress("Piazza Mercantile, 70, 70122 Bari BA, Italy");
-        stage3.setDescription("prova");
-        stage3.setName("Column of Shame or Column of Justice");
-        stage3.setCoordinates(new LatLng(41.128064, 16.8699213));
-
-        listPlace_test.add(stage1);
-        listPlace_test.add(stage2);
-        listPlace_test.add(stage3);
-
-        itinerary.setStages(listPlace_test);
+            }
+        });
+        */
 
 
+        itinerary = (Itinerary) ObjectSharer.get().getSharedObject("vito");
+
+
+        proposedStage = itinerary.getProposedStages();
 
 
         //Check if actionbar is initialized
@@ -107,12 +92,11 @@ public class ProposedStageActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        AdapterStage adapter = new AdapterStage(getApplicationContext(), listPlace_test);
-        recyclerView.setAdapter(adapter);
-
-
-
-
+        if(proposedStage.size() != 0)
+        {
+            AdapterStage adapter = new AdapterStage(getApplicationContext(), proposedStage, itinerary);
+            recyclerView.setAdapter(adapter);
+        }
 
     }
 
@@ -130,12 +114,14 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>{
     private Context context;
     private List<Stage> listPlace_test;
     private LayoutInflater inflater;
+    private Itinerary itinerary ;
 
-    public AdapterStage(Context appContext, List<Stage> listPlace_test)
+    public AdapterStage(Context appContext, List<Stage> listPlace_test, Itinerary itinerary)
     {
         this.context = appContext;
         this.listPlace_test = listPlace_test;
         inflater = (LayoutInflater.from(appContext));
+        this.itinerary = itinerary;
     }
 
 
@@ -157,7 +143,30 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>{
         holder.addstage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,listPlace_test.get(position).getName() + listPlace_test.get(position).getDescription(), Toast.LENGTH_LONG).show();
+                //Aggiungo la nuova tappa
+                List<Stage> newStage = itinerary.getStages();
+                newStage.add(listPlace_test.get(position));
+                itinerary.setStages(newStage);
+
+                //Rimuovo l'itinerario da quelli proposti
+                listPlace_test.remove(position);
+                //TODO LUCA, devi rimuovere la tappa proposta dalla reciclerView
+
+                itinerary.setProposedStages(listPlace_test);
+
+                //Aggiungere il nuovo itinerario
+                BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                    @Override
+                    public void onSuccess() {
+                        BackEndInterface.get().storeEntity(itinerary);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+
             }
         });
 
@@ -165,12 +174,19 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>{
         holder.imgGPS.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,listPlace_test.get(position).getName() + listPlace_test.get(position).getDescription(), Toast.LENGTH_LONG).show();
+                //TODO riattivare la funzione dopo il merge con claudio
+                /*
+                LatLng coordinates = listPlace_test.get(position).getCoordinates();
+                Double lat = coordinates.latitude;
+                Double lng = coordinates.longitude;
+                Intent intent = new Intent(v.getContext(), showPlaceActivity.class);
+                intent.putExtra("latitude", lat);
+                intent.putExtra("longitude", lng);
+                intent.putExtra("marker", listPlace_test.get(position).getName());
+                v.getContext().startActivity(intent);
+                */
             }
         });
-
-
-
     }
 
     @Override
