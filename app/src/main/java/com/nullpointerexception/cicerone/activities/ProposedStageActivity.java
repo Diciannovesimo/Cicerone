@@ -159,6 +159,9 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>{
                     @Override
                     public void onSuccess() {
                         BackEndInterface.get().storeEntity(itinerary);
+                        v.getContext().startActivity(new Intent(v.getContext(), ProposedStageActivity.class));
+                        //((ProposedStageActivity)context).finish();
+
                     }
 
                     @Override
