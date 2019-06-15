@@ -369,10 +369,7 @@ public class BackEndInterface
                 .startAt(idCicerone)
                 .endAt(idCicerone.substring(0, idCicerone.length()-1) +
                         (idCicerone.charAt(idCicerone.length()-1)+1) )
-                ;//.limitToFirst(20);
-        //  TODO: Inpagination
-
-        //  TODO: Sort list fetched
+                ;
 
         query.addValueEventListener(new ValueEventListener()
         {
@@ -389,6 +386,70 @@ public class BackEndInterface
                     itinerary.getFieldsFromId();
                     itinerariesList.add(itinerary);
                 }
+
+                if(onOperationCompleteListener != null)
+                    onOperationCompleteListener.onSuccess();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError)
+            {
+                Log.e(TAG, "Error: " + databaseError.toString());
+                if(onOperationCompleteListener != null)
+                    onOperationCompleteListener.onError();
+            }
+        });
+    }
+
+    /**
+     *      Launch a query on database to found itineraries programmed for a given
+     *      location at the given day.
+     *
+     *      @param location     City where itinerary will be done.
+     *      @param date         When itinerary will be done.
+     *      @param itinerariesList  List of itineraries to fill with results
+     *      @param onOperationCompleteListener  Implementation of the callback method launched after search ends
+     */
+    public void searchItinerariesFor(String location, String date, List<Itinerary> itinerariesList,
+                                 OnOperationCompleteListener onOperationCompleteListener)
+    {
+        if(location == null || date == null || itinerariesList == null)
+            return;
+
+        long msStart = System.currentTimeMillis();
+
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("itinerary");
+        Query query = ref.orderByChild("date")
+                .equalTo(date);
+
+        query.addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                itinerariesList.clear();
+
+                for(DataSnapshot ds : dataSnapshot.getChildren())
+                {
+                    Itinerary itinerary = new Itinerary();
+                    itinerary.setId(ds.getKey());
+
+                    try
+                    {
+                        getEntityFrom(itinerary, ds);
+                    }
+                    catch (Exception e) { continue; }
+
+                    itinerary.getFieldsFromId();
+
+                    if(itinerary.getLocation().equals(location) &&
+                       ! itinerary.getCicerone().getId().equals(AuthenticationManager.get().getUserLogged().getId()))
+                        itinerariesList.add(itinerary);
+                }
+
+                Log.i(TAG, "Query finished in " + (System.currentTimeMillis() - msStart)
+                + "ms with " + itinerariesList.size() + " results.");
 
                 if(onOperationCompleteListener != null)
                     onOperationCompleteListener.onSuccess();
@@ -464,9 +525,21 @@ public class BackEndInterface
                 }
                 if(fieldValue.isSubfield())
                 {
-                    Map<String, String> map = new HashMap<>();
+                    StorableAsField saf = fieldValue.getSubField();
 
-                    for(DataSnapshot dsChild : ds.getChildren())
+                    if(saf == null)
+                        continue;
+
+                    Map<String, String> map = saf.getSubFields();
+
+                    String id = ds.getChildren().iterator().next().getKey();
+
+                    if(id == null)
+                        continue;
+
+                    saf.restoreId(id);
+
+                    for(DataSnapshot dsChild : ds.getChildren().iterator().next().getChildren())
                     {
                         String subFieldName = dsChild.getKey();
 
@@ -474,23 +547,9 @@ public class BackEndInterface
                             map.put(subFieldName, dsChild.getValue(String.class));
                     }
 
-                    fields.put(fieldName, new FieldValue(new StorableAsField()
-                    {
-                        @Override
-                        public String getFieldId() { return null; }
+                    saf.restoreSubFields(map);
 
-                        @Override
-                        public Map<String, String> getSubFields()
-                        {
-                            return map;
-                        }
-
-                        @Override
-                        public void restoreId(String id) { }
-
-                        @Override
-                        public void restoreSubFields(Map<String, String> subFields) { }
-                    }));
+                    fields.put(fieldName, new FieldValue(saf));
                 }
                 else
                 {

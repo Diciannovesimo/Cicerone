@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,13 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class FindItineraryActivityFragment extends Fragment
 {
@@ -95,9 +100,21 @@ public class FindItineraryActivityFragment extends Fragment
         {
             if(checkFields())
             {
+                Date date = null;
+                try
+                {
+                    date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(insertDate.getText().toString());
+                }
+                catch (ParseException e)
+                {
+                    Log.e("FindItinerary", e.toString());
+                    return;
+                }
+                String formattedDate = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(date);
+
                 if(getActivity() != null && getActivity() instanceof OnUIInteractionListener)
                     ((OnUIInteractionListener) getActivity())
-                            .onButtonSearchPressed(findLocation.getText().toString(), insertDate.getText().toString());
+                            .onButtonSearchPressed(findLocation.getText().toString(), formattedDate);
             }
             else
             {

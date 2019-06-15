@@ -182,10 +182,14 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
 
         String id = this.id.replace("-", "/").replace("~", ".");
 
-        cicerone = new User();
-        cicerone.setId(id.substring(0, id.indexOf("/")-4));
-        date = id.substring(cicerone.getId().length(), cicerone.getId().length() + 10);
-        meetingTime = id.substring( cicerone.getId().length() + date.length() );
+        String idCicerone = id.substring(0, id.indexOf("/")-4);
+        if(cicerone == null || cicerone.getId() == null || !cicerone.getId().equals(idCicerone))
+        {
+            cicerone = new User();
+            cicerone.setId(idCicerone);
+        }
+        date = id.substring(idCicerone.length(), idCicerone.length() + 10);
+        meetingTime = id.substring( idCicerone.length() + date.length() );
     }
 
     /**
@@ -243,7 +247,7 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
     @Override
     public List<String> getIgnoredFields()
     {
-        return Arrays.asList("id", "date", "meetingTime");
+        return Arrays.asList("id", "meetingTime");
     }
 
     @Override

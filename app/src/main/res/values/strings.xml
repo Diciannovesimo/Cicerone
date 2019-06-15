@@ -103,5 +103,8 @@
     <string name="newTripField1">Cerca luogo…</string>
     <string name="newTripField2">Inserisci data</string>
     <string name="search">Cerca</string>
+    <string name="searchResultsTitle1">Risultati trovati per</string>
+    <string name="searchResultsTitle2">il</string>
+    <string name="noSearchResults">Non è stato trovato nessun itinerario.</string>
 
 </resources>

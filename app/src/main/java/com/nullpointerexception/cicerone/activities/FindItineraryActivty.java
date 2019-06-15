@@ -1,14 +1,15 @@
 package com.nullpointerexception.cicerone.activities;
 
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.fragments.FindItineraryActivityFragment;
+import com.nullpointerexception.cicerone.fragments.SearchResultsFragment;
 
-public class FindItineraryActivty extends AppCompatActivity implements FindItineraryActivityFragment.OnUIInteractionListener
+public class FindItineraryActivty extends AppCompatActivity
+        implements FindItineraryActivityFragment.OnUIInteractionListener
 {
 
     @Override
@@ -28,6 +29,9 @@ public class FindItineraryActivty extends AppCompatActivity implements FindItine
     @Override
     public void onButtonSearchPressed(String place, String date)
     {
-        Toast.makeText(this, "Find results for " + place + " on " + date, Toast.LENGTH_SHORT).show();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, new SearchResultsFragment(place, date))
+                .commitNow();
     }
 }
