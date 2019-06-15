@@ -579,51 +579,53 @@ public class ItineraryActivity extends AppCompatActivity
                 mItinerary.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        itinerary.addPartecipant(user);
-                        user.addItinerary(itinerary);
+                        if (itinerary.getParticipants().size() < itinerary.getMaxParticipants()) {
+                            itinerary.addPartecipant(user);
+                            user.addItinerary(itinerary);
 
-                        BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                            @Override
-                            public void onSuccess() {
-                                BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                                    @Override
-                                    public void onSuccess() {
-                                        BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
-                                            @Override
-                                            public void onSuccess() {
-                                                new KAlertDialog(v.getContext())
-                                                        .setTitleText("Complimenti")
-                                                        .setContentText("Ti sei iscritto a questa visita!")
-                                                        .setConfirmText("Ok")
-                                                        .setConfirmClickListener(new KAlertDialog.OnSweetClickListener() {
-                                                            @Override
-                                                            public void onClick(KAlertDialog kAlertDialog) {
-                                                                ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
-                                                                v.getContext().startActivity(new Intent(getApplicationContext(), ItineraryActivity.class));
-                                                                finish();
-                                                            }
-                                                        }).show();
-                                            }
+                            BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                                @Override
+                                public void onSuccess() {
+                                    BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                            BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    new KAlertDialog(v.getContext())
+                                                            .setTitleText("Complimenti")
+                                                            .setContentText("Ti sei iscritto a questa visita!")
+                                                            .setConfirmText("Ok")
+                                                            .setConfirmClickListener(new KAlertDialog.OnSweetClickListener() {
+                                                                @Override
+                                                                public void onClick(KAlertDialog kAlertDialog) {
+                                                                    ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
+                                                                    v.getContext().startActivity(new Intent(getApplicationContext(), ItineraryActivity.class));
+                                                                    finish();
+                                                                }
+                                                            }).show();
+                                                }
 
-                                            @Override
-                                            public void onError() {
+                                                @Override
+                                                public void onError() {
 
-                                            }
-                                        });
-                                    }
+                                                }
+                                            });
+                                        }
 
-                                    @Override
-                                    public void onError() {
+                                        @Override
+                                        public void onError() {
 
-                                    }
-                                });
-                            }
+                                        }
+                                    });
+                                }
 
-                            @Override
-                            public void onError() {
+                                @Override
+                                public void onError() {
 
-                            }
-                        });
+                                }
+                            });
+                        }
                     }
                 });
 
