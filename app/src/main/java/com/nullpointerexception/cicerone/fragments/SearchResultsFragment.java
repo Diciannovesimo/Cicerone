@@ -1,13 +1,13 @@
 package com.nullpointerexception.cicerone.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -15,8 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.activities.ItineraryActivity;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Itinerary;
+import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.custom_views.ItineraryView;
 
 import java.text.ParseException;
@@ -147,7 +149,9 @@ class FoundItinerariesAdapter extends RecyclerView.Adapter
 
         viewHolder.getView().setOnViewClickListener(() ->
         {
-            Toast.makeText(viewHolder.getView().getContext(), "Open detail.", Toast.LENGTH_SHORT).show();
+            ObjectSharer.get().shareObject("show_trip_as_user", dataSet.get(position));
+            viewHolder.getView().getContext().startActivity(
+                    new Intent(viewHolder.getView().getContext(), ItineraryActivity.class));
         });
     }
 
