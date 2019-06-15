@@ -57,9 +57,11 @@ import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class ItineraryActivity extends AppCompatActivity {
+public class ItineraryActivity extends AppCompatActivity
+{
 
     private static final String TAG = "It_ItineraryActivity";
+    private final int PROPOSED_STAGES_CODE = 321;
     private TextView mDateCard, mPlaceCard, mTimeCard, mLanguageCard, mDescriptionCard, mParticipantsCard, mPriceCard, mCityCard;
     private TextView placeName, placeDescription, mShowLocation;
     private EditText mPlace, mPlaceDesc;
@@ -214,34 +216,7 @@ public class ItineraryActivity extends AppCompatActivity {
                     ciceronePhoto.setImageDrawable(drawable);
                 });
 
-        View redSphere = getLayoutInflater().inflate(R.layout.red_sphere_layout, null);
-        linearLayout.addView(redSphere, 0);
-
-        if(itinerary.getStages() != null) {
-            for (int i = 0; i < itinerary.getStages().size(); ++i) {
-                View stageView = getLayoutInflater().inflate(R.layout.place_layout, null);
-                placeName = stageView.findViewById(R.id.placeName);
-                placeDescription = stageView.findViewById(R.id.placeDescription);
-                mShowLocation = stageView.findViewById(R.id.showStage_btn);
-
-                placeName.setText(itinerary.getStages().get(i).getName());
-                placeDescription.setText(itinerary.getStages().get(i).getDescription());
-
-                int finalI = i;
-                mShowLocation.setOnClickListener(v -> {
-                    LatLng coordinates = itinerary.getStages().get(finalI).getCoordinates();
-                    Double lat = coordinates.latitude;
-                    Double lng = coordinates.longitude;
-                    Intent intent = new Intent(v.getContext(), showPlaceActivity.class);
-                    intent.putExtra("latitude", lat);
-                    intent.putExtra("longitude", lng);
-                    intent.putExtra("marker", itinerary.getStages().get(finalI).getName());
-                    startActivity(intent);
-                });
-
-                linearLayout.addView(stageView);
-            }
-        }
+        refreshStagesList();
 
         List<User> userList = new ArrayList<>();
         userList = itinerary.getParticipants();
@@ -426,13 +401,11 @@ public class ItineraryActivity extends AppCompatActivity {
                                                 .setTitleText("Complimenti")
                                                 .setContentText("Ti sei disinscritto dalla gita")
                                                 .setConfirmText("Ok")
-                                                .setConfirmClickListener(new KAlertDialog.OnSweetClickListener() {
-                                                    @Override
-                                                    public void onClick(KAlertDialog kAlertDialog) {
-                                                        ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
-                                                        v.getContext().startActivity(new Intent(getApplicationContext(), ItineraryActivity.class));
-                                                        finish();
-                                                    }
+                                                .setConfirmClickListener(kAlertDialog ->
+                                                {
+                                                    ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
+                                                    v.getContext().startActivity(new Intent(getApplicationContext(), ItineraryActivity.class));
+                                                    finish();
                                                 }).show();
                                     }
 
@@ -661,11 +634,13 @@ public class ItineraryActivity extends AppCompatActivity {
         }else {
             mItinerary.setVisibility(View.GONE);
 
-            mPurposePlace.setOnClickListener(v -> {
+            mPurposePlace.setOnClickListener(v ->
+            {
                     ObjectSharer.get().shareObject("lista_proposte", itinerary);
-                    startActivity(new Intent(v.getContext(), ProposedStageActivity.class));
+                    startActivityForResult(new Intent(v.getContext(), ProposedStageActivity.class),
+                            PROPOSED_STAGES_CODE);
                     finish();
-                    });
+            });
 
             mPartecipantsList.setOnClickListener(v -> {
                 ObjectSharer.get().shareObject("lista_proposte", itinerary);
@@ -674,6 +649,43 @@ public class ItineraryActivity extends AppCompatActivity {
             });
         }
 
+    }
+
+    public void refreshStagesList()
+    {
+        linearLayout.removeAllViews();
+
+        View redSphere = getLayoutInflater().inflate(R.layout.red_sphere_layout, null);
+        linearLayout.addView(redSphere, 0);
+
+        if(itinerary.getStages() != null)
+        {
+            for (int i = 0; i < itinerary.getStages().size(); ++i)
+            {
+                View stageView = getLayoutInflater().inflate(R.layout.place_layout, null);
+                placeName = stageView.findViewById(R.id.placeName);
+                placeDescription = stageView.findViewById(R.id.placeDescription);
+                mShowLocation = stageView.findViewById(R.id.showStage_btn);
+
+                placeName.setText(itinerary.getStages().get(i).getName());
+                placeDescription.setText(itinerary.getStages().get(i).getDescription());
+
+                int finalI = i;
+                mShowLocation.setOnClickListener(v ->
+                {
+                    LatLng coordinates = itinerary.getStages().get(finalI).getCoordinates();
+                    Double lat = coordinates.latitude;
+                    Double lng = coordinates.longitude;
+                    Intent intent = new Intent(v.getContext(), showPlaceActivity.class);
+                    intent.putExtra("latitude", lat);
+                    intent.putExtra("longitude", lng);
+                    intent.putExtra("marker", itinerary.getStages().get(finalI).getName());
+                    startActivity(intent);
+                });
+
+                linearLayout.addView(stageView);
+            }
+        }
     }
 
     public boolean checkLocationPermission()
@@ -706,8 +718,10 @@ public class ItineraryActivity extends AppCompatActivity {
      * @param data An Intent, which can return result data to the caller
      */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE)
+        {
             if (resultCode == RESULT_OK) {
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 stage = new Stage(place.getName(), place.getAddress(), place.getLatLng());
@@ -718,6 +732,12 @@ public class ItineraryActivity extends AppCompatActivity {
             Log.i("it_view", status.getStatusMessage());
         } else if (resultCode == RESULT_CANCELED) {
             // The user canceled the operation.
+        }
+
+        if(requestCode == PROPOSED_STAGES_CODE && resultCode == RESULT_OK)
+        {
+            itinerary = (Itinerary) ObjectSharer.get().getSharedObject("lista_proposte");
+            refreshStagesList();
         }
     }
 
