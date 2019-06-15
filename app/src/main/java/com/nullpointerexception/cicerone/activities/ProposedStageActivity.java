@@ -1,5 +1,6 @@
 package com.nullpointerexception.cicerone.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -46,6 +47,7 @@ public class ProposedStageActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private List<Stage> proposedStage = new ArrayList<Stage>();
+    private Itinerary itinerary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +61,7 @@ public class ProposedStageActivity extends AppCompatActivity {
         toolbar.setTitle(R.string.title_ProposedStageActivity);
         setSupportActionBar(toolbar);
 
-        Itinerary itinerary = (Itinerary) ObjectSharer.get().getSharedObject("lista_proposte");
+        itinerary = (Itinerary) ObjectSharer.get().getSharedObject("lista_proposte");
 
         proposedStage = itinerary.getProposedStages();
 
@@ -74,7 +76,7 @@ public class ProposedStageActivity extends AppCompatActivity {
 
         if(proposedStage.size() != 0)
         {
-            AdapterStage adapter = new AdapterStage(getApplicationContext(), proposedStage, itinerary);
+            AdapterStage adapter = new AdapterStage(this, proposedStage, itinerary);
             recyclerView.setAdapter(adapter);
         }
     }
@@ -90,6 +92,11 @@ public class ProposedStageActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         ObjectSharer.get().remove("lista_proposte");
+        ObjectSharer.get().shareObject("show_trip_as_cicerone", itinerary);
+        Intent intent = new Intent(this, ItineraryActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 }
 
@@ -142,8 +149,13 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>{
                     @Override
                     public void onSuccess() {
                         BackEndInterface.get().storeEntity(itinerary);
-                        v.getContext().startActivity(new Intent(v.getContext(), ProposedStageActivity.class));
-
+                        Intent intent = new Intent(context, ProposedStageActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                        ObjectSharer.get().shareObject("lista_proposte", itinerary);
+                        if(context instanceof Activity) {
+                            ((Activity) context).finish();
+                        }
                     }
 
                     @Override
@@ -159,11 +171,12 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>{
             LatLng coordinates = listPlace_test.get(position).getCoordinates();
             Double lat = coordinates.latitude;
             Double lng = coordinates.longitude;
-            Intent intent = new Intent(v.getContext(), showPlaceActivity.class);
+            Intent intent = new Intent(context, showPlaceActivity.class);
             intent.putExtra("latitude", lat);
             intent.putExtra("longitude", lng);
             intent.putExtra("marker", listPlace_test.get(position).getName());
-            v.getContext().startActivity(intent);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
         });
     }
 

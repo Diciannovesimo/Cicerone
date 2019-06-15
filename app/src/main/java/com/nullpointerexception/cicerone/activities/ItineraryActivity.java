@@ -664,11 +664,13 @@ public class ItineraryActivity extends AppCompatActivity {
             mPurposePlace.setOnClickListener(v -> {
                     ObjectSharer.get().shareObject("lista_proposte", itinerary);
                     startActivity(new Intent(v.getContext(), ProposedStageActivity.class));
+                    finish();
                     });
 
             mPartecipantsList.setOnClickListener(v -> {
                 ObjectSharer.get().shareObject("lista_proposte", itinerary);
                 startActivity(new Intent(v.getContext(), ParticipantsActivity.class));
+                finish();
             });
         }
 
