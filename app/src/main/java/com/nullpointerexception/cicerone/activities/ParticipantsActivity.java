@@ -3,15 +3,6 @@ package com.nullpointerexception.cicerone.activities;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-
-import com.google.android.gms.maps.model.LatLng;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +11,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
-import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.User;
 
 import java.util.ArrayList;
@@ -37,7 +33,8 @@ import java.util.List;
  *
  *      @author Mattia
  */
-public class ParticipantsActivity extends AppCompatActivity {
+public class ParticipantsActivity extends AppCompatActivity
+{
 
     private List<User> participants = new ArrayList<User>();
 
@@ -45,7 +42,8 @@ public class ParticipantsActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_participants);
 
@@ -81,13 +79,15 @@ public class ParticipantsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         super.onDestroy();
         ObjectSharer.get().remove("lista_proposte");
     }
 }
 
-class AdapterPartecipants extends RecyclerView.Adapter <AdapterPartecipants.MyViewHolder>{
+class AdapterPartecipants extends RecyclerView.Adapter <AdapterPartecipants.MyViewHolder>
+{
 
     private Context context;
     private List<User> participants;
@@ -100,11 +100,10 @@ class AdapterPartecipants extends RecyclerView.Adapter <AdapterPartecipants.MyVi
         inflater = (LayoutInflater.from(appContext));
     }
 
-
-
     @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    {
         View v = inflater.inflate(R.layout.participant_layout, parent, false);
         MyViewHolder vh = new MyViewHolder(v);
 
