@@ -88,6 +88,10 @@ public class ProposedStageActivity extends AppCompatActivity
         super.onDestroy();
         ObjectSharer.get().remove("lista_proposte");
         ObjectSharer.get().shareObject("show_trip_as_cicerone", itinerary);
+        Intent intent = new Intent(this, ItineraryActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 }
 
@@ -95,14 +99,14 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>
 {
 
     private Context context;
-    private List<Stage> listPlaces;
+    private List<Stage> listPlace_test;
     private LayoutInflater inflater;
     private Itinerary itinerary ;
 
     public AdapterStage(Context appContext, List<Stage> listPlace_test, Itinerary itinerary)
     {
         this.context = appContext;
-        this.listPlaces = listPlace_test;
+        this.listPlace_test = listPlace_test;
         inflater = (LayoutInflater.from(appContext));
         this.itinerary = itinerary;
     }
@@ -121,21 +125,21 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position)
     {
-        holder.name.setText(listPlaces.get(position).getName());
-        holder.description.setText(listPlaces.get(position).getDescription());
+        holder.name.setText(listPlace_test.get(position).getName());
+        holder.description.setText(listPlace_test.get(position).getDescription());
 
         //Ascolto l'evento click relativo a "Aggiungi tappa"
         holder.addstage.setOnClickListener(v ->
         {
             //Aggiungo la nuova tappa
             List<Stage> newStage = itinerary.getStages();
-            newStage.add(listPlaces.get(position));
+            newStage.add(listPlace_test.get(position));
             itinerary.setStages(newStage);
 
             //Rimuovo l'itinerario da quelli proposti
-            listPlaces.remove(position);
-            notifyItemRemoved(position);
-            itinerary.setProposedStages(listPlaces);
+            listPlace_test.remove(position);
+
+            itinerary.setProposedStages(listPlace_test);
 
             //Aggiungere il nuovo itinerario
             BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener()
@@ -144,11 +148,14 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>
                 public void onSuccess()
                 {
                     BackEndInterface.get().storeEntity(itinerary);
-
-                    ObjectSharer.get().shareObject("show_trip_as_cicerone", itinerary);
+                    Intent intent = new Intent(context, ProposedStageActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                    ObjectSharer.get().shareObject("lista_proposte", itinerary);
                     if(context instanceof Activity)
                     {
                         ((Activity) context).setResult(Activity.RESULT_OK);
+                        ((Activity) context).finish();
                     }
                 }
 
@@ -163,13 +170,13 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>
         //Ascolto l'evento click relativo a "Visualizza posizione GPS"
         holder.imgGPS.setOnClickListener(v ->
         {
-            LatLng coordinates = listPlaces.get(position).getCoordinates();
+            LatLng coordinates = listPlace_test.get(position).getCoordinates();
             Double lat = coordinates.latitude;
             Double lng = coordinates.longitude;
             Intent intent = new Intent(context, showPlaceActivity.class);
             intent.putExtra("latitude", lat);
             intent.putExtra("longitude", lng);
-            intent.putExtra("marker", listPlaces.get(position).getName());
+            intent.putExtra("marker", listPlace_test.get(position).getName());
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         });
@@ -177,7 +184,7 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>
 
     @Override
     public int getItemCount() {
-        return listPlaces.size();
+        return listPlace_test.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder

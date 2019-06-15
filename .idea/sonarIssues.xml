@@ -68,6 +68,16 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/activities/ParticipantsActivity.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/activities/ProposedStageActivity.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/activities/RegistrationActivity.java">
           <value>
             <set />
@@ -269,6 +279,16 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/res/layout/nav_header_main.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/layout/participant_layout.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/layout/proposed_stage_activity.xml">
           <value>
             <set />
           </value>

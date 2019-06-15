@@ -636,14 +636,16 @@ public class ItineraryActivity extends AppCompatActivity
 
             mPurposePlace.setOnClickListener(v ->
             {
-                ObjectSharer.get().shareObject("lista_proposte", itinerary);
-                startActivityForResult(new Intent(v.getContext(), ProposedStageActivity.class),
-                        PROPOSED_STAGES_CODE);
+                    ObjectSharer.get().shareObject("lista_proposte", itinerary);
+                    startActivityForResult(new Intent(v.getContext(), ProposedStageActivity.class),
+                            PROPOSED_STAGES_CODE);
+                    finish();
             });
 
             mPartecipantsList.setOnClickListener(v -> {
                 ObjectSharer.get().shareObject("lista_proposte", itinerary);
                 startActivity(new Intent(v.getContext(), ParticipantsActivity.class));
+                finish();
             });
         }
 
@@ -656,7 +658,7 @@ public class ItineraryActivity extends AppCompatActivity
         View redSphere = getLayoutInflater().inflate(R.layout.red_sphere_layout, null);
         linearLayout.addView(redSphere, 0);
 
-        if(itinerary != null && itinerary.getStages() != null)
+        if(itinerary.getStages() != null)
         {
             for (int i = 0; i < itinerary.getStages().size(); ++i)
             {
@@ -734,7 +736,7 @@ public class ItineraryActivity extends AppCompatActivity
 
         if(requestCode == PROPOSED_STAGES_CODE && resultCode == RESULT_OK)
         {
-            itinerary = (Itinerary) ObjectSharer.get().getSharedObject("show_trip_as_cicerone");
+            itinerary = (Itinerary) ObjectSharer.get().getSharedObject("lista_proposte");
             refreshStagesList();
         }
     }
