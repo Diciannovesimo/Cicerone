@@ -71,7 +71,7 @@ public class ProposedStageActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.RecyclerView_ProposedStage);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
         if(proposedStage.size() != 0)
