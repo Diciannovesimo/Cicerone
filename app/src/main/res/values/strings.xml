@@ -95,6 +95,7 @@
 
     <!-- ItinerayEditActivity -->
     <string name="time_picker">Scegli l\'ora</string>
+    <string name="title_activity_show_place">Map</string>
 
     <!-- FindItineraryActivity -->
     <string name="fields_not_inserted">Non hai inserito tutti i campi.</string>

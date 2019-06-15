@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
                     phoneNumber;
 
     /**   List of itineraries which this user have or is participating.  */
-    protected List<Itinerary> itineraries;
+    protected List<Itinerary> itineraries = new ArrayList<>();
 
     public User() {}
 
@@ -130,6 +131,10 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
 
     public void setItineraries(List<Itinerary> itineraries) {
         this.itineraries = itineraries;
+    }
+
+    public void addItinerary(Itinerary itinerary) {
+        itineraries.add(itinerary);
     }
 
     public void setId(String id) {

@@ -115,7 +115,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_itinerary);
+        setContentView(R.layout.activity_creation_itinerary);
 
         //Initialize graphic interface
         initUI();
@@ -125,7 +125,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
         {
             edit_mode = true;
             itinerary = (Itinerary)ObjectSharer.get().getSharedObject("edit_itinerary");
-            setTextField(itinerary);
+            setTextField();
         }
 
         if(edit_mode)
@@ -742,7 +742,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
     /**
      * Reads data from itinerary and sets them in the right EditText
      */
-    private void setTextField(Itinerary itinerary) {
+    private void setTextField() {
         //disable the following fields
         mLuogo.setEnabled(false);
         luogo_box.setEnabled(false);

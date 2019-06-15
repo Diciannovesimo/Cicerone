@@ -21,6 +21,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.activities.ItineraryActivity;
 import com.nullpointerexception.cicerone.activities.ItineraryCreationActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
@@ -199,7 +200,9 @@ class ItinerariesAdapter extends RecyclerView.Adapter
 
         viewHolder.getView().setOnViewClickListener(() ->
         {
-            Toast.makeText(viewHolder.getView().getContext(), "Open detail.", Toast.LENGTH_SHORT).show();
+            Context context = viewHolder.getView().getContext();
+            ObjectSharer.get().shareObject("show_trip_as_cicerone", dataSet.get(position));
+            context.startActivity(new Intent(context, ItineraryActivity.class));
         });
 
         viewHolder.getView().setOnEditButtonClickListener(() ->
