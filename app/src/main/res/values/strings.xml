@@ -108,4 +108,12 @@
     <string name="searchResultsTitle2">il</string>
     <string name="noSearchResults">Non è stato trovato nessun itinerario.</string>
 
+    <!-- ParticipantsActivity -->
+    <string name="title_ParticipantsActivity">Partecipanti</string>
+    <string name="title_activity_participants">ParticipantsActivity</string>
+
+    <!-- ProposedStageActivity -->
+    <string name="title_activity_proposed_stage">ProposedStageActivity</string>
+    <string name="title_ProposedStageActivity">Tappe proposte</string>
+
 </resources>

@@ -661,19 +661,14 @@ public class ItineraryActivity extends AppCompatActivity {
         }else {
             mItinerary.setVisibility(View.GONE);
 
-            mPurposePlace.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    /*ObjectSharer.get().shareObject("lista_proposte", itinerary);
-                    Itinerary itinerary = (Itinerary)ObjectSharer.get().getSharedObject("lista_proposte");*/
-                }
-            });
+            mPurposePlace.setOnClickListener(v -> {
+                    ObjectSharer.get().shareObject("lista_proposte", itinerary);
+                    startActivity(new Intent(v.getContext(), ProposedStageActivity.class));
+                    });
 
-            mPartecipantsList.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
+            mPartecipantsList.setOnClickListener(v -> {
+                ObjectSharer.get().shareObject("lista_proposte", itinerary);
+                startActivity(new Intent(v.getContext(), ParticipantsActivity.class));
             });
         }
 

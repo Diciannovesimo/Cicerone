@@ -48,6 +48,14 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.FindItineraryActivty"/>
         <activity
+            android:name=".activities.ProposedStageActivity"
+            android:label="@string/title_activity_proposed_stage"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".activities.ParticipantsActivity"
+            android:label="@string/title_activity_participants"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".activities.ItineraryCreationActivity"
             android:label="@string/title_activity_itinerary"
             android:theme="@style/AppTheme.NoActionBar" />
