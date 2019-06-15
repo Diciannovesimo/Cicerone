@@ -62,7 +62,7 @@ public class ItineraryActivity extends AppCompatActivity
 
     private static final String TAG = "It_ItineraryActivity";
     private final int PROPOSED_STAGES_CODE = 321;
-    private TextView mDateCard, mPlaceCard, mTimeCard, mLanguageCard, mDescriptionCard, mParticipantsCard, mPriceCard, mCityCard;
+    private TextView mDateCard, mPlaceCard, mTimeCard, mLanguageCard, mDescriptionCard, mParticipantsCard, mPriceCard;
     private TextView placeName, placeDescription, mShowLocation;
     private EditText mPlace, mPlaceDesc;
     private TextFieldBoxes place_box;
@@ -120,7 +120,7 @@ public class ItineraryActivity extends AppCompatActivity
                 setTextField();
         }
 
-        toolbar.setTitle("Itinerario");
+        toolbar.setTitle(itinerary.getLocation());
 
         //Set toolbar
         setSupportActionBar(toolbar);
@@ -150,7 +150,6 @@ public class ItineraryActivity extends AppCompatActivity
         mDescriptionCard = findViewById(R.id.description_card);
         mParticipantsCard = findViewById(R.id.partecipants_card);
         mPriceCard = findViewById(R.id.price_card);
-        mCityCard = findViewById(R.id.city_card);
         linearLayout = findViewById(R.id.stage_linear_layout);
         ciceronePhoto = findViewById(R.id.ciceronePhoto);
         cityImage = findViewById(R.id.cityImage);
@@ -180,7 +179,6 @@ public class ItineraryActivity extends AppCompatActivity
             }
         });
 
-        mCityCard.setText(itinerary.getLocation());
         mDateCard.setText(itinerary.getDate());
         mPlaceCard.setText(itinerary.getMeetingPlace());
         mTimeCard.setText(itinerary.getMeetingTime());
@@ -636,16 +634,14 @@ public class ItineraryActivity extends AppCompatActivity
 
             mPurposePlace.setOnClickListener(v ->
             {
-                    ObjectSharer.get().shareObject("lista_proposte", itinerary);
-                    startActivityForResult(new Intent(v.getContext(), ProposedStageActivity.class),
-                            PROPOSED_STAGES_CODE);
-                    finish();
+                ObjectSharer.get().shareObject("lista_proposte", itinerary);
+                startActivityForResult(new Intent(v.getContext(), ProposedStageActivity.class),
+                        PROPOSED_STAGES_CODE);
             });
 
             mPartecipantsList.setOnClickListener(v -> {
                 ObjectSharer.get().shareObject("lista_proposte", itinerary);
                 startActivity(new Intent(v.getContext(), ParticipantsActivity.class));
-                finish();
             });
         }
 
@@ -658,7 +654,7 @@ public class ItineraryActivity extends AppCompatActivity
         View redSphere = getLayoutInflater().inflate(R.layout.red_sphere_layout, null);
         linearLayout.addView(redSphere, 0);
 
-        if(itinerary.getStages() != null)
+        if(itinerary != null && itinerary.getStages() != null)
         {
             for (int i = 0; i < itinerary.getStages().size(); ++i)
             {
@@ -736,7 +732,7 @@ public class ItineraryActivity extends AppCompatActivity
 
         if(requestCode == PROPOSED_STAGES_CODE && resultCode == RESULT_OK)
         {
-            itinerary = (Itinerary) ObjectSharer.get().getSharedObject("lista_proposte");
+            itinerary = (Itinerary) ObjectSharer.get().getSharedObject("show_trip_as_cicerone");
             refreshStagesList();
         }
     }
