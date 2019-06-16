@@ -194,6 +194,7 @@ class ItinerariesAdapter extends RecyclerView.Adapter
     {
         ViewHolder viewHolder = (ViewHolder) holder;
 
+        viewHolder.getView().setCiceroneShowed(false);
         viewHolder.setViewFor(dataSet.get(position));
 
         viewHolder.getView().setAsLastElement((position == dataSet.size() -1 && dataSet.size() > 3));

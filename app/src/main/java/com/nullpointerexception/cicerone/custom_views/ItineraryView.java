@@ -27,7 +27,6 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.nullpointerexception.cicerone.R;
-import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.ImageFetcher;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
@@ -72,6 +71,8 @@ public class ItineraryView extends FrameLayout
     private boolean editable = true;
     /**   Indicates if this itinerary is in condition to be edited.   */
     private boolean isEditAllowed = true;
+    /**   Indicates if show cicerone information  */
+    private boolean isCiceroneShowed = true;
     /**   Itinerary showed by this view  */
     private Itinerary itinerary;
 
@@ -266,8 +267,7 @@ public class ItineraryView extends FrameLayout
 
         meeting.setText(itinerary.getMeetingPlace() + " - " + itinerary.getMeetingTime());
 
-        if( ! AuthenticationManager.get().getUserLogged().getId().equals(
-                    itinerary.getCicerone().getId()) &&
+        if( isCiceroneShowed &&
                 itinerary.getCicerone().getDisplayName() != null
             && !itinerary.getCicerone().getDisplayName()
                 .replace(" ", "")
@@ -464,6 +464,14 @@ public class ItineraryView extends FrameLayout
         }
 
 
+    }
+
+    public boolean isCiceroneShowed() {
+        return isCiceroneShowed;
+    }
+
+    public void setCiceroneShowed(boolean ciceroneShowed) {
+        isCiceroneShowed = ciceroneShowed;
     }
 
     public boolean isCollapsed() { return isCollapsed; }

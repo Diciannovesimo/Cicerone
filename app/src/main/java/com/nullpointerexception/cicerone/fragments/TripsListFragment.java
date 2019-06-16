@@ -1,7 +1,5 @@
 package com.nullpointerexception.cicerone.fragments;
 
-
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,13 +17,18 @@ import com.nullpointerexception.cicerone.activities.FindItineraryActivty;
 import com.nullpointerexception.cicerone.activities.ItineraryActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.custom_views.ItineraryView;
 
 import java.util.List;
-import java.util.Vector;
 
+/**
+ *      TripsListFragment
+ *
+ *      Shows a list with itineraries which user want to participate.
+ */
 public class TripsListFragment extends Fragment
 {
 
@@ -41,7 +44,8 @@ public class TripsListFragment extends Fragment
      */
     private RecyclerView.LayoutManager layoutManager;
     private ParticipatedItinerariesAdapter adapter;
-    private List<Itinerary> itineraries = new Vector<>();
+    /**   Last adapter size. Used to refresh page only if adapter changes.  */
+    private int lastSize = 0;
 
     public TripsListFragment() { }
 
@@ -63,34 +67,44 @@ public class TripsListFragment extends Fragment
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(recyclerView.getContext());
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new ParticipatedItinerariesAdapter(itineraries);
+        adapter = new ParticipatedItinerariesAdapter(this,
+                AuthenticationManager.get().getUserLogged().getItineraries());
         recyclerView.setAdapter(adapter);
 
-        itineraries.addAll(AuthenticationManager.get().getUserLogged().getItineraries());
         updateItineraryViews();
 
-        //  TODO: Aggiornare in onActivityResult() in caso ci si disiscrive dalla schermata di ricerca?
-
-        findItineraryFab.setOnClickListener(v -> startActivity(new Intent(getContext(), FindItineraryActivty.class)));
+        findItineraryFab.setOnClickListener(v -> startActivityForResult(new Intent(getContext(), FindItineraryActivty.class), 0));
 
         return view;
     }
 
     private void updateItineraryViews()
     {
+        lastSize = adapter.getItemCount();
+
         adapter.notifyDataSetChanged();
         if(recyclerView.getAdapter() != null)
             noItinerariesLabel.setVisibility(recyclerView.getAdapter().getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(lastSize != adapter.getItemCount())
+            updateItineraryViews();
+    }
 }
 
 class ParticipatedItinerariesAdapter extends RecyclerView.Adapter
 {
+    private Fragment reference;
     private List<Itinerary> dataSet;
 
-    ParticipatedItinerariesAdapter(List<Itinerary> dataSet)
+    ParticipatedItinerariesAdapter(Fragment reference, List<Itinerary> dataSet)
     {
+        this.reference = reference;
         this.dataSet = dataSet;
     }
 
@@ -106,16 +120,39 @@ class ParticipatedItinerariesAdapter extends RecyclerView.Adapter
     {
         ViewHolder viewHolder = (ViewHolder) holder;
 
-        if(dataSet.get(position).getMeetingPlace() == null)
+        if(dataSet.get(position).getDate() == null ||
+                dataSet.get(position).getMeetingTime() == null)
             dataSet.get(position).getFieldsFromId();
 
+        viewHolder.getView().setCiceroneShowed(false);
         viewHolder.setViewFor(dataSet.get(position));
 
         viewHolder.getView().setOnViewClickListener(() ->
         {
-            ObjectSharer.get().shareObject("show_trip_as_user", viewHolder.getView().getItinerary());
-            Context context = viewHolder.getView().getContext();
-            context.startActivity(new Intent(context, ItineraryActivity.class));
+            Itinerary itinerary = viewHolder.getView().getItinerary();
+
+            if(itinerary.getParticipants() == null || itinerary.getParticipants().isEmpty())
+            {
+                BackEndInterface.get().getEntity(itinerary,
+                        new BackEndInterface.OnOperationCompleteListener()
+                        {
+                            @Override
+                            public void onSuccess()
+                            {
+                                ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
+                                reference.startActivityForResult(new Intent(reference.getContext(), ItineraryActivity.class), 0);
+                            }
+
+                            @Override
+                            public void onError() { }
+                        });
+            }
+            else
+            {
+                ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
+                reference.startActivityForResult(new Intent(reference.getContext(), ItineraryActivity.class), 0);
+            }
+
         });
     }
 

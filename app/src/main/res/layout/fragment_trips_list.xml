@@ -44,7 +44,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
-        android:src="@drawable/ic_add"
+        android:tint="#fff"
+        android:src="@drawable/ic_trip"
         app:backgroundTint="#FF9800"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

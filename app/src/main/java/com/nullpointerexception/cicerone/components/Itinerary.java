@@ -189,15 +189,15 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
         if(id == null || id.isEmpty())
             return;
 
-        String id = this.id.replace("-", "/").replace("~", ".");
+        String id = this.id.replace("~", ".");
 
-        String idCicerone = id.substring(0, id.indexOf("/")-4);
+        String idCicerone = id.substring(0, id.indexOf("-")-4);
         if(cicerone == null || cicerone.getId() == null || !cicerone.getId().equals(idCicerone))
         {
             cicerone = new User();
             cicerone.setId(idCicerone);
         }
-        date = id.substring(idCicerone.length(), idCicerone.length() + 10);
+        date = id.substring(idCicerone.length(), idCicerone.length() + 10).replace("-", "/");
         meetingTime = id.substring( idCicerone.length() + date.length() );
     }
 
@@ -279,7 +279,7 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
     @Override
     public void restoreId(String id)
     {
-        this.id = id;
+        this.id = id.replace("/", "-");
     }
 
     @Override
