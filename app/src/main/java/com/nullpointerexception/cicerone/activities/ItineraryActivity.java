@@ -393,7 +393,7 @@ public class ItineraryActivity extends AppCompatActivity
                     itinerary.setParticipants(userList1);
 
                     for(int i = 0; i < user.getItineraries().size(); ++i) {
-                        if(itinerary.getId().equals(user.getItineraries().get(i)))
+                        if(itinerary.getId().equals(user.getItineraries().get(i).getId()))
                             user.removeItinerary(i);
                     }
 
@@ -403,6 +403,8 @@ public class ItineraryActivity extends AppCompatActivity
                             BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
                                 @Override
                                 public void onSuccess() {
+                                    BackEndInterface.get().removeEntity(user);
+                                    BackEndInterface.get().storeEntity(user);
                                     new KAlertDialog(v.getContext())
                                             .setContentText("Ti sei disinscritto dalla gita")
                                             .setConfirmText("Ok")
@@ -695,7 +697,7 @@ public class ItineraryActivity extends AppCompatActivity
                 mPurposePlace.setVisibility(View.GONE);
             }
 
-            if(itinerary.getProposedStages().size() != 0) {
+            if(itinerary.getParticipants().size() != 0) {
                 mPartecipantsList.setOnClickListener(v -> {
                     ObjectSharer.get().shareObject("lista_proposte", itinerary);
                     startActivity(new Intent(v.getContext(), ParticipantsActivity.class));
