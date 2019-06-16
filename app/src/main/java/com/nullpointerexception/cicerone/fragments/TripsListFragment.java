@@ -1,12 +1,12 @@
 package com.nullpointerexception.cicerone.fragments;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -16,9 +16,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.activities.FindItineraryActivty;
+import com.nullpointerexception.cicerone.activities.ItineraryActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Itinerary;
+import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.User;
 import com.nullpointerexception.cicerone.custom_views.ItineraryView;
 
@@ -127,7 +129,9 @@ class ParticipatedItinerariesAdapter extends RecyclerView.Adapter
 
         viewHolder.getView().setOnViewClickListener(() ->
         {
-            Toast.makeText(viewHolder.getView().getContext(), "Open detail.", Toast.LENGTH_SHORT).show();
+            ObjectSharer.get().shareObject("show_trip_as_user", viewHolder.getView().getItinerary());
+            Context context = viewHolder.getView().getContext();
+            context.startActivity(new Intent(context, ItineraryActivity.class));
         });
     }
 

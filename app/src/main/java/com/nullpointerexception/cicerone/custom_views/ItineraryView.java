@@ -27,6 +27,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.ImageFetcher;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
@@ -71,6 +72,8 @@ public class ItineraryView extends FrameLayout
     private boolean editable = true;
     /**   Indicates if this itinerary is in condition to be edited.   */
     private boolean isEditAllowed = true;
+    /**   Itinerary showed by this view  */
+    private Itinerary itinerary;
 
     @SuppressLint("ClickableViewAccessibility")
     public ItineraryView(@NonNull Context context)
@@ -240,6 +243,8 @@ public class ItineraryView extends FrameLayout
      */
     public void setFrom(Itinerary itinerary)
     {
+        this.itinerary = itinerary;
+
         city.setText(itinerary.getLocation());
 
         //Change date format
@@ -261,7 +266,9 @@ public class ItineraryView extends FrameLayout
 
         meeting.setText(itinerary.getMeetingPlace() + " - " + itinerary.getMeetingTime());
 
-        if(itinerary.getCicerone().getDisplayName() != null
+        if( ! AuthenticationManager.get().getUserLogged().getId().equals(
+                    itinerary.getCicerone().getId()) &&
+                itinerary.getCicerone().getDisplayName() != null
             && !itinerary.getCicerone().getDisplayName()
                 .replace(" ", "")
                 .replace("null", "").isEmpty())
@@ -359,6 +366,8 @@ public class ItineraryView extends FrameLayout
     }
 
     public boolean isLastElement() { return isLastElement; }
+
+    public Itinerary getItinerary() { return itinerary; }
 
     /**
      *      Hides edit and delete button with animations, after set state as collapsed.

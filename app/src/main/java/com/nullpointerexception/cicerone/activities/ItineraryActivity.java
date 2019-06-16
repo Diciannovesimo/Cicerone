@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +20,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -70,11 +70,9 @@ public class ItineraryActivity extends AppCompatActivity
     private Button mItinerary, mPurposePlace, mPartecipantsList, create_stage;
     private com.kinda.mtextfield.TextFieldBoxes descrizione_tappa_box;
     private Stage stage;
-    private List<Stage> proposedStages = new ArrayList<>();
 
     //UI
     private LinearLayout linearLayout;
-    private ConstraintLayout constraintLayout;
     private boolean userMode = false;
     private boolean subscribed = false;
 
@@ -93,7 +91,8 @@ public class ItineraryActivity extends AppCompatActivity
     private PlaceLikelihood MaxPlaceLikelihood;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_itinerary);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -154,30 +153,42 @@ public class ItineraryActivity extends AppCompatActivity
         ciceronePhoto = findViewById(R.id.ciceronePhoto);
         cityImage = findViewById(R.id.cityImage);
         mItinerary = findViewById(R.id.itinerary_btn);
-        constraintLayout = findViewById(R.id.itineraryLayout);
         mPurposePlace = findViewById(R.id.purposePlace_btn);
         mPartecipantsList = findViewById(R.id.partecipantsList_btn);
     }
 
-    private void setTextField() {
+    private void setTextField()
+    {
         ImageFetcher imageFetcher = new ImageFetcher();
 
-        imageFetcher.findSubject(itinerary.getLocation(), new ImageFetcher.OnImageFoundListener() {
-            @Override
-            public void onImageFound(String url) {
+        String keyword = itinerary.getLocation() + " " + getResources().getString(R.string.city);
 
-                ((Activity) cityImage.getContext()).runOnUiThread(() ->
-                        Glide.with(cityImage.getContext())
-                                .load(url)
-                                .transition(DrawableTransitionOptions.withCrossFade())
-                                .into(cityImage));
-            }
+        if(itinerary.getLocation() != null &&
+                itinerary.getLocation().trim().equalsIgnoreCase("bitritto"))
+            keyword = "corvo gigante bitritto";
 
-            @Override
-            public void onError() {
+        Drawable resource = (Drawable) ObjectSharer.get().getSharedObject("resource_" + keyword);
+        if(resource == null)
+        {
+            imageFetcher.findSubject(keyword, new ImageFetcher.OnImageFoundListener()
+            {
+                @Override
+                public void onImageFound(String url)
+                {
 
-            }
-        });
+                    ((Activity) cityImage.getContext()).runOnUiThread(() ->
+                            Glide.with(cityImage.getContext())
+                                    .load(url)
+                                    .transition(DrawableTransitionOptions.withCrossFade())
+                                    .into(cityImage));
+                }
+
+                @Override
+                public void onError() { }
+            });
+        }
+        else
+            cityImage.setImageDrawable(resource);
 
         mDateCard.setText(itinerary.getDate());
         mPlaceCard.setText(itinerary.getMeetingPlace());
