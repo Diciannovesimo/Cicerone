@@ -606,7 +606,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess() {
                                 if(checkItinerary.getLocation() != null && !checkItinerary.getLocation().isEmpty()) {
-                                    Toast.makeText(getApplicationContext(), "L'itinerario inserito è già esistente", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "L'itinerario inserito è già esistente", Toast.LENGTH_SHORT).show();
                                 } else {
                                     //Load the itinerary on Firebase DB
                                     BackEndInterface.get().storeEntity(new_itinerary, new BackEndInterface.OnOperationCompleteListener() {
