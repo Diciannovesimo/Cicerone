@@ -49,7 +49,6 @@ import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.User;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -227,7 +226,7 @@ public class ItineraryActivity extends AppCompatActivity
 
         refreshStagesList();
 
-        List<User> userList = new ArrayList<>();
+        List<User> userList;
         userList = itinerary.getParticipants();
 
         //Check if user is already a participant of the itinerary
@@ -264,11 +263,6 @@ public class ItineraryActivity extends AppCompatActivity
                     mBuilder.setView(mView);
                     AlertDialog dialog = mBuilder.create();
 
-                    //If dialog is dismissed, shows the listStage_title
-                    dialog.setOnDismissListener(dialog1 -> {
-
-                    });
-
                     //Listener to open Google Place autocomplete intent
                     place_box.setOnClickListener(v1 -> {
                         Intent intent = new Autocomplete.IntentBuilder(
@@ -390,32 +384,136 @@ public class ItineraryActivity extends AppCompatActivity
                     dialog.show();
                 });
 
-                mItinerary.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        List<User> userList = itinerary.getParticipants();
-                        for(int i = 0; i < userList.size(); ++i) {
-                            if(user.getId().equals(userList.get(i).getId()))
-                                userList.remove(i);
+                mItinerary.setOnClickListener(v -> {
+                    List<User> userList1 = itinerary.getParticipants();
+                    for(int i = 0; i < userList1.size(); ++i) {
+                        if(user.getId().equals(userList1.get(i).getId()))
+                            userList1.remove(i);
+                    }
+                    itinerary.setParticipants(userList1);
+
+                    for(int i = 0; i < user.getItineraries().size(); ++i) {
+                        if(itinerary.getId().equals(user.getItineraries().get(i)))
+                            user.removeItinerary(i);
+                    }
+                    
+                    BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                        @Override
+                        public void onSuccess() {
+                            BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                                @Override
+                                public void onSuccess() {
+                                    new KAlertDialog(v.getContext())
+                                            .setTitleText("Complimenti")
+                                            .setContentText("Ti sei disinscritto dalla gita")
+                                            .setConfirmText("Ok")
+                                            .setConfirmClickListener(kAlertDialog ->
+                                            {
+                                                ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
+                                                v.getContext().startActivity(new Intent(getApplicationContext(), ItineraryActivity.class));
+                                                finish();
+                                            }).show();
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
                         }
 
-                        itinerary.setParticipants(userList);
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
+
+                });
+
+                linearLayout.addView(addStageView);
+            }else {
+                if(itinerary.getMaxParticipants() != 0) {
+                    if (itinerary.getParticipants().size() < itinerary.getMaxParticipants()) {
+                        mItinerary.setVisibility(View.VISIBLE);
+                        mItinerary.setOnClickListener(v -> {
+                            itinerary.addPartecipant(user);
+                            user.addItinerary(itinerary);
+
+                            BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                                @Override
+                                public void onSuccess() {
+                                    BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                            BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    new KAlertDialog(v.getContext())
+                                                            .setTitleText("Complimenti")
+                                                            .setContentText("Ti sei iscritto a questa visita!")
+                                                            .setConfirmText("Ok")
+                                                            .setConfirmClickListener(kAlertDialog -> {
+                                                                ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
+                                                                v.getContext().startActivity(new Intent(getApplicationContext(), ItineraryActivity.class));
+                                                                finish();
+                                                            }).show();
+                                                }
+
+                                                @Override
+                                                public void onError() {
+
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onError() {
+
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
+                        });
+                    }else {
+                        mItinerary.setVisibility(View.GONE);
+                        mParticipantsCard.setTextColor(getResources().getColor(R.color.md_red_400));
+                    }
+                } else {
+                    mItinerary.setVisibility(View.VISIBLE);
+                    mItinerary.setOnClickListener(v -> {
+                        itinerary.addPartecipant(user);
+                        user.addItinerary(itinerary);
+
                         BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
                             @Override
                             public void onSuccess() {
                                 BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
                                     @Override
                                     public void onSuccess() {
-                                        new KAlertDialog(v.getContext())
-                                                .setTitleText("Complimenti")
-                                                .setContentText("Ti sei disinscritto dalla gita")
-                                                .setConfirmText("Ok")
-                                                .setConfirmClickListener(kAlertDialog ->
-                                                {
-                                                    ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
-                                                    v.getContext().startActivity(new Intent(getApplicationContext(), ItineraryActivity.class));
-                                                    finish();
-                                                }).show();
+                                        BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                new KAlertDialog(v.getContext())
+                                                        .setTitleText("Complimenti")
+                                                        .setContentText("Ti sei iscritto a questa visita!")
+                                                        .setConfirmText("Ok")
+                                                        .setConfirmClickListener(kAlertDialog -> {
+                                                            ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
+                                                            v.getContext().startActivity(new Intent(getApplicationContext(), ItineraryActivity.class));
+                                                            finish();
+                                                        }).show();
+                                            }
+
+                                            @Override
+                                            public void onError() {
+
+                                            }
+                                        });
                                     }
 
                                     @Override
@@ -430,13 +528,9 @@ public class ItineraryActivity extends AppCompatActivity
 
                             }
                         });
+                    });
+                }
 
-                    }
-                });
-
-                linearLayout.addView(addStageView);
-            }else {
-                mItinerary.setVisibility(View.VISIBLE);
                 mPurposePlace.setVisibility(View.GONE);
                 mPartecipantsList.setVisibility(View.GONE);
 
@@ -565,7 +659,6 @@ public class ItineraryActivity extends AppCompatActivity
                             stage.setDescription(mPlaceDesc.getText().toString());
                             itinerary.addProposedStage(stage);
 
-                            //TODO: Luca guarda qui ;)
                             try {
                                 BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
                                     @Override
@@ -585,59 +678,6 @@ public class ItineraryActivity extends AppCompatActivity
                         }
                     });
                     dialog.show();
-                });
-
-                mItinerary.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (itinerary.getParticipants().size() < itinerary.getMaxParticipants()) {
-                            itinerary.addPartecipant(user);
-                            user.addItinerary(itinerary);
-
-                            BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                                @Override
-                                public void onSuccess() {
-                                    BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                                        @Override
-                                        public void onSuccess() {
-                                            BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
-                                                @Override
-                                                public void onSuccess() {
-                                                    new KAlertDialog(v.getContext())
-                                                            .setTitleText("Complimenti")
-                                                            .setContentText("Ti sei iscritto a questa visita!")
-                                                            .setConfirmText("Ok")
-                                                            .setConfirmClickListener(new KAlertDialog.OnSweetClickListener() {
-                                                                @Override
-                                                                public void onClick(KAlertDialog kAlertDialog) {
-                                                                    ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
-                                                                    v.getContext().startActivity(new Intent(getApplicationContext(), ItineraryActivity.class));
-                                                                    finish();
-                                                                }
-                                                            }).show();
-                                                }
-
-                                                @Override
-                                                public void onError() {
-
-                                                }
-                                            });
-                                        }
-
-                                        @Override
-                                        public void onError() {
-
-                                        }
-                                    });
-                                }
-
-                                @Override
-                                public void onError() {
-
-                                }
-                            });
-                        }
-                    }
                 });
 
                 linearLayout.addView(addStageView);

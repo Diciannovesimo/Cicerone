@@ -158,13 +158,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_marginStart="8dp"
+                            android:layout_marginTop="20dp"
                             android:layout_marginEnd="8dp"
-                            android:layout_marginBottom="16dp"
-                            app:layout_constraintBottom_toBottomOf="@id/card_layout"
+                            android:layout_marginBottom="3dp"
+                            app:layout_constraintBottom_toTopOf="@+id/partecipants_card"
                             app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.0"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/description_title_card"
-                            app:layout_constraintVertical_bias="0.0">
+                            app:layout_constraintTop_toBottomOf="@+id/description_title_card">
 
                             <TextView
                                 android:id="@+id/description_card"
@@ -182,39 +183,33 @@
                         <TextView
                             android:id="@+id/language_card"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="5dp"
                             android:layout_marginStart="8dp"
-                            android:layout_marginTop="26dp"
+                            android:layout_marginTop="8dp"
                             android:text="italiano"
+                            app:layout_constraintBottom_toBottomOf="@+id/language_title_card"
                             app:layout_constraintStart_toEndOf="@+id/language_title_card"
-                            app:layout_constraintTop_toTopOf="@+id/guideline" />
+                            app:layout_constraintTop_toTopOf="@+id/guideline"
+                            app:layout_constraintVertical_bias="1.0" />
 
                         <TextView
                             android:id="@+id/partecipants_card"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="43dp"
+                            android:layout_height="0dp"
                             android:layout_marginStart="8dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="3dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView2"
                             app:layout_constraintStart_toEndOf="@+id/textView2"
-                            app:layout_constraintTop_toBottomOf="@+id/scrollView3"
-                            app:layout_constraintVertical_bias="0.78"
                             tools:text="15/20" />
 
                         <TextView
                             android:id="@+id/price_card"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginEnd="16dp"
-                            android:layout_marginBottom="3dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/scrollView3"
-                            app:layout_constraintVertical_bias="0.79"
-                            android:textStyle="bold"
+                            android:layout_marginEnd="8dp"
                             android:textColor="#FF7700"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="@+id/partecipants_card"
+                            app:layout_constraintEnd_toEndOf="parent"
                             tools:text="€ price" />
 
                         <TextView

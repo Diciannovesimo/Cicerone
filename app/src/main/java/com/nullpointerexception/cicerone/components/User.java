@@ -137,6 +137,10 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
         itineraries.add(itinerary);
     }
 
+    public void removeItinerary(int index) {
+        itineraries.remove(index);
+    }
+
     public void setId(String id) {
         this.id = id;
     }
