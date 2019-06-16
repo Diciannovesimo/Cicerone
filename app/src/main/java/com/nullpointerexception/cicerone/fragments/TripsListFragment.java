@@ -18,10 +18,9 @@ import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.activities.FindItineraryActivty;
 import com.nullpointerexception.cicerone.activities.ItineraryActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
-import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
-import com.nullpointerexception.cicerone.components.User;
 import com.nullpointerexception.cicerone.custom_views.ItineraryView;
 
 import java.util.List;
@@ -67,39 +66,21 @@ public class TripsListFragment extends Fragment
         adapter = new ParticipatedItinerariesAdapter(itineraries);
         recyclerView.setAdapter(adapter);
 
-        //  Add fake data
-        Itinerary itinerary = new Itinerary();
-        itinerary.setDate("2019/06/13");
-        itinerary.setMeetingTime("10:00");
-        itinerary.setLocation("Canosa Di Puglia");
-        itinerary.setMeetingPlace("Piazza Terme");
+        itineraries.addAll(AuthenticationManager.get().getUserLogged().getItineraries());
+        updateItineraryViews();
 
-        User cicerone = new User();
-        cicerone.setId("fQv6mnTt6BTnuULNhv1DeasBOuL2");
-        BackEndInterface.get().getEntity(cicerone, new BackEndInterface.OnOperationCompleteListener()
-        {
-            @Override
-            public void onSuccess()
-            {
-                itinerary.setCicerone(cicerone);
-                itineraries.add(itinerary);
-
-                setItineraryViews(itineraries);
-            }
-
-            @Override
-            public void onError() { }
-        });
+        //  TODO: Aggiornare in onActivityResult() in caso ci si disiscrive dalla schermata di ricerca?
 
         findItineraryFab.setOnClickListener(v -> startActivity(new Intent(getContext(), FindItineraryActivty.class)));
 
         return view;
     }
 
-    private void setItineraryViews(List<Itinerary> itineraries)
+    private void updateItineraryViews()
     {
         adapter.notifyDataSetChanged();
-        noItinerariesLabel.setVisibility(this.itineraries.size() == 0 ? View.VISIBLE : View.GONE);
+        if(recyclerView.getAdapter() != null)
+            noItinerariesLabel.setVisibility(recyclerView.getAdapter().getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
 }
@@ -124,6 +105,9 @@ class ParticipatedItinerariesAdapter extends RecyclerView.Adapter
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position)
     {
         ViewHolder viewHolder = (ViewHolder) holder;
+
+        if(dataSet.get(position).getMeetingPlace() == null)
+            dataSet.get(position).getFieldsFromId();
 
         viewHolder.setViewFor(dataSet.get(position));
 

@@ -271,6 +271,7 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
         Map<String, String> subFields = new HashMap<>();
 
         subFields.put("location", location);
+        subFields.put("meetingPlace", meetingPlace);
 
         return subFields;
     }
@@ -285,6 +286,7 @@ public class Itinerary extends StorableEntity implements StorableAsField, ListOf
     public void restoreSubFields(Map<String, String> subFields)
     {
         location = subFields.get("location");
+        meetingPlace = subFields.get("meetingPlace");
     }
 
     @Override

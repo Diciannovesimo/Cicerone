@@ -368,8 +368,7 @@ public class BackEndInterface
         Query query = ref.orderByKey()
                 .startAt(idCicerone)
                 .endAt(idCicerone.substring(0, idCicerone.length()-1) +
-                        (idCicerone.charAt(idCicerone.length()-1)+1) )
-                ;
+                        (idCicerone.charAt(idCicerone.length()-1)+1) );
 
         query.addValueEventListener(new ValueEventListener()
         {
