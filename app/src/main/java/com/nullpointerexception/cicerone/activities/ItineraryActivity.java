@@ -396,7 +396,7 @@ public class ItineraryActivity extends AppCompatActivity
                         if(itinerary.getId().equals(user.getItineraries().get(i)))
                             user.removeItinerary(i);
                     }
-                    
+
                     BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
                         @Override
                         public void onSuccess() {
@@ -404,7 +404,6 @@ public class ItineraryActivity extends AppCompatActivity
                                 @Override
                                 public void onSuccess() {
                                     new KAlertDialog(v.getContext())
-                                            .setTitleText("Complimenti")
                                             .setContentText("Ti sei disinscritto dalla gita")
                                             .setConfirmText("Ok")
                                             .setConfirmClickListener(kAlertDialog ->
@@ -685,19 +684,26 @@ public class ItineraryActivity extends AppCompatActivity
         }else {
             mItinerary.setVisibility(View.GONE);
 
-            mPurposePlace.setOnClickListener(v ->
-            {
-                ObjectSharer.get().shareObject("lista_proposte", itinerary);
-                startActivityForResult(new Intent(v.getContext(), ProposedStageActivity.class),
-                        PROPOSED_STAGES_CODE);
-            });
+            if(itinerary.getProposedStages().size() != 0) {
+                mPurposePlace.setOnClickListener(v ->
+                {
+                    ObjectSharer.get().shareObject("lista_proposte", itinerary);
+                    startActivityForResult(new Intent(v.getContext(), ProposedStageActivity.class),
+                            PROPOSED_STAGES_CODE);
+                });
+            } else {
+                mPurposePlace.setVisibility(View.GONE);
+            }
 
-            mPartecipantsList.setOnClickListener(v -> {
-                ObjectSharer.get().shareObject("lista_proposte", itinerary);
-                startActivity(new Intent(v.getContext(), ParticipantsActivity.class));
-            });
+            if(itinerary.getProposedStages().size() != 0) {
+                mPartecipantsList.setOnClickListener(v -> {
+                    ObjectSharer.get().shareObject("lista_proposte", itinerary);
+                    startActivity(new Intent(v.getContext(), ParticipantsActivity.class));
+                });
+            } else{
+                mPartecipantsList.setVisibility(View.GONE);
+            }
         }
-
     }
 
     public void refreshStagesList()
