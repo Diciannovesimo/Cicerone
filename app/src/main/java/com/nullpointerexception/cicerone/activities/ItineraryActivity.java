@@ -61,6 +61,7 @@ public class ItineraryActivity extends AppCompatActivity
 
     private static final String TAG = "It_ItineraryActivity";
     private final int PROPOSED_STAGES_CODE = 321;
+    private final int PARTICIPANT_CODE = 123;
     private TextView mDateCard, mPlaceCard, mTimeCard, mLanguageCard, mDescriptionCard, mParticipantsCard, mPriceCard;
     private TextView placeName, placeDescription, mShowLocation;
     private EditText mPlace, mPlaceDesc;
@@ -205,22 +206,10 @@ public class ItineraryActivity extends AppCompatActivity
             mPriceCard.setText("Prezzo non specificato");
         }
 
-        if(itinerary.getMaxParticipants() != 0) {
-            if(itinerary.getParticipants() != null){
-                String participants = itinerary.getParticipants().size() + "/" +
-                        itinerary.getMaxParticipants();
-                mParticipantsCard.setText(participants);
-            }
-        } else {
-            if(itinerary.getParticipants() != null)
-                mParticipantsCard.setText(String.valueOf(itinerary.getParticipants().size()));
-            else
-                mParticipantsCard.setText("0");
-        }
+        updateParticipants();
 
         new ProfileImageFetcher(this)
-                .fetchImageOf(itinerary.getCicerone(), drawable ->
-                {
+                .fetchImageOf(itinerary.getCicerone(), drawable -> {
                     ciceronePhoto.setImageDrawable(drawable);
                 });
 
@@ -235,453 +224,171 @@ public class ItineraryActivity extends AppCompatActivity
                 subscribed = true;
         }
 
+        //Setting dell'interfaccia
         if(userMode) {
-            if (subscribed) {
+
+            View addStageView = getLayoutInflater().inflate(R.layout.add_stage_button, null);
+            addStageView.setOnClickListener(v -> {
+                //New layout for place's dialog
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(ItineraryActivity.this);
+                View mView = getLayoutInflater().inflate(R.layout.activity_dialog_tappe, null);
+
+                //Init field of place's layout
+                descrizione_tappa_box = mView.findViewById(R.id.text_desc_boxes);
+                mPlace = mView.findViewById(R.id.place_et);
+                mPlaceDesc = mView.findViewById(R.id.placeDesc_et);
+                place_box = mView.findViewById(R.id.place_box);
+                create_stage = mView.findViewById(R.id.createStage_btn);
+                findPosition = mView.findViewById(R.id.findPosition);
+
+                mPlace.setEnabled(false);
+
+                //Create a new dialog
+                mBuilder.setView(mView);
+                AlertDialog dialog = mBuilder.create();
+
+                //Listener to open Google Place autocomplete intent
+                place_box.setOnClickListener(v1 -> {
+                    Intent intent = new Autocomplete.IntentBuilder(
+                            AutocompleteActivityMode.FULLSCREEN, fields)
+                            .build(v1.getContext());
+                    startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+                });
+
+                //Listener to capture user's position
+                findPosition.setOnClickListener(v14 -> {
+
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest
+                            .permission.ACCESS_FINE_LOCATION}, 1);
+
+                    gpsPermission = checkLocationPermission();
+
+                    if (gpsPermission) {
+
+                        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                            Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
+                            placeResponse.addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    FindCurrentPlaceResponse response = task.getResult();
+                                    MaxPlaceLikelihood = null;
+                                    int counter = 0;
+
+                                    for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+                                        if (counter == 0)
+                                            MaxPlaceLikelihood = placeLikelihood;
+
+                                        counter++;
+
+                                        if (MaxPlaceLikelihood.getLikelihood() <= placeLikelihood.getLikelihood())
+                                            MaxPlaceLikelihood = placeLikelihood;
+
+                                        Log.i(TAG, String.format("Place '%s' has likelihood: %f",
+                                                placeLikelihood.getPlace().getName(),
+                                                placeLikelihood.getLikelihood()));
+                                    }
+                                    //Set the name of Stage in EditText
+                                    mPlace.setText(MaxPlaceLikelihood.getPlace().getName());
+                                    //Set attributes of Place in stage
+                                    stage = new Stage();
+                                    stage.setName(MaxPlaceLikelihood.getPlace().getName());
+                                    stage.setCoordinates(MaxPlaceLikelihood.getPlace().getLatLng());
+                                    stage.setAddress(MaxPlaceLikelihood.getPlace().getAddress());
+                                } else {
+                                    Exception exception = task.getException();
+                                    if (exception instanceof ApiException) {
+                                        ApiException apiException = (ApiException) exception;
+                                        Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                    }
+
+                });
+
+                //Check if the number of character in description field is more than 250 character
+                descrizione_tappa_box.setSimpleTextChangeWatcher((theNewText, isError) -> {
+                    if (theNewText.length() > 250)
+                        descrizione_tappa_box.setError(getResources().getString(R.string.max_char), false);
+                });
+
+                //Listener to create a new place for a itinerary
+                create_stage.setOnClickListener(v12 -> {
+                    //Check if the number of character in description field is more than 250 character
+                    if (mPlaceDesc.getText().toString().length() > 250) {
+
+                        descrizione_tappa_box.setError(getResources().getString(R.string.insert_shorter_desc), false);
+
+                        //Check if the description is empty
+                    } else if (mPlaceDesc.getText().toString().isEmpty()) {
+
+                        descrizione_tappa_box.setError(getResources().getString(R.string.no_desc), false);
+
+                        //Check if the name's field is empty
+                    } else if (mPlace.getText().toString().isEmpty()) {
+
+                        place_box.setError(getResources().getString(R.string.no_place_name), false);
+
+                        //Check if the place already exist
+                    } else if (placeAlreadyExist(stage.getCoordinates())) {
+
+                        runOnUiThread(() -> {
+                            // Show error message
+                            new KAlertDialog(mView.getContext(), KAlertDialog.ERROR_TYPE)
+                                    .setTitleText(getResources().getString(R.string.error_dialog_title))
+                                    .setContentText(getResources().getString(R.string.error_dialog_content))
+                                    .setConfirmText(getResources().getString(R.string.error_dialog_confirmText))
+                                    .show();
+                        });
+                    } else {
+                        stage.setDescription(mPlaceDesc.getText().toString());
+                        itinerary.addProposedStage(stage);
+
+                        //TODO: Luca guarda qui ;)
+                        try {
+                            BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
+                                @Override
+                                public void onSuccess() {
+                                    dialog.dismiss();
+                                }
+
+                                @Override
+                                public void onError() {
+                                    Toast.makeText(getApplicationContext(), "Impossibile caricare la tappa", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+                dialog.show();
+            });
+
+            linearLayout.addView(addStageView);
+            if(subscribed) {
                 mItinerary.setVisibility(View.VISIBLE);
                 mItinerary.setText("Non partecipare");
                 mPurposePlace.setVisibility(View.GONE);
                 mPartecipantsList.setVisibility(View.GONE);
-
-                View addStageView = getLayoutInflater().inflate(R.layout.add_stage_button, null);
-
-                addStageView.setOnClickListener(v -> {
-                    //New layout for place's dialog
-                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(ItineraryActivity.this);
-                    View mView = getLayoutInflater().inflate(R.layout.activity_dialog_tappe, null);
-
-                    //Init field of place's layout
-                    descrizione_tappa_box = mView.findViewById(R.id.text_desc_boxes);
-                    mPlace = mView.findViewById(R.id.place_et);
-                    mPlaceDesc = mView.findViewById(R.id.placeDesc_et);
-                    place_box = mView.findViewById(R.id.place_box);
-                    create_stage = mView.findViewById(R.id.createStage_btn);
-                    findPosition = mView.findViewById(R.id.findPosition);
-
-                    mPlace.setEnabled(false);
-
-                    //Create a new dialog
-                    mBuilder.setView(mView);
-                    AlertDialog dialog = mBuilder.create();
-
-                    //Listener to open Google Place autocomplete intent
-                    place_box.setOnClickListener(v1 -> {
-                        Intent intent = new Autocomplete.IntentBuilder(
-                                AutocompleteActivityMode.FULLSCREEN, fields)
-                                .build(v1.getContext());
-                        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-                    });
-
-                    //Listener to capture user's position
-                    findPosition.setOnClickListener(v14 -> {
-
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest
-                                .permission.ACCESS_FINE_LOCATION}, 1);
-
-                        gpsPermission = checkLocationPermission();
-
-                        if (gpsPermission) {
-
-                            if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                                Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
-                                placeResponse.addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        FindCurrentPlaceResponse response = task.getResult();
-                                        MaxPlaceLikelihood = null;
-                                        int counter = 0;
-
-                                        for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                                            if (counter == 0)
-                                                MaxPlaceLikelihood = placeLikelihood;
-
-                                            counter++;
-
-                                            if (MaxPlaceLikelihood.getLikelihood() <= placeLikelihood.getLikelihood())
-                                                MaxPlaceLikelihood = placeLikelihood;
-
-                                            Log.i(TAG, String.format("Place '%s' has likelihood: %f",
-                                                    placeLikelihood.getPlace().getName(),
-                                                    placeLikelihood.getLikelihood()));
-                                        }
-                                        //Set the name of Stage in EditText
-                                        mPlace.setText(MaxPlaceLikelihood.getPlace().getName());
-                                        //Set attributes of Place in stage
-                                        stage = new Stage();
-                                        stage.setName(MaxPlaceLikelihood.getPlace().getName());
-                                        stage.setCoordinates(MaxPlaceLikelihood.getPlace().getLatLng());
-                                        stage.setAddress(MaxPlaceLikelihood.getPlace().getAddress());
-                                    } else {
-                                        Exception exception = task.getException();
-                                        if (exception instanceof ApiException) {
-                                            ApiException apiException = (ApiException) exception;
-                                            Log.e(TAG, "Place not found: " + apiException.getStatusCode());
-                                        }
-                                    }
-                                });
-                            }
-                        } else {
-                            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                        }
-
-                    });
-
-                    //Check if the number of character in description field is more than 250 character
-                    descrizione_tappa_box.setSimpleTextChangeWatcher((theNewText, isError) -> {
-                        if (theNewText.length() > 250)
-                            descrizione_tappa_box.setError(getResources().getString(R.string.max_char), false);
-                    });
-
-                    //Listener to create a new place for a itinerary
-                    create_stage.setOnClickListener(v12 -> {
-                        //Check if the number of character in description field is more than 250 character
-                        if (mPlaceDesc.getText().toString().length() > 250) {
-
-                            descrizione_tappa_box.setError(getResources().getString(R.string.insert_shorter_desc), false);
-
-                            //Check if the description is empty
-                        } else if (mPlaceDesc.getText().toString().isEmpty()) {
-
-                            descrizione_tappa_box.setError(getResources().getString(R.string.no_desc), false);
-
-                            //Check if the name's field is empty
-                        } else if (mPlace.getText().toString().isEmpty()) {
-
-                            place_box.setError(getResources().getString(R.string.no_place_name), false);
-
-                            //Check if the place already exist
-                        } else if (placeAlreadyExist(stage.getCoordinates())) {
-
-                            runOnUiThread(() -> {
-                                // Show error message
-                                new KAlertDialog(mView.getContext(), KAlertDialog.ERROR_TYPE)
-                                        .setTitleText(getResources().getString(R.string.error_dialog_title))
-                                        .setContentText(getResources().getString(R.string.error_dialog_content))
-                                        .setConfirmText(getResources().getString(R.string.error_dialog_confirmText))
-                                        .show();
-                            });
-                        } else {
-                            stage.setDescription(mPlaceDesc.getText().toString());
-                            itinerary.addProposedStage(stage);
-
-                            //TODO: Luca guarda qui ;)
-                            try {
-                                BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                                    @Override
-                                    public void onSuccess() {
-                                        dialog.dismiss();
-                                    }
-
-                                    @Override
-                                    public void onError() {
-                                        Toast.makeText(getApplicationContext(), "Impossibile caricare la tappa", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-                    });
-                    dialog.show();
-                });
-
-                mItinerary.setOnClickListener(v -> {
-                    List<User> userList1 = itinerary.getParticipants();
-                    for(int i = 0; i < userList1.size(); ++i) {
-                        if(user.getId().equals(userList1.get(i).getId()))
-                            userList1.remove(i);
-                    }
-                    itinerary.setParticipants(userList1);
-
-                    for(int i = 0; i < user.getItineraries().size(); ++i) {
-                        if(itinerary.getId().equals(user.getItineraries().get(i).getId()))
-                            user.removeItinerary(i);
-                    }
-
-                    BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                        @Override
-                        public void onSuccess() {
-                            BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                                @Override
-                                public void onSuccess() {
-                                    BackEndInterface.get().removeEntity(user);
-                                    BackEndInterface.get().storeEntity(user);
-                                    new KAlertDialog(v.getContext())
-                                            .setContentText("Ti sei disinscritto dalla gita")
-                                            .setConfirmText("Ok")
-                                            .setConfirmClickListener(kAlertDialog ->
-                                            {
-                                                ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
-                                                v.getContext().startActivity(new Intent(getApplicationContext(), ItineraryActivity.class));
-                                                finish();
-                                            }).show();
-                                }
-
-                                @Override
-                                public void onError() {
-
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
-
-                });
-
-                linearLayout.addView(addStageView);
             }else {
                 if(itinerary.getMaxParticipants() != 0) {
                     if (itinerary.getParticipants().size() < itinerary.getMaxParticipants()) {
+
                         mItinerary.setVisibility(View.VISIBLE);
-                        mItinerary.setOnClickListener(v -> {
-                            itinerary.addPartecipant(user);
-                            user.addItinerary(itinerary);
-
-                            BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                                @Override
-                                public void onSuccess() {
-                                    BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                                        @Override
-                                        public void onSuccess() {
-                                            BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
-                                                @Override
-                                                public void onSuccess() {
-                                                    new KAlertDialog(v.getContext())
-                                                            .setTitleText("Complimenti")
-                                                            .setContentText("Ti sei iscritto a questa visita!")
-                                                            .setConfirmText("Ok")
-                                                            .setConfirmClickListener(kAlertDialog -> {
-                                                                ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
-                                                                v.getContext().startActivity(new Intent(getApplicationContext(), ItineraryActivity.class));
-                                                                finish();
-                                                            }).show();
-                                                }
-
-                                                @Override
-                                                public void onError() {
-
-                                                }
-                                            });
-                                        }
-
-                                        @Override
-                                        public void onError() {
-
-                                        }
-                                    });
-                                }
-
-                                @Override
-                                public void onError() {
-
-                                }
-                            });
-                        });
                     }else {
+
                         mItinerary.setVisibility(View.GONE);
                         mParticipantsCard.setTextColor(getResources().getColor(R.color.md_red_400));
                     }
-                } else {
+                }else
                     mItinerary.setVisibility(View.VISIBLE);
-                    mItinerary.setOnClickListener(v -> {
-                        itinerary.addPartecipant(user);
-                        user.addItinerary(itinerary);
-
-                        BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                            @Override
-                            public void onSuccess() {
-                                BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                                    @Override
-                                    public void onSuccess() {
-                                        BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
-                                            @Override
-                                            public void onSuccess() {
-                                                new KAlertDialog(v.getContext())
-                                                        .setTitleText("Complimenti")
-                                                        .setContentText("Ti sei iscritto a questa visita!")
-                                                        .setConfirmText("Ok")
-                                                        .setConfirmClickListener(kAlertDialog -> {
-                                                            ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
-                                                            v.getContext().startActivity(new Intent(getApplicationContext(), ItineraryActivity.class));
-                                                            finish();
-                                                        }).show();
-                                            }
-
-                                            @Override
-                                            public void onError() {
-
-                                            }
-                                        });
-                                    }
-
-                                    @Override
-                                    public void onError() {
-
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onError() {
-
-                            }
-                        });
-                    });
-                }
 
                 mPurposePlace.setVisibility(View.GONE);
                 mPartecipantsList.setVisibility(View.GONE);
-
-                View addStageView = getLayoutInflater().inflate(R.layout.add_stage_button, null);
-
-                addStageView.setOnClickListener(v -> {
-                    //New layout for place's dialog
-                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(ItineraryActivity.this);
-                    View mView = getLayoutInflater().inflate(R.layout.activity_dialog_tappe, null);
-
-                    //Init field of place's layout
-                    descrizione_tappa_box = mView.findViewById(R.id.text_desc_boxes);
-                    mPlace = mView.findViewById(R.id.place_et);
-                    mPlaceDesc = mView.findViewById(R.id.placeDesc_et);
-                    place_box = mView.findViewById(R.id.place_box);
-                    create_stage = mView.findViewById(R.id.createStage_btn);
-                    findPosition = mView.findViewById(R.id.findPosition);
-
-                    mPlace.setEnabled(false);
-
-                    //Create a new dialog
-                    mBuilder.setView(mView);
-                    AlertDialog dialog = mBuilder.create();
-
-                    //If dialog is dismissed, shows the listStage_title
-                    dialog.setOnDismissListener(dialog1 -> {
-
-                    });
-
-                    //Listener to open Google Place autocomplete intent
-                    place_box.setOnClickListener(v1 -> {
-                        Intent intent = new Autocomplete.IntentBuilder(
-                                AutocompleteActivityMode.FULLSCREEN, fields)
-                                .build(v1.getContext());
-                        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-                    });
-
-                    //Listener to capture user's position
-                    findPosition.setOnClickListener(v14 -> {
-
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest
-                                .permission.ACCESS_FINE_LOCATION}, 1);
-
-                        gpsPermission = checkLocationPermission();
-
-                        if (gpsPermission) {
-
-                            if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                                Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
-                                placeResponse.addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        FindCurrentPlaceResponse response = task.getResult();
-                                        MaxPlaceLikelihood = null;
-                                        int counter = 0;
-
-                                        for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                                            if (counter == 0)
-                                                MaxPlaceLikelihood = placeLikelihood;
-
-                                            counter++;
-
-                                            if (MaxPlaceLikelihood.getLikelihood() <= placeLikelihood.getLikelihood())
-                                                MaxPlaceLikelihood = placeLikelihood;
-
-                                            Log.i(TAG, String.format("Place '%s' has likelihood: %f",
-                                                    placeLikelihood.getPlace().getName(),
-                                                    placeLikelihood.getLikelihood()));
-                                        }
-                                        //Set the name of Stage in EditText
-                                        mPlace.setText(MaxPlaceLikelihood.getPlace().getName());
-                                        //Set attributes of Place in stage
-                                        stage = new Stage();
-                                        stage.setName(MaxPlaceLikelihood.getPlace().getName());
-                                        stage.setCoordinates(MaxPlaceLikelihood.getPlace().getLatLng());
-                                        stage.setAddress(MaxPlaceLikelihood.getPlace().getAddress());
-                                    } else {
-                                        Exception exception = task.getException();
-                                        if (exception instanceof ApiException) {
-                                            ApiException apiException = (ApiException) exception;
-                                            Log.e(TAG, "Place not found: " + apiException.getStatusCode());
-                                        }
-                                    }
-                                });
-                            }
-                        } else {
-                            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                        }
-
-                    });
-
-                    //Check if the number of character in description field is more than 250 character
-                    descrizione_tappa_box.setSimpleTextChangeWatcher((theNewText, isError) -> {
-                        if (theNewText.length() > 250)
-                            descrizione_tappa_box.setError(getResources().getString(R.string.max_char), false);
-                    });
-
-                    //Listener to create a new place for a itinerary
-                    create_stage.setOnClickListener(v12 -> {
-                        //Check if the number of character in description field is more than 250 character
-                        if (mPlaceDesc.getText().toString().length() > 250) {
-
-                            descrizione_tappa_box.setError(getResources().getString(R.string.insert_shorter_desc), false);
-
-                            //Check if the description is empty
-                        } else if (mPlaceDesc.getText().toString().isEmpty()) {
-
-                            descrizione_tappa_box.setError(getResources().getString(R.string.no_desc), false);
-
-                            //Check if the name's field is empty
-                        } else if (mPlace.getText().toString().isEmpty()) {
-
-                            place_box.setError(getResources().getString(R.string.no_place_name), false);
-
-                            //Check if the place already exist
-                        } else if (placeAlreadyExist(stage.getCoordinates())) {
-
-                            runOnUiThread(() -> {
-                                // Show error message
-                                new KAlertDialog(mView.getContext(), KAlertDialog.ERROR_TYPE)
-                                        .setTitleText(getResources().getString(R.string.error_dialog_title))
-                                        .setContentText(getResources().getString(R.string.error_dialog_content))
-                                        .setConfirmText(getResources().getString(R.string.error_dialog_confirmText))
-                                        .show();
-                            });
-                        } else {
-                            stage.setDescription(mPlaceDesc.getText().toString());
-                            itinerary.addProposedStage(stage);
-
-                            try {
-                                BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
-                                    @Override
-                                    public void onSuccess() {
-                                        dialog.dismiss();
-                                    }
-
-                                    @Override
-                                    public void onError() {
-                                        Toast.makeText(getApplicationContext(), "Impossibile caricare la tappa", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-                    });
-                    dialog.show();
-                });
-
-                linearLayout.addView(addStageView);
             }
         }else {
             mItinerary.setVisibility(View.GONE);
@@ -700,12 +407,177 @@ public class ItineraryActivity extends AppCompatActivity
             if(itinerary.getParticipants().size() != 0) {
                 mPartecipantsList.setOnClickListener(v -> {
                     ObjectSharer.get().shareObject("lista_proposte", itinerary);
-                    startActivity(new Intent(v.getContext(), ParticipantsActivity.class));
+                    startActivityForResult(new Intent(v.getContext(), ParticipantsActivity.class),
+                            PARTICIPANT_CODE);
                 });
             } else{
                 mPartecipantsList.setVisibility(View.GONE);
             }
         }
+
+        //Listener pulsante partecipazione
+        mItinerary.setOnClickListener(v -> {
+            if(userMode) {
+                if(subscribed) {
+                    List<User> userList1 = itinerary.getParticipants();
+                    for(int i = 0; i < userList1.size(); ++i) {
+                        if(user.getId().equals(userList1.get(i).getId()))
+                            userList1.remove(i);
+                    }
+                    itinerary.setParticipants(userList1);
+
+                    for(int i = 0; i < user.getItineraries().size(); ++i) {
+                        if(itinerary.getId().equals(user.getItineraries().get(i).getId()))
+                            user.removeItinerary(i);
+                    }
+
+                    BackEndInterface.get().removeEntity(itinerary,
+                            new BackEndInterface.OnOperationCompleteListener() {
+                        @Override
+                        public void onSuccess() {
+                            BackEndInterface.get().storeEntity(itinerary,
+                                    new BackEndInterface.OnOperationCompleteListener() {
+                                @Override
+                                public void onSuccess() {
+                                    BackEndInterface.get().removeEntity(user);
+                                    BackEndInterface.get().storeEntity(user);
+                                    KAlertDialog kAlertDialog = new KAlertDialog(v.getContext())
+                                            .setTitleText("Disiscritto")
+                                            .setContentText("Ti sei disinscritto dalla gita")
+                                            .setConfirmText("Ok");
+
+                                    kAlertDialog.setConfirmClickListener(new KAlertDialog.OnSweetClickListener() {
+                                        @Override
+                                        public void onClick(KAlertDialog kAlertDialog) {
+                                            mItinerary.setText("Partecipa");
+                                            subscribed = false;
+                                            updateParticipants();
+                                            kAlertDialog.dismissWithAnimation();
+                                        }
+                                    });
+                                    kAlertDialog.show();
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
+                }else {
+                    if (itinerary.getMaxParticipants() != 0) {
+                        if (itinerary.getParticipants().size() < itinerary.getMaxParticipants()) {
+
+                            itinerary.addPartecipant(user);
+                            user.addItinerary(itinerary);
+
+                            BackEndInterface.get().removeEntity(itinerary,
+                                    new BackEndInterface.OnOperationCompleteListener() {
+                                @Override
+                                public void onSuccess() {
+                                    BackEndInterface.get().storeEntity(itinerary,
+                                            new BackEndInterface.OnOperationCompleteListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                            BackEndInterface.get().storeEntity(user,
+                                                    new BackEndInterface.OnOperationCompleteListener() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    KAlertDialog kAlertDialog = new KAlertDialog(v.getContext())
+                                                            .setTitleText("Complimenti")
+                                                            .setContentText("Ti sei iscritto a" +
+                                                                    " questa visita!")
+                                                            .setConfirmText("Ok");
+
+                                                    kAlertDialog.setConfirmClickListener(kAlertDialog12 -> {
+                                                        subscribed = true;
+                                                        mItinerary.setText("Non partecipare");
+                                                        updateParticipants();
+                                                        kAlertDialog12.dismissWithAnimation();
+                                                    });
+                                                    kAlertDialog.show();
+
+                                                    }
+                                                    @Override
+                                                    public void onError() {
+
+                                                    }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onError() {
+
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
+                        }
+                    }else {
+                        itinerary.addPartecipant(user);
+                        user.addItinerary(itinerary);
+
+                        BackEndInterface.get().removeEntity(itinerary,
+                                new BackEndInterface.OnOperationCompleteListener() {
+                            @Override
+                            public void onSuccess() {
+                                BackEndInterface.get().storeEntity(itinerary,
+                                        new BackEndInterface.OnOperationCompleteListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        BackEndInterface.get().storeEntity(user,
+                                                new BackEndInterface.OnOperationCompleteListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                KAlertDialog kAlertDialog = new KAlertDialog(v.getContext())
+                                                        .setTitleText("Complimenti")
+                                                        .setContentText("Ti sei iscritto a" +
+                                                                " questa visita!")
+                                                        .setConfirmText("Ok");
+
+                                                kAlertDialog.setConfirmClickListener(kAlertDialog1 -> {
+                                                    subscribed = true;
+                                                    mItinerary.setText("Non partecipare");
+                                                    updateParticipants();
+                                                    kAlertDialog1.dismissWithAnimation();
+                                                });
+                                                kAlertDialog.show();
+                                                }
+
+                                                @Override
+                                                public void onError() {
+
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onError() {
+
+                                        }
+                                });
+                            }
+
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 
     public void refreshStagesList()
@@ -745,6 +617,20 @@ public class ItineraryActivity extends AppCompatActivity
         }
     }
 
+    public void updateParticipants() {
+        if(itinerary.getMaxParticipants() != 0) {
+            if(itinerary.getParticipants() != null){
+                String participants = itinerary.getParticipants().size() + "/" +
+                        itinerary.getMaxParticipants();
+                mParticipantsCard.setText(participants);
+            }
+        } else {
+            if(itinerary.getParticipants() != null)
+                mParticipantsCard.setText(String.valueOf(itinerary.getParticipants().size()));
+            else
+                mParticipantsCard.setText("0");
+        }
+    }
     public boolean checkLocationPermission()
     {
         String permission = "android.permission.ACCESS_FINE_LOCATION";
@@ -792,6 +678,12 @@ public class ItineraryActivity extends AppCompatActivity
         }
 
         if(requestCode == PROPOSED_STAGES_CODE && resultCode == RESULT_OK)
+        {
+            itinerary = (Itinerary) ObjectSharer.get().getSharedObject("show_trip_as_cicerone");
+            refreshStagesList();
+        }
+
+        if(requestCode == PARTICIPANT_CODE && resultCode == RESULT_OK)
         {
             itinerary = (Itinerary) ObjectSharer.get().getSharedObject("show_trip_as_cicerone");
             refreshStagesList();
