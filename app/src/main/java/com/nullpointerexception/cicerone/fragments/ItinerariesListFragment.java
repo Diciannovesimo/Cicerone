@@ -30,7 +30,7 @@ import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.custom_views.ItineraryView;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -116,7 +116,7 @@ public class ItinerariesListFragment extends Fragment
                                     ((ViewGroup)frameLayout.getParent()).removeView(frameLayout);
                             });
 
-                        setItineraryViews(itineraries);
+                        updateItineraryViews();
                     }
 
                     @Override
@@ -143,32 +143,11 @@ public class ItinerariesListFragment extends Fragment
         return view;
     }
 
-    private void addItinerary(Itinerary itinerary)
+    private void updateItineraryViews()
     {
-        itineraries.add(itinerary);
-        adapter.notifyItemInserted( itineraries.size()-1 );
-        noItinerariesLabel.setVisibility(itineraries.size() == 0 ? View.VISIBLE : View.GONE);
-    }
-
-    private void addItineraries(Itinerary... itineraries)
-    {
-        int startIndex = this.itineraries.size();
-        this.itineraries.addAll(Arrays.asList(itineraries));
-        adapter.notifyItemRangeInserted(startIndex, this.itineraries.size());
-        noItinerariesLabel.setVisibility(this.itineraries.size() == 0 ? View.VISIBLE : View.GONE);
-    }
-
-    private void setItineraryViews(List<Itinerary> itineraries)
-    {
+        Collections.sort(itineraries, (itinerary, t1) -> t1.getDate().compareTo(itinerary.getDate()));
         adapter.notifyDataSetChanged();
         noItinerariesLabel.setVisibility(this.itineraries.size() == 0 ? View.VISIBLE : View.GONE);
-    }
-
-    private void removeItinerary(int i)
-    {
-        itineraries.remove(i);
-        adapter.notifyItemRemoved(i);
-        noItinerariesLabel.setVisibility(itineraries.size() == 0 ? View.VISIBLE : View.GONE);
     }
 
 }

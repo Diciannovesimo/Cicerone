@@ -119,6 +119,7 @@ public class ItineraryActivity extends AppCompatActivity
                 setTextField();
         }
 
+        if(itinerary != null)
         toolbar.setTitle(itinerary.getLocation());
 
         //Set toolbar

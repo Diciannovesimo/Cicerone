@@ -2,6 +2,7 @@
 package com.nullpointerexception.cicerone.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +17,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.nullpointerexception.cicerone.R;
@@ -110,6 +112,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void drawMenuWith(ProfileDrawerItem profileDrawerItem)
     {
+        SharedPreferences sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
+        boolean developerMode = sharedPreferences.getBoolean("developer_enabled", false);
+
         Drawer result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
@@ -124,7 +129,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 )
                 .addDrawerItems(
                         //new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Logout").withIdentifier(123)
+                        new SecondaryDrawerItem().withName("Logout").withIdentifier(123),
+                        developerMode ?
+                        new SecondaryDrawerItem().withName("Developer tools")
+                                .withOnDrawerItemClickListener((view, position, drawerItem) ->
+                                {
+                                    startActivity(new Intent(MainActivity.this, DevelopersToolsActivity.class));
+                                    return false;
+                                })
+                        : new DividerDrawerItem()
+
                 )
                 .withOnDrawerItemClickListener((view, position, drawerItem) ->
                 {

@@ -2,9 +2,11 @@ package com.nullpointerexception.cicerone.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.view.Gravity;
@@ -19,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -54,6 +57,9 @@ public class LoginActivity extends AppCompatActivity
     private TextView registrationButton;
     private CallbackManager callbackManager;
 
+    //  Developer tools
+    private int touched = 0;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -71,6 +77,37 @@ public class LoginActivity extends AppCompatActivity
         registrationButton = findViewById(R.id.registerButton);
         googleSignInButton = findViewById(R.id.googleSignInButton);
         facebookSignInButton = findViewById(R.id.facebookSignInButton);
+
+        //  Developer tools enabling
+        findViewById(R.id.bannerLogo).setOnClickListener(view ->
+        {
+            if(touched == 0)
+                new Handler().postDelayed(() -> touched = 0, 1000);
+
+            if(touched == 5)
+            {
+                EditText editText = new EditText(this);
+                editText.setHint("Codice");
+                new AlertDialog.Builder(this)
+                        .setTitle("Modalità sviluppatore")
+                        .setView(editText)
+                        .setPositiveButton("Accedi", (dialogInterface, i) ->
+                        {
+                            if(editText.getText().toString().equalsIgnoreCase("corvo di bitritto"))
+                            {
+                                SharedPreferences sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
+                                sharedPreferences.edit().putBoolean("developer_enabled", true).apply();
+                                Toast.makeText(this, "Ora sei in modalità sviluppatore.", Toast.LENGTH_SHORT).show();
+                            }
+                            else
+                                Toast.makeText(this, "Codice errato", Toast.LENGTH_SHORT).show();
+                        })
+                        .setCancelable(false)
+                        .create().show();
+            }
+            else
+                touched++;
+        });
 
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().setAuthType("rerequest");
