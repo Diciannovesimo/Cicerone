@@ -16,4 +16,15 @@
     <color name="colorNavAccentUnselected">#777</color>
 
     <color name="black_overlay">#66000000</color>
+
+    <color name="headings">#FF7700</color>
+    <color name="solidCircle">#AAFFFFFF</color>
+    <color name="circleBorder">#50FFFFFF</color>
+    <color name="gradEnd">#FF470D</color>
+    <color name="gradStart">#FFC30D</color>
+    <color name="ownItinerariesBg">#FF590E</color>
+    <color name="itinerariesAsParticipantBg">#E89E0C</color>
+    <color name="grey">#E5E5E5</color>
+
+    <color name="white">#FFFFFF</color>
 </resources>

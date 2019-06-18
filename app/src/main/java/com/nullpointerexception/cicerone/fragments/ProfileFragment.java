@@ -1,32 +1,24 @@
 package com.nullpointerexception.cicerone.fragments;
 
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.activities.MainActivity;
-import com.nullpointerexception.cicerone.activities.ParticipantsActivity;
-import com.nullpointerexception.cicerone.activities.ProposedStageActivity;
-import com.nullpointerexception.cicerone.components.BackEndInterface;
-import com.nullpointerexception.cicerone.components.Itinerary;
-import com.nullpointerexception.cicerone.components.ObjectSharer;
-import com.nullpointerexception.cicerone.components.Stage;
+import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProfileFragment extends Fragment
 {
-    private Button button1, button2;
+    private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant;
+    private ImageView profileImage;
 
     public ProfileFragment() { }
 
@@ -38,7 +30,53 @@ public class ProfileFragment extends Fragment
         if(getActivity() != null && ((MainActivity) getActivity()).getSupportActionBar() != null)
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.menu_profile);
 
+        //Initialize UI
+        initUI(view);
+
+        //Set text in the field
+        setTextField(view);
+
         return view;
+    }
+
+    public void initUI(View v) {
+        mEmail = v.findViewById(R.id.profileMail_tv);
+        mTelephone = v.findViewById(R.id.profilePhone_tv);
+        mDate = v.findViewById(R.id.profileDate_tv);
+        mName = v.findViewById(R.id.profileName_tv);
+        mItinerariesAsParticipant = v.findViewById(R.id.itinerariesAsParticipant_tv);
+        profileImage = v.findViewById(R.id.profile_image);
+    }
+
+    /**
+     * @brief Set text field
+     */
+    public void setTextField(View v) {
+
+        //Get user form firebase
+        User user = AuthenticationManager.get().getUserLogged();
+
+        new ProfileImageFetcher(v.getContext())
+                .fetchImageOf(user, drawable -> {
+                    profileImage.setImageDrawable(drawable);
+                });
+
+        //Set name field
+        mName.setText(user.getDisplayName());
+
+        //set email
+        if(!user.getEmail().isEmpty()) {
+            mEmail.setText(user.getEmail());
+        }
+
+        //set dateBirth
+        mDate.setText(user.getDateBirth());
+
+        //Set the number of itinerary in which the user participated
+        mItinerariesAsParticipant.setText(String.valueOf(user.getItineraries().size()));
+
+        //Set telephone number
+        mTelephone.setText(user.getPhoneNumber());
     }
 
 }

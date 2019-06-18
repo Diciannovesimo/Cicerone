@@ -194,6 +194,7 @@ public class ItineraryActivity extends AppCompatActivity
         mDateCard.setText(itinerary.getDate());
         mPlaceCard.setText(itinerary.getMeetingPlace());
         mTimeCard.setText(itinerary.getMeetingTime());
+
         if(itinerary.getLanguage() != null)
             mLanguageCard.setText(itinerary.getLanguage());
 
@@ -213,6 +214,12 @@ public class ItineraryActivity extends AppCompatActivity
                 .fetchImageOf(itinerary.getCicerone(), drawable -> {
                     ciceronePhoto.setImageDrawable(drawable);
                 });
+
+        ciceronePhoto.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ProfileActivity.class);
+            intent.putExtra("id_cicerone_to_show", itinerary.getCicerone().getId());
+            startActivity(intent);
+        });
 
         refreshStagesList();
 
@@ -347,7 +354,6 @@ public class ItineraryActivity extends AppCompatActivity
                         stage.setDescription(mPlaceDesc.getText().toString());
                         itinerary.addProposedStage(stage);
 
-                        //TODO: Luca guarda qui ;)
                         try {
                             BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
                                 @Override
@@ -581,8 +587,7 @@ public class ItineraryActivity extends AppCompatActivity
         });
     }
 
-    public void refreshStagesList()
-    {
+    public void refreshStagesList() {
         linearLayout.removeAllViews();
 
         View redSphere = getLayoutInflater().inflate(R.layout.red_sphere_layout, null);
@@ -632,8 +637,8 @@ public class ItineraryActivity extends AppCompatActivity
                 mParticipantsCard.setText("0");
         }
     }
-    public boolean checkLocationPermission()
-    {
+
+    public boolean checkLocationPermission() {
         String permission = "android.permission.ACCESS_FINE_LOCATION";
         int res = this.checkCallingOrSelfPermission(permission);
         return (res == PackageManager.PERMISSION_GRANTED);
@@ -655,7 +660,7 @@ public class ItineraryActivity extends AppCompatActivity
     }
 
     /**
-     * Used to receive data from Google Place autocomplete intent.
+     * Used to receive from Google Place autocomplete intent.
      *
      * @param requestCode The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
      * @param resultCode The integer result code returned by the child activity through its setResult().

@@ -115,5 +115,6 @@
     <!-- ProposedStageActivity -->
     <string name="title_activity_proposed_stage">ProposedStageActivity</string>
     <string name="title_ProposedStageActivity">Tappe proposte</string>
+    <string name="title_activity_profile">ProfileActivity</string>
 
 </resources>
