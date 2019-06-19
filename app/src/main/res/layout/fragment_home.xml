@@ -1,16 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.HomeFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:srcCompat="@drawable/trip"
+        android:scaleType="centerCrop"/>
 
     <TextView
         android:id="@+id/welcomeText"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:background="#77ffffff"
+        android:padding="10sp"
+        android:textColor="#282828"
         android:textSize="24sp"
+        android:textStyle="italic"
         android:text="Ciao, Svil!" />
 
-</FrameLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10sp"
+            android:background="@drawable/button_background"
+            android:alpha="0.8"
+            android:elevation="5sp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ti piace viaggiare?\nCerca un itinerario e comincia a esplorare il mondo."
+                android:paddingLeft="10sp"
+                android:paddingTop="10sp"
+                android:paddingRight="10sp"
+                android:textColor="#000"/>
+
+            <TextView
+                android:id="@+id/buttonFindItinerary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10sp"
+                android:layout_marginBottom="5sp"
+                android:layout_marginTop="5sp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:paddingLeft="9dp"
+                android:paddingRight="9dp"
+                android:layout_gravity="end"
+                android:background="@drawable/button_background_home"
+                android:textColor="#fff"
+                android:elevation="3sp"
+                android:text="Cerca un itinerario"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10sp"
+            android:background="@drawable/button_background"
+            android:alpha="0.8"
+            android:elevation="5sp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Conosci molto bene la tua città?\nProponi un nuovo itinerario e condividi la tua conoscenza con le altre persone!"
+                android:paddingLeft="10sp"
+                android:paddingTop="10sp"
+                android:paddingRight="10sp"
+                android:textColor="#000"/>
+
+            <TextView
+                android:id="@+id/buttonCreateItinerary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10sp"
+                android:layout_marginBottom="5sp"
+                android:layout_marginTop="5sp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:paddingLeft="9dp"
+                android:paddingRight="9dp"
+                android:layout_gravity="end"
+                android:background="@drawable/button_background_home"
+                android:textColor="#fff"
+                android:elevation="3sp"
+                android:text="Proponi un itinerario"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</RelativeLayout>
