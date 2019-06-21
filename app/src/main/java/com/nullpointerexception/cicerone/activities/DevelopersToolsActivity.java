@@ -27,7 +27,7 @@ public class DevelopersToolsActivity extends AppCompatActivity
 {
 
     private EditText cityItinerary, dateItinerary;
-    private Button generateItinerary;
+    private Button generateItinerary, profile_test;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,6 +38,7 @@ public class DevelopersToolsActivity extends AppCompatActivity
         cityItinerary = findViewById(R.id.locationGenItinerary);
         dateItinerary = findViewById(R.id.dateGenItinerary);
         generateItinerary = findViewById(R.id.btnGenItinerary);
+        profile_test = findViewById(R.id.profile_test);
 
         generateItinerary.setOnClickListener(v -> generateItinerary());
         generateItinerary.setOnLongClickListener(v ->

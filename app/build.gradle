@@ -56,11 +56,6 @@ dependencies
             implementation 'com.rishabhharit.roundedimageview:RoundedImageView:0.7.1'
 
             /*
-                Circular imageview
-             */
-            implementation 'com.rishabhharit.roundedimageview:RoundedImageView:0.7.1'
-
-            /*
                     Test
              */
             testImplementation 'junit:junit:4.12'

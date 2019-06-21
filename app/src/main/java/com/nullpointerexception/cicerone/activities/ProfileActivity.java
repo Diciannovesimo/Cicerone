@@ -1,7 +1,10 @@
 package com.nullpointerexception.cicerone.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,8 +24,19 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Window w = getWindow();
+        w.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        w.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        //Initialize UI
+        initUI();
+
+        //Change color of toolbar
+        Window window = getWindow();
+        window.setStatusBarColor(Color.parseColor("#FF5500"));
 
         Intent intent = getIntent();
         String extra = intent.getExtras().getString("id_cicerone_to_show");
@@ -37,6 +51,9 @@ public class ProfileActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Impossibile caricare le" +
                             "informazioni di profilo", Toast.LENGTH_SHORT);
                     finish();
+                }else {
+                    //Set text in the field
+                    setTextField();
                 }
             }
 
@@ -45,12 +62,6 @@ public class ProfileActivity extends AppCompatActivity {
 
             }
         });
-
-        //Initialize UI
-        initUI();
-
-        //Set text in the field
-        setTextField();
     }
 
     public void initUI() {
@@ -59,7 +70,7 @@ public class ProfileActivity extends AppCompatActivity {
         mDate = findViewById(R.id.profileDate_tv);
         mName = findViewById(R.id.profileName_tv);
         mItinerariesAsParticipant = findViewById(R.id.itinerariesAsParticipant_tv);
-        profileImage = findViewById(R.id.profile_image);
+        profileImage = findViewById(R.id.us_image);
     }
 
     /**
@@ -82,9 +93,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         //set dateBirth
         if(user.getDateBirth() != null) {
-
+            mDate.setText(user.getDateBirth());
         }
-        mDate.setText(user.getDateBirth());
+
 
         //Set the number of itinerary in which the user participated
         mItinerariesAsParticipant.setText(String.valueOf(user.getItineraries().size()));

@@ -18,7 +18,7 @@ import com.nullpointerexception.cicerone.components.User;
 public class ProfileFragment extends Fragment
 {
     private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant;
-    private ImageView profileImage;
+    private ImageView profileImage, settings_btn;
 
     public ProfileFragment() { }
 
@@ -45,7 +45,8 @@ public class ProfileFragment extends Fragment
         mDate = v.findViewById(R.id.profileDate_tv);
         mName = v.findViewById(R.id.profileName_tv);
         mItinerariesAsParticipant = v.findViewById(R.id.itinerariesAsParticipant_tv);
-        profileImage = v.findViewById(R.id.profile_image);
+        profileImage = v.findViewById(R.id.us_image);
+        settings_btn = v.findViewById(R.id.settings_btn);
     }
 
     /**
@@ -77,6 +78,11 @@ public class ProfileFragment extends Fragment
 
         //Set telephone number
         mTelephone.setText(user.getPhoneNumber());
+
+        //Set click listener for settings button
+        /*settings_btn.setOnClickListener(v1 -> {
+
+        });*/
     }
 
 }
