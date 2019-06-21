@@ -5,12 +5,15 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.kinda.mtextfield.ExtendedEditText;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
@@ -19,7 +22,11 @@ import com.nullpointerexception.cicerone.components.User;
 public class ProfileActivity extends AppCompatActivity {
 
     private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant;
+    private ExtendedEditText mComment;
     private ImageView profileImage;
+    private RatingBar ratingBar;
+    private Button sndFeedBtn;
+    private float rating;
     private User user;
 
     @Override
@@ -71,6 +78,9 @@ public class ProfileActivity extends AppCompatActivity {
         mName = findViewById(R.id.profileName_tv);
         mItinerariesAsParticipant = findViewById(R.id.itinerariesAsParticipant_tv);
         profileImage = findViewById(R.id.us_image);
+        ratingBar = findViewById(R.id.ratingBar);
+        mComment = findViewById(R.id.commento_tv);
+        sndFeedBtn = findViewById(R.id.sndFeed_btn);
     }
 
     /**
@@ -96,11 +106,30 @@ public class ProfileActivity extends AppCompatActivity {
             mDate.setText(user.getDateBirth());
         }
 
-
         //Set the number of itinerary in which the user participated
         mItinerariesAsParticipant.setText(String.valueOf(user.getItineraries().size()));
 
         //Set telephone number
         mTelephone.setText(user.getPhoneNumber());
+
+        //Set ratingBar listener
+        ratingBarListener();
+
+        sndFeedBtn.setOnClickListener(v -> {
+            if(mComment != null && !mComment.getText().toString().isEmpty()) {
+                //setta il commento in ueser
+            } else if(rating != 0) {
+                //setta il rating in user
+                //setta lo storeEntity
+            }
+        });
+    }
+
+    private void ratingBarListener() {
+
+        ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+            this.rating = rating;
+        });
+
     }
 }

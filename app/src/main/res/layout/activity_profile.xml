@@ -244,7 +244,7 @@
                 app:secondaryColor="@color/notPressedEt">
 
                 <com.kinda.mtextfield.ExtendedEditText
-                    android:id="@+id/placeDesc_et"
+                    android:id="@+id/commento_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
