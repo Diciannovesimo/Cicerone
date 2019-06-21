@@ -1,5 +1,6 @@
 package com.nullpointerexception.cicerone.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -28,6 +29,7 @@ public class HomeFragment extends Fragment
         super.onCreate(savedInstanceState);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
@@ -42,7 +44,8 @@ public class HomeFragment extends Fragment
 
         if(AuthenticationManager.get().getUserLogged() != null)
             ((TextView) view.findViewById(R.id.welcomeText)).setText(
-                    "Ciao, " + AuthenticationManager.get().getUserLogged().getName() + " !");
+                    getResources().getString(R.string.homePre) + " " +
+                            AuthenticationManager.get().getUserLogged().getName() + " !");
 
         buttonCreateItinerary.setOnClickListener(v ->
                 startActivity(new Intent(getContext(), ItineraryCreationActivity.class)));

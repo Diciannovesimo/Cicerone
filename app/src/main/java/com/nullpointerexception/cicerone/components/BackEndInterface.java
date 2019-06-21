@@ -353,6 +353,49 @@ public class BackEndInterface
         });
     }
 
+    /*
+            Used only for developer tools, ignore it.
+     */
+    public void getAllUsers(List<User> users, OnOperationCompleteListener onOperationCompleteListener)
+    {
+        long startTime = System.currentTimeMillis();
+
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference(User.class.getSimpleName().toLowerCase());
+        Query query = ref.orderByKey();
+        query.addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                users.clear();
+
+                for(DataSnapshot ds : dataSnapshot.getChildren())
+                {
+                    User user = new User();
+                    user.setId(ds.getKey());
+                    getEntityFrom(user, ds);
+                    users.add(user);
+                }
+
+                Log.i(TAG, "getUsers() -> Query finished retrieving " + dataSnapshot.toString().getBytes().length +
+                        " bytes in " + (System.currentTimeMillis() - startTime) + " ms.");
+
+                if(onOperationCompleteListener != null)
+                    onOperationCompleteListener.onSuccess();
+
+                query.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError)
+            {
+                if(onOperationCompleteListener != null)
+                    onOperationCompleteListener.onError();
+            }
+        });
+    }
+
     /**
      *      Get itineraries created by a cicerone.
      *

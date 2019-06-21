@@ -11,8 +11,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.Feedback;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.Stage;
+import com.nullpointerexception.cicerone.components.User;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -27,7 +29,9 @@ public class DevelopersToolsActivity extends AppCompatActivity
 {
 
     private EditText cityItinerary, dateItinerary;
-    private Button generateItinerary;
+    private Button generateItinerary, generateFeedback;
+
+    List<User> users = new Vector<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,12 +42,18 @@ public class DevelopersToolsActivity extends AppCompatActivity
         cityItinerary = findViewById(R.id.locationGenItinerary);
         dateItinerary = findViewById(R.id.dateGenItinerary);
         generateItinerary = findViewById(R.id.btnGenItinerary);
+        generateFeedback = findViewById(R.id.btnGenerateFeedback);
 
         generateItinerary.setOnClickListener(v -> generateItinerary());
         generateItinerary.setOnLongClickListener(v ->
         {
             dateItinerary.setText("2019/07/07");
             return false;
+        });
+
+        generateFeedback.setOnClickListener(v ->
+        {
+            generateFeedback();
         });
 
     }
@@ -111,6 +121,71 @@ public class DevelopersToolsActivity extends AppCompatActivity
             public void onSuccess()
             {
                 Toast.makeText(DevelopersToolsActivity.this, "Itinerario creato", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError()
+            {
+                Toast.makeText(DevelopersToolsActivity.this, "Errore", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void getAllUsers()
+    {
+        BackEndInterface.get().getAllUsers(users, new BackEndInterface.OnOperationCompleteListener()
+        {
+            @Override
+            public void onSuccess()
+            {
+                generateFeedback();
+            }
+
+            @Override
+            public void onError()
+            {
+                Toast.makeText(DevelopersToolsActivity.this, "Errore", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void generateFeedback()
+    {
+        if(users.isEmpty())
+        {
+            getAllUsers();
+            return;
+        }
+
+        Random random = new Random();
+
+        User currentUser = AuthenticationManager.get().getUserLogged();
+        User userSender;
+        do
+        {
+            userSender = users.get( random.nextInt(users.size()) );
+        } while(userSender.getId().equals(currentUser.getId()));
+
+        Feedback feedback = new Feedback(userSender);
+
+        List<String> comments = Arrays.asList("Nice itineraries, good job!",
+                "Great experience!\n" + currentUser.getName() + " thanks a lot for the trip.",
+                "I got inspired a lot from the places visited with you, a very instructive trip.\nThanks.",
+                "A lot of fun, " + currentUser.getName() + " is a very kind person, and will bring you to see the best places.",
+                "The best Cicerone!");
+
+        feedback.setComment( comments.get( random.nextInt(comments.size())) );
+        feedback.setVote( random.nextInt(5)+1 );
+
+        currentUser.addFeedback(feedback);
+
+        BackEndInterface.get().storeEntity(currentUser, new BackEndInterface.OnOperationCompleteListener()
+        {
+            @Override
+            public void onSuccess()
+            {
+                Toast.makeText(DevelopersToolsActivity.this, "Feedback generato", Toast.LENGTH_SHORT).show();
             }
 
             @Override

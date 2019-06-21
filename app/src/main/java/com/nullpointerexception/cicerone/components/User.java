@@ -39,6 +39,12 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
     /**   List of itineraries which this user have or is participating.  */
     protected List<Itinerary> itineraries = new ArrayList<>();
 
+    /**   Average vote into user feedbacks  */
+    protected float averageFeedback;
+
+    /**   List of feedback user received from other users.  */
+    protected List<Feedback> feedbacks = new Vector<>();
+
     public User() {}
 
     /** Construct object from a FireBase user and set fields from it */
@@ -139,6 +145,44 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
 
     public void removeItinerary(int index) {
         itineraries.remove(index);
+    }
+
+    public List<Feedback> getFeedbacks()
+    {
+        return feedbacks;
+    }
+
+    /**
+     *      Add a feedback into user feedbacks list and calculate new average rating.
+     *
+     *      @param feedback Feedback to add.
+     */
+    public void addFeedback(Feedback feedback)
+    {
+        int sum = (int) (averageFeedback * getFeedbacks().size());
+
+        boolean found = false;
+        for(Feedback fb : feedbacks)
+            if(fb.getIdUser().equals(feedback.getIdUser()))
+            {
+                sum -= fb.getVote();
+
+                fb.setVote(feedback.getVote());
+                fb.setComment(feedback.getComment());
+
+                sum += feedback.getVote();
+
+                found = true;
+                break;
+            }
+
+        if( ! found)
+        {
+            sum += feedback.getVote();
+            feedbacks.add(feedback);
+        }
+
+        averageFeedback = (float) sum / getFeedbacks().size();
     }
 
     public void setId(String id) {
@@ -259,6 +303,17 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
 
             itineraries.add(itinerary);
             return itinerary;
+        }
+
+        if(fieldName.equals("feedbacks"))
+        {
+            Feedback feedback = new Feedback(id);
+
+            if(feedbacks == null)
+                feedbacks = new Vector<>();
+
+            feedbacks.add(feedback);
+            return feedback;
         }
 
         return null;
