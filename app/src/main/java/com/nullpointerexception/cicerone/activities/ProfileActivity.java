@@ -117,8 +117,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         for(int i = 0; i < user.getFeedbacks().size(); ++i) {
             if(userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
-                mComment.setText(feedback.getComment());
-                ratingBar.setRating((float) feedback.getVote());
+                mComment.setText(user.getFeedbacks().get(i).getComment());
+                ratingBar.setRating((float) user.getFeedbacks().get(i).getVote());
                 feedbackTitle.setVisibility(View.GONE);
             }else {
                 removeFeedback.setEnabled(false);
