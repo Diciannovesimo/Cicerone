@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -33,11 +32,10 @@ import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant, completedFeedBackMsg_tv;
+    private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant, completedFeedBackMsg_tv, sndFeedBtn, removeFeedback, feedbackTitle;
     private ExtendedEditText mComment;
     private ImageView profileImage;
     private RatingBar ratingBar;
-    private Button sndFeedBtn;
     private float rating;
     private User user;
 
@@ -86,10 +84,6 @@ public class ProfileActivity extends AppCompatActivity {
 
             }
         });
-
-
-
-
     }
 
     public void initUI() {
@@ -104,6 +98,8 @@ public class ProfileActivity extends AppCompatActivity {
         sndFeedBtn = findViewById(R.id.sndFeed_btn);
         constraintLayout = findViewById(R.id.feedback_layout);
         completedFeedBackMsg_tv = findViewById(R.id.completedFeedBackMsg_tv);
+        removeFeedback = findViewById(R.id.deleteFeedback_tv);
+        feedbackTitle = findViewById(R.id.feedbackTitle_tv);
     }
 
     /**
@@ -111,10 +107,23 @@ public class ProfileActivity extends AppCompatActivity {
      */
     public void setTextField() {
 
+        User userLogged = AuthenticationManager.get().getUserLogged();
+        Feedback feedback = new Feedback(userLogged);
+
         new ProfileImageFetcher(this)
                 .fetchImageOf(user, drawable -> {
                     profileImage.setImageDrawable(drawable);
                 });
+
+        for(int i = 0; i < user.getFeedbacks().size(); ++i) {
+            if(userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
+                mComment.setText(feedback.getComment());
+                ratingBar.setRating((float) feedback.getVote());
+                feedbackTitle.setVisibility(View.GONE);
+            }else {
+                removeFeedback.setEnabled(false);
+            }
+        }
 
         //Set name field
         mName.setText(user.getDisplayName());
@@ -138,9 +147,6 @@ public class ProfileActivity extends AppCompatActivity {
         //Set ratingBar listener
         ratingBarListener();
 
-        User userLogged = AuthenticationManager.get().getUserLogged();
-        Feedback feedback = new Feedback(userLogged);
-
         sndFeedBtn.setOnClickListener(v -> {
             if(mComment != null && !mComment.getText().toString().isEmpty()) {
                     feedback.setComment(mComment.getText().toString());
@@ -152,8 +158,8 @@ public class ProfileActivity extends AppCompatActivity {
                 BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
                     @Override
                     public void onSuccess() {
-                        constraintLayout.setVisibility(View.GONE);
                         completedFeedBackMsg_tv.setVisibility(View.VISIBLE);
+                        removeFeedback.setEnabled(true);
                     }
 
                     @Override
@@ -161,6 +167,17 @@ public class ProfileActivity extends AppCompatActivity {
 
                     }
                 });
+            }
+        });
+
+        removeFeedback.setOnClickListener(v -> {
+            for(int i = 0; i < user.getFeedbacks().size(); ++i) {
+                if(userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
+                    user.getFeedbacks().remove(i);
+                    Toast.makeText(getApplicationContext(), "Hai rimosso il feedback", Toast.LENGTH_SHORT).show();
+                    removeFeedback.setEnabled(false);
+                    break;
+                }
             }
         });
 

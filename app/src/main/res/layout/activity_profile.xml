@@ -218,7 +218,7 @@
             android:layout_marginTop="10dp">
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/feedbackTitle_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -236,10 +236,10 @@
                 android:layout_marginTop="8dp"
                 android:progressTint="#FF5500"
                 android:stepSize="1"
-                app:layout_constraintEnd_toEndOf="@+id/textView5"
+                app:layout_constraintEnd_toEndOf="@+id/feedbackTitle_tv"
                 app:layout_constraintHorizontal_bias="0.517"
-                app:layout_constraintStart_toStartOf="@+id/textView5"
-                app:layout_constraintTop_toBottomOf="@+id/textView5" />
+                app:layout_constraintStart_toStartOf="@+id/feedbackTitle_tv"
+                app:layout_constraintTop_toBottomOf="@+id/feedbackTitle_tv" />
 
             <com.kinda.mtextfield.TextFieldBoxes
                 android:id="@+id/text_desc_boxes"
@@ -263,19 +263,30 @@
 
             </com.kinda.mtextfield.TextFieldBoxes>
 
-            <Button
+            <TextView
                 android:id="@+id/sndFeed_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="10dp"
                 android:background="@color/white"
-                android:text="invia"
+                android:text="Invia"
                 android:textColor="@color/colorPrimary"
+                android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_desc_boxes" />
+
+            <TextView
+                android:id="@+id/deleteFeedback_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="10dp"
+                android:text="Cancella feedback"
+                android:textColor="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/text_desc_boxes" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
