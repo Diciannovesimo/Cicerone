@@ -73,9 +73,11 @@ public class ProfileActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Impossibile caricare le" +
                             "informazioni di profilo", Toast.LENGTH_SHORT);
                     finish();
+
                 }else {
                     //Set text in the field
                     setTextField();
+
                 }
             }
 
@@ -86,13 +88,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
 
-        recyclerView = findViewById(R.id.RecyclerView_Review);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
-
-        AdapterReview adapter = new AdapterReview(getApplicationContext(), user.getFeedbacks());
-        recyclerView.setAdapter(adapter);
 
     }
 
@@ -167,6 +163,14 @@ public class ProfileActivity extends AppCompatActivity {
                 });
             }
         });
+
+        recyclerView = findViewById(R.id.RecyclerView_Review);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        AdapterReview adapter = new AdapterReview(getApplicationContext(), user.getFeedbacks());
+        recyclerView.setAdapter(adapter);
     }
 
     private void ratingBarListener() {
