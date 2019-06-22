@@ -51,11 +51,7 @@ public class DevelopersToolsActivity extends AppCompatActivity
             return false;
         });
 
-        generateFeedback.setOnClickListener(v ->
-        {
-            generateFeedback();
-        });
-
+        generateFeedback.setOnClickListener(v -> generateFeedback());
     }
 
     private void generateItinerary()
@@ -178,7 +174,10 @@ public class DevelopersToolsActivity extends AppCompatActivity
         feedback.setComment( comments.get( random.nextInt(comments.size())) );
         feedback.setVote( random.nextInt(5)+1 );
 
-        currentUser.addFeedback(feedback);
+        if(currentUser.getFeedbacks().contains(feedback))
+            currentUser.editFeedback(feedback);
+        else
+            currentUser.addFeedback(feedback);
 
         BackEndInterface.get().storeEntity(currentUser, new BackEndInterface.OnOperationCompleteListener()
         {
