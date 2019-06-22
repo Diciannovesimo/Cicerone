@@ -147,7 +147,8 @@ public class ProfileActivity extends AppCompatActivity {
         sndFeedBtn.setOnClickListener(v -> {
             if(mComment != null && !mComment.getText().toString().isEmpty()) {
                     feedback.setComment(mComment.getText().toString());
-            } else if(rating != 0) {
+            }
+            if(rating != 0) {
                 feedback.setVote((int) rating);
                 user.addFeedback(feedback);
 
