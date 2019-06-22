@@ -166,7 +166,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.RecyclerView_Review);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
 
         AdapterReview adapter = new AdapterReview(getApplicationContext(), user.getFeedbacks());
