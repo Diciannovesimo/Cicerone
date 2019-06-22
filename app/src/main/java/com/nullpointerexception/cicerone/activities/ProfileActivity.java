@@ -187,7 +187,7 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
     public void onBindViewHolder(@NonNull AdapterReview.MyViewHolder holder, int position) {
         holder.displayName.setText(feedbacks.get(position).getDisplayNameUser());
         holder.description.setText(feedbacks.get(position).getComment());
-        holder.ratingBar.setNumStars(feedbacks.get(position).getVote());
+        holder.ratingBar.setRating((float) feedbacks.get(position).getVote());
 
         User user = new User();
         user.setId(feedbacks.get(position).getIdUser());
