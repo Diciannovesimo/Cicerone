@@ -30,9 +30,9 @@
         android:text="Genera itinerario"/>
 
     <Button
-        android:id="@+id/profile_test"
+        android:id="@+id/btnGenerateFeedback"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="activity di prova profilo" />
+        android:text="Genera feedback"/>
 
 </LinearLayout>

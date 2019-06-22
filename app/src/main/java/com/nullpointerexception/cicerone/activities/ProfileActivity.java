@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.kinda.mtextfield.ExtendedEditText;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.Feedback;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
 
@@ -85,13 +86,13 @@ public class ProfileActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.RecyclerView_Review);
 
-        /**
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        AdapterPartecipants adapter = new AdapterPartecipants(getApplicationContext(), itinerary.getParticipants());
+        AdapterReview adapter = new AdapterReview(getApplicationContext(), user.getFeedbacks());
         recyclerView.setAdapter(adapter);
-         **/
+
     }
 
     public void initUI() {
@@ -156,37 +157,43 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 }
-/**
-class AdapterReview extends RecyclerView.Adapter <AdapterPartecipants.MyViewHolder>
+
+class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
 {
     private Context context;
-    private List<User> participants;
+    private List<Feedback> feedbacks;
     private LayoutInflater inflater;
 
-    public AdapterReview(Context appContext,List<User> participants)
+    public AdapterReview(Context appContext,List<Feedback> feedbacks)
     {
         this.context = appContext;
-        this.participants = participants;
+        this.feedbacks = feedbacks;
         inflater = (LayoutInflater.from(appContext));
+
+
     }
 
     @NonNull
     @Override
-    public AdapterPartecipants.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    public AdapterReview.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
-        View v = inflater.inflate(R.layout.participant_layout, parent, false);
-        AdapterPartecipants.MyViewHolder vh = new AdapterPartecipants.MyViewHolder(v);
+        View v = inflater.inflate(R.layout.review_layout, parent, false);
+        AdapterReview.MyViewHolder vh = new AdapterReview.MyViewHolder(v);
 
         return vh;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AdapterPartecipants.MyViewHolder holder, int position) {
-        holder.name.setText(participants.get(position).getName());
-        holder.surname.setText(participants.get(position).getSurname());
+    public void onBindViewHolder(@NonNull AdapterReview.MyViewHolder holder, int position) {
+        holder.displayName.setText(feedbacks.get(position).getDisplayNameUser());
+        holder.description.setText(feedbacks.get(position).getComment());
+        holder.ratingBar.setNumStars(feedbacks.get(position).getVote());
 
+        User user = new User();
+        user.setId(feedbacks.get(position).getIdUser());
+        user.setProfileImageUrl(feedbacks.get(position).getProfileImageUrlUser());
 
-        new ProfileImageFetcher(context).fetchImageOf(participants.get(position), drawable ->
+        new ProfileImageFetcher(context).fetchImageOf(user, drawable ->
         {
 
             if(drawable != null)
@@ -198,7 +205,6 @@ class AdapterReview extends RecyclerView.Adapter <AdapterPartecipants.MyViewHold
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,participants.get(position).getName() + participants.get(position).getSurname(), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -206,22 +212,23 @@ class AdapterReview extends RecyclerView.Adapter <AdapterPartecipants.MyViewHold
 
     @Override
     public int getItemCount() {
-        return participants.size();
+        return feedbacks.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
 
-        TextView name, surname;
+        TextView displayName, description;
         ImageView imgProfile;
+        RatingBar ratingBar;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            name = (TextView) itemView.findViewById(R.id.textView_Name);
-            surname = (TextView) itemView.findViewById(R.id.textView_Surname);
+            displayName = (TextView) itemView.findViewById(R.id.textView_DisplayName);
+            description = (TextView) itemView.findViewById(R.id.textView_Description);
             imgProfile = (ImageView) itemView.findViewById(R.id.imageView_ProfileImage);
+            ratingBar = itemView.findViewById(R.id.ratingBar2);
 
         }
     }
 }
-**/

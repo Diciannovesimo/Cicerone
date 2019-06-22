@@ -367,9 +367,8 @@ public class ItineraryActivity extends AppCompatActivity
                                 }
                             });
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            Log.e(TAG, e.toString());
                         }
-
                     }
                 });
                 dialog.show();
@@ -653,7 +652,7 @@ public class ItineraryActivity extends AppCompatActivity
     private boolean placeAlreadyExist(LatLng coordinates)
     {
         for(int i = 0; i < itinerary.getStages().size(); ++i) {
-            if(coordinates.equals(itinerary.getStages().get(i)))
+            if(coordinates.equals(itinerary.getStages().get(i).getCoordinates()))
                 return true;
         }
         return false;
