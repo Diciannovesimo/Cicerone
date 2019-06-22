@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kinda.mtextfield.ExtendedEditText;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Feedback;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
@@ -141,13 +142,14 @@ public class ProfileActivity extends AppCompatActivity {
         //Set ratingBar listener
         ratingBarListener();
 
-        Feedback feedback = new Feedback(user);
-
+        User userLogged = AuthenticationManager.get().getUserLogged();
+        Feedback feedback = new Feedback(userLogged);
 
         sndFeedBtn.setOnClickListener(v -> {
             if(mComment != null && !mComment.getText().toString().isEmpty()) {
                     feedback.setComment(mComment.getText().toString());
-            } else if(rating != 0) {
+            }
+            if(rating != 0) {
                 feedback.setVote((int) rating);
                 user.addFeedback(feedback);
 
