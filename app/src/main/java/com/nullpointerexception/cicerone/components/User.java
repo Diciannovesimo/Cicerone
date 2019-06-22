@@ -42,6 +42,9 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
     /**   Average vote into user feedbacks  */
     protected float averageFeedback;
 
+    /**   Number of feedbacks given to this user.  */
+    protected int feedbacksCount;
+
     /**   List of feedback user received from other users.  */
     protected List<Feedback> feedbacks = new Vector<>();
 
@@ -68,7 +71,12 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
         }
 
         if(user.getPhotoUrl() != null)
+        {
             profileImageUrl = user.getPhotoUrl().toString();
+
+            if(profileImageUrl.contains("facebook"))
+                profileImageUrl += "?type=large";
+        }
     }
 
     public String getEmail()
@@ -149,7 +157,27 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
 
     public List<Feedback> getFeedbacks()
     {
-        return feedbacks;
+        return new Vector<>(feedbacks);
+    }
+
+    public float getAverageFeedback() {
+        return averageFeedback;
+    }
+
+    public void setAverageFeedback(float averageFeedback) {
+        this.averageFeedback = averageFeedback;
+    }
+
+    public int getFeedbacksCount() {
+        return feedbacksCount;
+    }
+
+    public void setFeedbacksCount(int feedbacksCount) {
+        this.feedbacksCount = feedbacksCount;
+    }
+
+    public void setFeedbacks(List<Feedback> feedbacks) {
+        this.feedbacks = feedbacks;
     }
 
     /**
@@ -159,30 +187,52 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
      */
     public void addFeedback(Feedback feedback)
     {
-        int sum = (int) (averageFeedback * getFeedbacks().size());
+        int sum = (int) (averageFeedback * feedbacksCount);
 
-        boolean found = false;
-        for(Feedback fb : feedbacks)
-            if(fb.getIdUser().equals(feedback.getIdUser()))
+        sum += feedback.getVote();
+        feedbacks.add(feedback);
+        feedbacksCount++;
+
+        averageFeedback = (float) sum / feedbacksCount;
+    }
+
+    /**
+     *      Edit a previous shared feedback and calculate new average rating.
+     *
+     *      @param feedback Feedback to edit.
+     */
+    public void editFeedback(Feedback feedback)
+    {
+        int sum = (int) (averageFeedback * feedbacksCount);
+
+        for(Feedback fd : feedbacks)
+            if(fd.getIdUser().equals(feedback.getIdUser()))
             {
-                sum -= fb.getVote();
+                sum = sum - fd.getVote() + feedback.getVote();
 
-                fb.setVote(feedback.getVote());
-                fb.setComment(feedback.getComment());
+                fd.setVote(feedback.getVote());
+                fd.setComment(feedback.getComment());
 
-                sum += feedback.getVote();
-
-                found = true;
                 break;
             }
 
-        if( ! found)
-        {
-            sum += feedback.getVote();
-            feedbacks.add(feedback);
-        }
+        averageFeedback = (float) sum / feedbacksCount;
+    }
 
-        averageFeedback = (float) sum / getFeedbacks().size();
+    /**
+     *      Remove a feedback from user feedbacks list and calculate new average rating.
+     *
+     *      @param feedback Feedback to remove.
+     */
+    public void removeFeedback(Feedback feedback)
+    {
+        int sum = (int) (averageFeedback * feedbacksCount);
+
+        sum -= feedback.getVote();
+        feedbacks.remove(feedback);
+        feedbacksCount--;
+
+        averageFeedback = (float) sum / feedbacksCount;
     }
 
     public void setId(String id) {
@@ -320,24 +370,25 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(getId(), user.getId()) &&
+        return Float.compare(user.getAverageFeedback(), getAverageFeedback()) == 0 &&
+                getFeedbacksCount() == user.getFeedbacksCount() &&
+                Objects.equals(getId(), user.getId()) &&
                 Objects.equals(getEmail(), user.getEmail()) &&
                 Objects.equals(getProfileImageUrl(), user.getProfileImageUrl()) &&
                 Objects.equals(getName(), user.getName()) &&
                 Objects.equals(getSurname(), user.getSurname()) &&
                 Objects.equals(getDateBirth(), user.getDateBirth()) &&
                 Objects.equals(getPhoneNumber(), user.getPhoneNumber()) &&
-                Objects.equals(getItineraries(), user.getItineraries());
+                Objects.equals(getItineraries(), user.getItineraries()) &&
+                Objects.equals(getFeedbacks(), user.getFeedbacks());
     }
 
     @Override
-    public int hashCode()
-    {
-        return Objects.hash(getId(), getEmail(), getProfileImageUrl(), getName(), getSurname(), getDateBirth(), getPhoneNumber(), getItineraries());
+    public int hashCode() {
+        return Objects.hash(getId(), getEmail(), getProfileImageUrl(), getName(), getSurname(), getDateBirth(), getPhoneNumber(), getItineraries(), getAverageFeedback(), getFeedbacksCount(), getFeedbacks());
     }
 }

@@ -2,6 +2,7 @@ package com.nullpointerexception.cicerone.components;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Feedback implements StorableAsField
 {
@@ -97,5 +98,20 @@ public class Feedback implements StorableAsField
         comment = subFields.get("comment");
         if( subFields.get("vote") != null)
             vote = Integer.parseInt( subFields.get("vote"));
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Feedback feedback = (Feedback) o;
+        return getIdUser().equals(feedback.getIdUser());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getIdUser(), getDisplayNameUser(), getProfileImageUrlUser(), getComment(), getVote());
     }
 }
