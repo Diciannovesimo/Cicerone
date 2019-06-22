@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,14 +32,16 @@ import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant;
+    private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant, completedFeedBackMsg_tv;
     private ExtendedEditText mComment;
     private ImageView profileImage;
     private RatingBar ratingBar;
     private Button sndFeedBtn;
     private float rating;
     private User user;
+
     private RecyclerView recyclerView;
+    ConstraintLayout constraintLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +51,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-
-
 
         //Initialize UI
         initUI();
@@ -86,7 +87,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.RecyclerView_Review);
 
-
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
@@ -105,6 +105,8 @@ public class ProfileActivity extends AppCompatActivity {
         ratingBar = findViewById(R.id.ratingBar);
         mComment = findViewById(R.id.commento_tv);
         sndFeedBtn = findViewById(R.id.sndFeed_btn);
+        constraintLayout = findViewById(R.id.feedback_layout);
+        completedFeedBackMsg_tv = findViewById(R.id.completedFeedBackMsg_tv);
     }
 
     /**
@@ -139,12 +141,28 @@ public class ProfileActivity extends AppCompatActivity {
         //Set ratingBar listener
         ratingBarListener();
 
+        Feedback feedback = new Feedback(user);
+
+
         sndFeedBtn.setOnClickListener(v -> {
             if(mComment != null && !mComment.getText().toString().isEmpty()) {
-                //setta il commento in ueser
+                    feedback.setComment(mComment.getText().toString());
             } else if(rating != 0) {
-                //setta il rating in user
-                //setta lo storeEntity
+                feedback.setVote((int) rating);
+                user.addFeedback(feedback);
+
+                BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
+                    @Override
+                    public void onSuccess() {
+                        constraintLayout.setVisibility(View.GONE);
+                        completedFeedBackMsg_tv.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
             }
         });
     }
