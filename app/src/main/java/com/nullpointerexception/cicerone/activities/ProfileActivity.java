@@ -1,8 +1,12 @@
 package com.nullpointerexception.cicerone.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -11,13 +15,18 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.kinda.mtextfield.ExtendedEditText;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
+
+import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -28,6 +37,7 @@ public class ProfileActivity extends AppCompatActivity {
     private Button sndFeedBtn;
     private float rating;
     private User user;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +47,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+
 
         //Initialize UI
         initUI();
@@ -69,6 +81,17 @@ public class ProfileActivity extends AppCompatActivity {
 
             }
         });
+
+
+        recyclerView = findViewById(R.id.RecyclerView_Review);
+
+        /**
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        AdapterPartecipants adapter = new AdapterPartecipants(getApplicationContext(), itinerary.getParticipants());
+        recyclerView.setAdapter(adapter);
+         **/
     }
 
     public void initUI() {
@@ -133,3 +156,72 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 }
+/**
+class AdapterReview extends RecyclerView.Adapter <AdapterPartecipants.MyViewHolder>
+{
+    private Context context;
+    private List<User> participants;
+    private LayoutInflater inflater;
+
+    public AdapterReview(Context appContext,List<User> participants)
+    {
+        this.context = appContext;
+        this.participants = participants;
+        inflater = (LayoutInflater.from(appContext));
+    }
+
+    @NonNull
+    @Override
+    public AdapterPartecipants.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    {
+        View v = inflater.inflate(R.layout.participant_layout, parent, false);
+        AdapterPartecipants.MyViewHolder vh = new AdapterPartecipants.MyViewHolder(v);
+
+        return vh;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull AdapterPartecipants.MyViewHolder holder, int position) {
+        holder.name.setText(participants.get(position).getName());
+        holder.surname.setText(participants.get(position).getSurname());
+
+
+        new ProfileImageFetcher(context).fetchImageOf(participants.get(position), drawable ->
+        {
+
+            if(drawable != null)
+                holder.imgProfile.setImageDrawable(drawable);
+        });
+
+
+        //Ascolto l'evento click
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context,participants.get(position).getName() + participants.get(position).getSurname(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return participants.size();
+    }
+
+    public class MyViewHolder extends RecyclerView.ViewHolder{
+
+        TextView name, surname;
+        ImageView imgProfile;
+
+        public MyViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            name = (TextView) itemView.findViewById(R.id.textView_Name);
+            surname = (TextView) itemView.findViewById(R.id.textView_Surname);
+            imgProfile = (ImageView) itemView.findViewById(R.id.imageView_ProfileImage);
+
+        }
+    }
+}
+**/
