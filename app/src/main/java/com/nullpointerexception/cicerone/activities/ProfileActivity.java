@@ -338,8 +338,11 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
     @Override
     public int getItemCount() {
 
-        return 2;
-       // return feedbacks.size();
+        if(feedbacks.size()>2)
+            return 2;
+        else
+            return feedbacks.size();
+
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{

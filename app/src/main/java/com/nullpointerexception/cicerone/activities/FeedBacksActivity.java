@@ -41,17 +41,6 @@ public class FeedBacksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed_backs);
 
-        User user = (User) ObjectSharer.get().getSharedObject("feedback");
-        String IdUserLogged = AuthenticationManager.get().getUserLogged().getId();
-        List<Feedback> feedbacks = new ArrayList<Feedback>();
-
-        for(int i=0; i<user.getFeedbacks().size(); i++)
-        {
-            if(!IdUserLogged.equals(user.getFeedbacks().get(i).getIdUser())){
-                feedbacks.add(user.getFeedbacks().get(i));
-            }
-        }
-        
 
         Window window = getWindow();
         window.setStatusBarColor(Color.parseColor("#FF5500"));
@@ -64,6 +53,19 @@ public class FeedBacksActivity extends AppCompatActivity {
         if(getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
+        User user = (User) ObjectSharer.get().getSharedObject("feedback");
+        String IdUserLogged = AuthenticationManager.get().getUserLogged().getId();
+        List<Feedback> feedbacks = new ArrayList<Feedback>();
+
+        for(int i=0; i<user.getFeedbacks().size(); i++)
+        {
+            if(!IdUserLogged.equals(user.getFeedbacks().get(i).getIdUser())){
+                feedbacks.add(user.getFeedbacks().get(i));
+            }
+        }
+
+
         recyclerView = findViewById(R.id.RecyclerView_Review);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -73,6 +75,20 @@ public class FeedBacksActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
 
+    }
+
+    @Override
+    public boolean onSupportNavigateUp()
+    {
+        finish();
+        return super.onSupportNavigateUp();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        ObjectSharer.get().remove("feedback");
     }
 
 
