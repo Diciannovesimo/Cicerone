@@ -30,6 +30,7 @@ import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -93,6 +94,7 @@ public class ProfileActivity extends AppCompatActivity {
             ObjectSharer.get().shareObject("feedback", user);
             startActivity(intent2);
         });
+
     }
 
     public void initUI() {
@@ -168,6 +170,9 @@ public class ProfileActivity extends AppCompatActivity {
         //Set ratingBar listener
         ratingBarListener();
 
+        if(userLogged.getFeedbacks().size()<=2){
+            goFeedBacksList.setVisibility(View.GONE);
+        }
 
 
 
@@ -249,13 +254,23 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        List<Feedback> feedbacks = new ArrayList<Feedback>();
+
+        String IdUserLogged = AuthenticationManager.get().getUserLogged().getId();
+        for(int i=0; i<user.getFeedbacks().size(); i++)
+        {
+            if(!IdUserLogged.equals(user.getFeedbacks().get(i).getIdUser())){
+                feedbacks.add(user.getFeedbacks().get(i));
+            }
+        }
+
         recyclerView = findViewById(R.id.RecyclerView_Review);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(),
                 LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        AdapterReview adapter = new AdapterReview(getApplicationContext(), user.getFeedbacks());
+        AdapterReview adapter = new AdapterReview(getApplicationContext(), feedbacks);
         recyclerView.setAdapter(adapter);
     }
 

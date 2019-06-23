@@ -54,15 +54,20 @@ public class FeedBacksActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        User user = (User) ObjectSharer.get().getSharedObject("feedback");
-        String IdUserLogged = AuthenticationManager.get().getUserLogged().getId();
         List<Feedback> feedbacks = new ArrayList<Feedback>();
 
-        for(int i=0; i<user.getFeedbacks().size(); i++)
-        {
-            if(!IdUserLogged.equals(user.getFeedbacks().get(i).getIdUser())){
-                feedbacks.add(user.getFeedbacks().get(i));
+        if(ObjectSharer.get().getSharedObject("feedback") != null){
+            User user = (User) ObjectSharer.get().getSharedObject("feedback");
+            String IdUserLogged = AuthenticationManager.get().getUserLogged().getId();
+            for(int i=0; i<user.getFeedbacks().size(); i++)
+            {
+                if(!IdUserLogged.equals(user.getFeedbacks().get(i).getIdUser())){
+                    feedbacks.add(user.getFeedbacks().get(i));
+                }
             }
+
+        }else {
+            feedbacks = AuthenticationManager.get().getUserLogged().getFeedbacks();
         }
 
 

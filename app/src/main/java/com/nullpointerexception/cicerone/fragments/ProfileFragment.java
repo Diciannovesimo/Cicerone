@@ -1,5 +1,6 @@
 package com.nullpointerexception.cicerone.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,14 +11,16 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.activities.FeedBacksActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
 
 public class ProfileFragment extends Fragment
 {
-    private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant;
+    private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant,  goFeedBacksList;
     private ImageView profileImage, settings_btn;
 
     public ProfileFragment() { }
@@ -36,6 +39,12 @@ public class ProfileFragment extends Fragment
         //Set text in the field
         setTextField(view);
 
+
+        goFeedBacksList.setOnClickListener(v -> {
+            Intent intent2 = new Intent(getContext(), FeedBacksActivity.class);
+            startActivity(intent2);
+        });
+
         return view;
     }
 
@@ -47,6 +56,7 @@ public class ProfileFragment extends Fragment
         mItinerariesAsParticipant = v.findViewById(R.id.itinerariesAsParticipant_tv);
         profileImage = v.findViewById(R.id.us_image);
         settings_btn = v.findViewById(R.id.settings_btn);
+        goFeedBacksList = v.findViewById(R.id.goFeedBacksList);
     }
 
     /**
@@ -78,6 +88,10 @@ public class ProfileFragment extends Fragment
 
         //Set telephone number
         mTelephone.setText(user.getPhoneNumber());
+
+        if(user.getFeedbacks().size()<=2){
+            goFeedBacksList.setVisibility(View.GONE);
+        }
 
         //Set click listener for settings button
         /*settings_btn.setOnClickListener(v1 -> {
