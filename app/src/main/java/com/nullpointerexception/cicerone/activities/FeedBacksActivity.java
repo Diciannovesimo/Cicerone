@@ -22,12 +22,14 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.Feedback;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FeedBacksActivity extends AppCompatActivity {
@@ -40,6 +42,16 @@ public class FeedBacksActivity extends AppCompatActivity {
         setContentView(R.layout.activity_feed_backs);
 
         User user = (User) ObjectSharer.get().getSharedObject("feedback");
+        String IdUserLogged = AuthenticationManager.get().getUserLogged().getId();
+        List<Feedback> feedbacks = new ArrayList<Feedback>();
+
+        for(int i=0; i<user.getFeedbacks().size(); i++)
+        {
+            if(!IdUserLogged.equals(user.getFeedbacks().get(i).getIdUser())){
+                feedbacks.add(user.getFeedbacks().get(i));
+            }
+        }
+        
 
         Window window = getWindow();
         window.setStatusBarColor(Color.parseColor("#FF5500"));
@@ -57,8 +69,7 @@ public class FeedBacksActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
-
-        AdapterReviewFeedBack adapter = new AdapterReviewFeedBack(getApplicationContext(), user.getFeedbacks());
+        AdapterReviewFeedBack adapter = new AdapterReviewFeedBack(getApplicationContext(), feedbacks);
         recyclerView.setAdapter(adapter);
 
 
@@ -94,6 +105,7 @@ class AdapterReviewFeedBack extends RecyclerView.Adapter <AdapterReviewFeedBack.
 
     @Override
     public void onBindViewHolder(@NonNull AdapterReviewFeedBack.MyViewHolder holder, int position) {
+
         holder.displayName.setText(feedbacks.get(position).getDisplayNameUser());
         holder.description.setText(feedbacks.get(position).getComment());
         holder.ratingBar.setRating((float) feedbacks.get(position).getVote());
@@ -127,12 +139,15 @@ class AdapterReviewFeedBack extends RecyclerView.Adapter <AdapterReviewFeedBack.
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
 
+
+
         TextView displayName, description;
         ImageView imgProfile;
         RatingBar ratingBar;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
+
 
             displayName = (TextView) itemView.findViewById(R.id.textView_DisplayName);
             description = (TextView) itemView.findViewById(R.id.textView_Description);
