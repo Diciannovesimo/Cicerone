@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -145,8 +144,8 @@ public class ProfileActivity extends AppCompatActivity {
         if(!found)
             removeFeedback.setEnabled(false);
         else
-            if(mComment.getText().toString().isEmpty())
-                mComment.setHint("Non hai lasciato nessun commento nel tuo feedback");
+        if(user.getFeedbacks().get(position).getComment().isEmpty())
+            textFieldBoxes.setVisibility(View.GONE);
 
         //Set name field
         mName.setText(user.getDisplayName());
@@ -236,18 +235,18 @@ public class ProfileActivity extends AppCompatActivity {
 
                     BackEndInterface.get().storeEntity(user,
                             new BackEndInterface.OnOperationCompleteListener() {
-                        @Override
-                        public void onSuccess() {
-                            Toast.makeText(getApplicationContext(), "Hai rimosso " +
-                                    "il feedback", Toast.LENGTH_SHORT).show();
-                            removeFeedback.setEnabled(false);
-                        }
+                                @Override
+                                public void onSuccess() {
+                                    Toast.makeText(getApplicationContext(), "Hai rimosso " +
+                                            "il feedback", Toast.LENGTH_SHORT).show();
+                                    removeFeedback.setEnabled(false);
+                                }
 
-                        @Override
-                        public void onError() {
+                                @Override
+                                public void onError() {
 
-                        }
-                    });
+                                }
+                            });
 
                     break;
                 }
@@ -291,11 +290,11 @@ public class ProfileActivity extends AppCompatActivity {
 
         ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
             this.rating = rating;
+
+            if(textFieldBoxes.getVisibility() == View.GONE)
+                textFieldBoxes.setVisibility(View.VISIBLE);
         });
-
     }
-
-
 }
 
 class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
@@ -345,6 +344,13 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //TODO chiamind do
+                /**
+                 Intent intent2 = new Intent(v.getContext(), FeedBacksActivity.class);
+                 ObjectSharer.get().shareObject("feedback_globetrotter", user);
+                 v.getContext().startActivity(intent2);
+                 **/
+
             }
         });
 

@@ -49,8 +49,11 @@ import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.User;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
 
@@ -377,7 +380,20 @@ public class ItineraryActivity extends AppCompatActivity
             linearLayout.addView(addStageView);
             if(subscribed) {
                 mItinerary.setVisibility(View.VISIBLE);
-                mItinerary.setText("Non partecipare");
+                Date itineraryDate = new Date();
+                try {
+                    itineraryDate = new SimpleDateFormat("yyyy/MM/dd", Locale.ITALY).parse(itinerary.getDate());
+                } catch (Exception e) {
+                    Log.e(TAG, e.toString());
+                }
+
+                Date today = new Date(System.currentTimeMillis());
+
+                if(itineraryDate.before(today))
+                    mItinerary.setText("Cancella");
+                else
+                    mItinerary.setText("Non partecipare");
+
                 mPurposePlace.setVisibility(View.GONE);
                 mPartecipantsList.setVisibility(View.GONE);
             }else {
@@ -425,54 +441,81 @@ public class ItineraryActivity extends AppCompatActivity
         mItinerary.setOnClickListener(v -> {
             if(userMode) {
                 if(subscribed) {
-                    List<User> userList1 = itinerary.getParticipants();
-                    for(int i = 0; i < userList1.size(); ++i) {
-                        if(user.getId().equals(userList1.get(i).getId()))
-                            userList1.remove(i);
-                    }
-                    itinerary.setParticipants(userList1);
+                    if(mItinerary.getText().toString().equals("Cancella")) {
+                        for(int i = 0; i < user.getItineraries().size(); ++i) {
+                            if(itinerary.getId().equals(user.getItineraries().get(i).getId())) {
+                                user.removeItinerary(i);
 
-                    for(int i = 0; i < user.getItineraries().size(); ++i) {
-                        if(itinerary.getId().equals(user.getItineraries().get(i).getId()))
-                            user.removeItinerary(i);
-                    }
-
-                    BackEndInterface.get().removeEntity(itinerary,
-                            new BackEndInterface.OnOperationCompleteListener() {
-                        @Override
-                        public void onSuccess() {
-                            BackEndInterface.get().storeEntity(itinerary,
-                                    new BackEndInterface.OnOperationCompleteListener() {
-                                @Override
-                                public void onSuccess() {
-                                    BackEndInterface.get().removeEntity(user);
-                                    BackEndInterface.get().storeEntity(user);
-                                    KAlertDialog kAlertDialog = new KAlertDialog(v.getContext())
-                                            .setTitleText("Disiscritto")
-                                            .setContentText("Ti sei disinscritto dalla gita")
-                                            .setConfirmText("Ok");
-
-                                    kAlertDialog.setConfirmClickListener(kAlertDialog13 -> {
-                                        mItinerary.setText("Partecipa");
-                                        subscribed = false;
-                                        updateParticipants();
-                                        kAlertDialog13.dismissWithAnimation();
-                                    });
-                                    kAlertDialog.show();
-                                }
-
-                                @Override
-                                public void onError() {
-
-                                }
-                            });
+                                new KAlertDialog(this)
+                                        .setTitleText("Itinerario cancella")
+                                        .setContentText("Hai cancellato con successo l'itinerario!")
+                                        .setConfirmText("Ok")
+                                        .setCancelClickListener(kAlertDialog -> finish()).show();
+                            }
                         }
 
-                        @Override
-                        public void onError() {
+                        BackEndInterface.get().removeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
+                            @Override
+                            public void onSuccess() {
+                                BackEndInterface.get().storeEntity(user);
+                            }
 
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
+                    } else {
+
+                        List<User> userList1 = itinerary.getParticipants();
+                        for (int i = 0; i < userList1.size(); ++i) {
+                            if (user.getId().equals(userList1.get(i).getId()))
+                                userList1.remove(i);
                         }
-                    });
+                        itinerary.setParticipants(userList1);
+
+                        for (int i = 0; i < user.getItineraries().size(); ++i) {
+                            if (itinerary.getId().equals(user.getItineraries().get(i).getId()))
+                                user.removeItinerary(i);
+                        }
+
+                        BackEndInterface.get().removeEntity(itinerary,
+                                new BackEndInterface.OnOperationCompleteListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        BackEndInterface.get().storeEntity(itinerary,
+                                                new BackEndInterface.OnOperationCompleteListener() {
+                                                    @Override
+                                                    public void onSuccess() {
+                                                        BackEndInterface.get().removeEntity(user);
+                                                        BackEndInterface.get().storeEntity(user);
+                                                        KAlertDialog kAlertDialog = new KAlertDialog(v.getContext())
+                                                                .setTitleText("Disiscritto")
+                                                                .setContentText("Ti sei disinscritto dalla gita")
+                                                                .setConfirmText("Ok");
+
+                                                        kAlertDialog.setConfirmClickListener(kAlertDialog13 -> {
+                                                            mItinerary.setText("Partecipa");
+                                                            subscribed = false;
+                                                            updateParticipants();
+                                                            kAlertDialog13.dismissWithAnimation();
+                                                        });
+                                                        kAlertDialog.show();
+                                                    }
+
+                                                    @Override
+                                                    public void onError() {
+
+                                                    }
+                                                });
+                                    }
+
+                                    @Override
+                                    public void onError() {
+
+                                    }
+                                });
+                    }
                 }else {
                     if (itinerary.getMaxParticipants() != 0) {
                         if (itinerary.getParticipants().size() < itinerary.getMaxParticipants()) {
