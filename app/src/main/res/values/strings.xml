@@ -119,7 +119,7 @@
     <!-- HomeFragment -->
     <string name="homePre">Ciao,</string>
     <string name="homeLabel1">Ti piace viaggiare?\nCerca un itinerario e comincia a esplorare il mondo.</string>
-    <string name="homeLabel2">Ti piace viaggiare?\nCerca un itinerario e comincia a esplorare il mondo.</string>
+    <string name="homeLabel2">Conosci molto bene la tua città?\nProponi un itinerario e condividi la tua conoscenza con il resto del mondo!</string>
     <string name="homeButton1">Cerca un itinerario</string>
     <string name="homeButton2">Proponi un itinerario</string>
 

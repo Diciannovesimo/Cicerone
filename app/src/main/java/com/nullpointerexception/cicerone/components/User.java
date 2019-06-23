@@ -147,8 +147,9 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
         this.itineraries = itineraries;
     }
 
-    public void addItinerary(Itinerary itinerary) {
-        itineraries.add(itinerary);
+    public void addItinerary(Itinerary itinerary)
+    {
+        itineraries.add(0, itinerary);
     }
 
     public void removeItinerary(int index) {
@@ -222,6 +223,8 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
     /**
      *      Remove a feedback from user feedbacks list and calculate new average rating.
      *
+     *      NOTE: This method require a manual delete of the node on the database.
+     *
      *      @param feedback Feedback to remove.
      */
     public void removeFeedback(Feedback feedback)
@@ -232,7 +235,10 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
         feedbacks.remove(feedback);
         feedbacksCount--;
 
-        averageFeedback = (float) sum / feedbacksCount;
+        if(feedbacksCount > 0)
+            averageFeedback = (float) sum / feedbacksCount;
+        else
+            averageFeedback = 0;
     }
 
     public void setId(String id) {
@@ -351,7 +357,7 @@ public class User extends StorableEntity implements StorableAsField, ListOfStora
             if(itineraries == null)
                 itineraries = new Vector<>();
 
-            itineraries.add(itinerary);
+            itineraries.add(0, itinerary);
             return itinerary;
         }
 
