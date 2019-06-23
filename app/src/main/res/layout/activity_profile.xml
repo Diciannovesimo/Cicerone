@@ -242,7 +242,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/feedbackTitle_tv" />
 
             <com.kinda.mtextfield.TextFieldBoxes
-                android:id="@+id/text_desc_boxes"
+                android:id="@+id/feedback_box"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:layout_marginTop="8dp"
@@ -274,7 +274,7 @@
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_desc_boxes" />
+                app:layout_constraintTop_toBottomOf="@+id/feedback_box" />
 
             <TextView
                 android:id="@+id/deleteFeedback_tv"
@@ -285,7 +285,7 @@
                 android:text="Cancella feedback"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/text_desc_boxes" />
+                app:layout_constraintStart_toStartOf="@+id/feedback_box" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -302,11 +302,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="15dp"
             android:onClick="goFeedBacksActivity"
             android:text="Visualizza lista completa"
             android:textColor="@color/headings"
-            android:textSize="13sp" />
+            android:layout_marginTop="5dp"
+            android:textSize="18sp" />
 
     </LinearLayout>
 

@@ -72,7 +72,7 @@
     </LinearLayout>
 
     <com.kinda.mtextfield.TextFieldBoxes
-        android:id="@+id/text_desc_boxes"
+        android:id="@+id/feedback_box"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_gravity="center_horizontal"

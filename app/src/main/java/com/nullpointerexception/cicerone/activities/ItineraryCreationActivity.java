@@ -239,7 +239,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
             View mView = getLayoutInflater().inflate(R.layout.activity_dialog_tappe, null);
 
             //Init field of place's layout
-            descrizione_tappa_box = mView.findViewById(R.id.text_desc_boxes);
+            descrizione_tappa_box = mView.findViewById(R.id.feedback_box);
             mPlace = mView.findViewById(R.id.place_et);
             mPlaceDesc = mView.findViewById(R.id.placeDesc_et);
             place_box = mView.findViewById(R.id.place_box);

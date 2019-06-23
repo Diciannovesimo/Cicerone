@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kinda.mtextfield.ExtendedEditText;
+import com.kinda.mtextfield.TextFieldBoxes;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
@@ -34,10 +35,14 @@ public class ProfileActivity extends AppCompatActivity {
 
     private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant, completedFeedBackMsg_tv, sndFeedBtn, removeFeedback, feedbackTitle, goFeedBacksList;
     private ExtendedEditText mComment;
+    private TextFieldBoxes textFieldBoxes;
     private ImageView profileImage;
     private RatingBar ratingBar;
     private float rating;
     private User user;
+
+    private int position = 0;
+    private boolean found = false;
 
     private RecyclerView recyclerView;
     ConstraintLayout constraintLayout;
@@ -75,7 +80,6 @@ public class ProfileActivity extends AppCompatActivity {
                 }else {
                     //Set text in the field
                     setTextField();
-
                 }
             }
 
@@ -84,9 +88,6 @@ public class ProfileActivity extends AppCompatActivity {
 
             }
         });
-
-
-
     }
 
     public void initUI() {
@@ -104,6 +105,7 @@ public class ProfileActivity extends AppCompatActivity {
         removeFeedback = findViewById(R.id.deleteFeedback_tv);
         feedbackTitle = findViewById(R.id.feedbackTitle_tv);
         goFeedBacksList = findViewById(R.id.goFeedBacksList);
+        textFieldBoxes = findViewById(R.id.feedback_box);
     }
 
     /**
@@ -119,15 +121,25 @@ public class ProfileActivity extends AppCompatActivity {
                     profileImage.setImageDrawable(drawable);
                 });
 
+        found = false;
+        position = 0;
+
         for(int i = 0; i < user.getFeedbacks().size(); ++i) {
             if(userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
                 mComment.setText(user.getFeedbacks().get(i).getComment());
                 ratingBar.setRating((float) user.getFeedbacks().get(i).getVote());
                 feedbackTitle.setVisibility(View.GONE);
-            }else {
-                removeFeedback.setEnabled(false);
+                sndFeedBtn.setText("Modifica");
+                position = i;
+                found = true;
             }
         }
+        //found is true if the user has already a feedback
+        if(!found)
+            removeFeedback.setEnabled(false);
+        else
+            if(mComment.getText().toString().isEmpty())
+                mComment.setHint("Non hai lasciato nessun commento nel tuo feedback");
 
         //Set name field
         mName.setText(user.getDisplayName());
@@ -152,25 +164,55 @@ public class ProfileActivity extends AppCompatActivity {
         ratingBarListener();
 
         sndFeedBtn.setOnClickListener(v -> {
-            if(mComment != null && !mComment.getText().toString().isEmpty()) {
+
+            if (found) {
+                if(checkError()) {
                     feedback.setComment(mComment.getText().toString());
-            }
-            if(rating != 0) {
-                feedback.setVote((int) rating);
-                user.addFeedback(feedback);
 
-                BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
-                    @Override
-                    public void onSuccess() {
-                        completedFeedBackMsg_tv.setVisibility(View.VISIBLE);
-                        removeFeedback.setEnabled(true);
+                    if (rating != 0 && rating != user.getFeedbacks().get(position).getVote()) {
+                        feedback.setVote((int) rating);
+                        user.editFeedback(feedback);
+
+                        BackEndInterface.get().storeEntity(user,
+                                new BackEndInterface.OnOperationCompleteListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        completedFeedBackMsg_tv.setVisibility(View.VISIBLE);
+                                        removeFeedback.setEnabled(true);
+
+                                    }
+
+                                    @Override
+                                    public void onError() {
+
+                                    }
+                                });
+                    } else{
+                        Toast.makeText(getApplicationContext(), "Hai inserito lo stesso voto", Toast.LENGTH_SHORT).show();
                     }
+                }
+            } else {
+                if(mComment != null && !mComment.getText().toString().isEmpty()) {
+                    feedback.setComment(mComment.getText().toString());
+                }
+                if (rating != 0) {
+                    feedback.setVote((int) rating);
+                    user.addFeedback(feedback);
 
-                    @Override
-                    public void onError() {
+                    BackEndInterface.get().storeEntity(user,
+                            new BackEndInterface.OnOperationCompleteListener() {
+                                @Override
+                                public void onSuccess() {
+                                    completedFeedBackMsg_tv.setVisibility(View.VISIBLE);
+                                    removeFeedback.setEnabled(true);
+                                }
 
-                    }
-                });
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
+                }
             }
         });
 
@@ -178,8 +220,22 @@ public class ProfileActivity extends AppCompatActivity {
             for(int i = 0; i < user.getFeedbacks().size(); ++i) {
                 if(userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
                     user.getFeedbacks().remove(i);
-                    Toast.makeText(getApplicationContext(), "Hai rimosso il feedback", Toast.LENGTH_SHORT).show();
-                    removeFeedback.setEnabled(false);
+
+                    BackEndInterface.get().storeEntity(user,
+                            new BackEndInterface.OnOperationCompleteListener() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(getApplicationContext(), "Hai rimosso " +
+                                    "il feedback", Toast.LENGTH_SHORT).show();
+                            removeFeedback.setEnabled(false);
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
+
                     break;
                 }
             }
@@ -187,13 +243,27 @@ public class ProfileActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.RecyclerView_Review);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(),
+                LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
 
         AdapterReview adapter = new AdapterReview(getApplicationContext(), user.getFeedbacks());
         recyclerView.setAdapter(adapter);
     }
 
+    private boolean checkError() {
+        boolean alright = true;
+
+        if (mComment != null &&
+                mComment.getText().toString().equals(user.getFeedbacks().get(position).getComment())
+                && !user.getFeedbacks().get(position).getComment().isEmpty()
+                && !mComment.getText().toString().isEmpty()) {
+            textFieldBoxes.setError("Hai inserito lo stesso commento", true);
+            alright = false;
+        }
+
+        return alright;
+    }
     private void ratingBarListener() {
 
         ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
