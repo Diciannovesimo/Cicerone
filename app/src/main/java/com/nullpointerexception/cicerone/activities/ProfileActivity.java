@@ -32,7 +32,7 @@ import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant, completedFeedBackMsg_tv, sndFeedBtn, removeFeedback, feedbackTitle;
+    private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant, completedFeedBackMsg_tv, sndFeedBtn, removeFeedback, feedbackTitle, goFeedBacksList;
     private ExtendedEditText mComment;
     private ImageView profileImage;
     private RatingBar ratingBar;
@@ -84,6 +84,9 @@ public class ProfileActivity extends AppCompatActivity {
 
             }
         });
+
+
+
     }
 
     public void initUI() {
@@ -100,6 +103,7 @@ public class ProfileActivity extends AppCompatActivity {
         completedFeedBackMsg_tv = findViewById(R.id.completedFeedBackMsg_tv);
         removeFeedback = findViewById(R.id.deleteFeedback_tv);
         feedbackTitle = findViewById(R.id.feedbackTitle_tv);
+        goFeedBacksList = findViewById(R.id.goFeedBacksList);
     }
 
     /**
@@ -195,6 +199,17 @@ public class ProfileActivity extends AppCompatActivity {
         ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
             this.rating = rating;
         });
+
+    }
+
+    public void goFeedBacksActivity(View view) {
+
+        //TODO chiamind do
+        /**
+        Intent intent = new Intent(this, FeedBacksActivity.class);
+        intent.putExtra("feedbacks", user.getFeedbacks());
+        startActivity(intent);
+         **/
 
     }
 }

@@ -297,6 +297,17 @@
             android:orientation="horizontal"
             android:scrollbars="horizontal" />
 
+        <TextView
+            android:id="@+id/goFeedBacksList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="10dp"
+            android:onClick="goFeedBacksActivity"
+            android:text="Visualizza lista completa"
+            android:textColor="@color/headings"
+            android:textSize="13sp" />
+
     </LinearLayout>
 
 </ScrollView>

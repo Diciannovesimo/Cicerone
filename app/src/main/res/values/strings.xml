@@ -213,5 +213,7 @@
     <string name="homeLabel2">Ti piace viaggiare?\nCerca un itinerario e comincia a esplorare il mondo.</string>
     <string name="homeButton1">Cerca un itinerario</string>
     <string name="homeButton2">Proponi un itinerario</string>
+    <string name="title_activity_feed_backs">FeedBacksActivity</string>
+    <string name="title_FeedBacksActivity">Recensioni</string>
 
 </resources>
