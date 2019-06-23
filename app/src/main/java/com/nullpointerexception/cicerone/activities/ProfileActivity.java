@@ -26,6 +26,7 @@ import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Feedback;
+import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
 
@@ -50,8 +51,6 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Window w = getWindow();
-        w.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        w.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
@@ -87,6 +86,12 @@ public class ProfileActivity extends AppCompatActivity {
             public void onError() {
 
             }
+        });
+
+        goFeedBacksList.setOnClickListener(v -> {
+            Intent intent2 = new Intent(this, FeedBacksActivity.class);
+            ObjectSharer.get().shareObject("feedback", user);
+            startActivity(intent2);
         });
     }
 
@@ -162,6 +167,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         //Set ratingBar listener
         ratingBarListener();
+
+
+
 
         sndFeedBtn.setOnClickListener(v -> {
 
@@ -272,16 +280,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
-    public void goFeedBacksActivity(View view) {
 
-        //TODO chiamind do
-        /**
-        Intent intent = new Intent(this, FeedBacksActivity.class);
-        intent.putExtra("feedbacks", user.getFeedbacks());
-        startActivity(intent);
-         **/
-
-    }
 }
 
 class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>

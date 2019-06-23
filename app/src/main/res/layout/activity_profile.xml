@@ -245,12 +245,11 @@
                 android:id="@+id/feedback_box"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:layout_marginTop="8dp"
                 android:padding="5dp"
                 app:hasFocus="false"
                 app:labelText="Commento"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/ratingBar"
                 app:primaryColor="@color/colorPrimary"
@@ -303,11 +302,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginBottom="15dp"
-            android:onClick="goFeedBacksActivity"
             android:text="Visualizza lista completa"
             android:textColor="@color/headings"
             android:layout_marginTop="5dp"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:clickable="true"
+            android:focusable="true"/>
+
 
     </LinearLayout>
 

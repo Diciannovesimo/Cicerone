@@ -39,6 +39,8 @@ public class FeedBacksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed_backs);
 
+        User user = (User) ObjectSharer.get().getSharedObject("feedback");
+
         Window window = getWindow();
         window.setStatusBarColor(Color.parseColor("#FF5500"));
 
@@ -52,11 +54,12 @@ public class FeedBacksActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.RecyclerView_Review);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
-      //  AdapterReview adapter = new AdapterReview(getApplicationContext(), user.getFeedbacks());
-      //  recyclerView.setAdapter(adapter);
+
+        AdapterReviewFeedBack adapter = new AdapterReviewFeedBack(getApplicationContext(), user.getFeedbacks());
+        recyclerView.setAdapter(adapter);
 
 
     }
