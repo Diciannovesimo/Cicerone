@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +35,8 @@ import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant, completedFeedBackMsg_tv, sndFeedBtn, removeFeedback, feedbackTitle, goFeedBacksList;
+    private static final String TAG = "ProfileActivity_log";
+    private TextView mEmail, mTelephone, mDate, mName, completedFeedBackMsg_tv, sndFeedBtn, removeFeedback, feedbackTitle, goFeedBacksList;
     private ExtendedEditText mComment;
     private TextFieldBoxes textFieldBoxes;
     private ImageView profileImage;
@@ -71,9 +73,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         user.setId(extra);
 
-
-
-
         if(intent.getExtras().getString("id_cicerone_to_show") != null) {
             BackEndInterface.get().getEntity(user, new BackEndInterface.OnOperationCompleteListener() {
                 @Override
@@ -109,7 +108,6 @@ public class ProfileActivity extends AppCompatActivity {
         mTelephone = findViewById(R.id.profilePhone_tv);
         mDate = findViewById(R.id.profileDate_tv);
         mName = findViewById(R.id.profileName_tv);
-        mItinerariesAsParticipant = findViewById(R.id.itinerariesAsParticipant_tv);
         profileImage = findViewById(R.id.us_image);
         ratingBar = findViewById(R.id.ratingBar);
         mComment = findViewById(R.id.commento_tv);
@@ -168,30 +166,52 @@ public class ProfileActivity extends AppCompatActivity {
             mDate.setText(user.getDateBirth());
         }
 
-        //Set the number of itinerary in which the user participated
-        mItinerariesAsParticipant.setText(String.valueOf(user.getItineraries().size()));
-
         //Set telephone number
         mTelephone.setText(user.getPhoneNumber());
-
-        //Set ratingBar listener
-        ratingBarListener();
 
         if(userLogged.getFeedbacks().size()<=2){
             goFeedBacksList.setVisibility(View.GONE);
         }
 
+        //Set ratingBar listener
+        if(!user.getId().equals(userLogged.getId())) {
+            ratingBarListener();
 
+            sndFeedBtn.setOnClickListener(v -> {
 
-        sndFeedBtn.setOnClickListener(v -> {
+                if (found) {
+                    if(checkError()) {
+                        feedback.setComment(mComment.getText().toString());
 
-            if (found) {
-                if(checkError()) {
-                    feedback.setComment(mComment.getText().toString());
+                        if (rating != 0 && rating != user.getFeedbacks().get(position).getVote()) {
+                            feedback.setVote((int) rating);
+                            user.editFeedback(feedback);
 
-                    if (rating != 0 && rating != user.getFeedbacks().get(position).getVote()) {
+                            BackEndInterface.get().storeEntity(user,
+                                    new BackEndInterface.OnOperationCompleteListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                            completedFeedBackMsg_tv.setVisibility(View.VISIBLE);
+                                            removeFeedback.setEnabled(true);
+
+                                        }
+
+                                        @Override
+                                        public void onError() {
+
+                                        }
+                                    });
+                        } else{
+                            Toast.makeText(getApplicationContext(), "Hai inserito lo stesso voto", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } else {
+                    if(mComment != null && !mComment.getText().toString().isEmpty()) {
+                        feedback.setComment(mComment.getText().toString());
+                    }
+                    if (rating != 0) {
                         feedback.setVote((int) rating);
-                        user.editFeedback(feedback);
+                        user.addFeedback(feedback);
 
                         BackEndInterface.get().storeEntity(user,
                                 new BackEndInterface.OnOperationCompleteListener() {
@@ -199,7 +219,6 @@ public class ProfileActivity extends AppCompatActivity {
                                     public void onSuccess() {
                                         completedFeedBackMsg_tv.setVisibility(View.VISIBLE);
                                         removeFeedback.setEnabled(true);
-
                                     }
 
                                     @Override
@@ -207,68 +226,58 @@ public class ProfileActivity extends AppCompatActivity {
 
                                     }
                                 });
-                    } else{
-                        Toast.makeText(getApplicationContext(), "Hai inserito lo stesso voto", Toast.LENGTH_SHORT).show();
                     }
                 }
-            } else {
-                if(mComment != null && !mComment.getText().toString().isEmpty()) {
-                    feedback.setComment(mComment.getText().toString());
+            });
+
+            removeFeedback.setOnClickListener(v -> {
+                Log.i(TAG, "entrato");
+                for(int i = 0; i < user.getFeedbacks().size(); ++i) {
+                    if(userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
+                        user.getFeedbacks().remove(i);
+                        //break;
+                    }
                 }
-                if (rating != 0) {
-                    feedback.setVote((int) rating);
-                    user.addFeedback(feedback);
+                BackEndInterface.get().removeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
+                    @Override
+                    public void onSuccess() {
+                        BackEndInterface.get().storeEntity(user,
+                                new BackEndInterface.OnOperationCompleteListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Toast.makeText(getApplicationContext(), "Hai rimosso " +
+                                                "il feedback", Toast.LENGTH_SHORT).show();
+                                        removeFeedback.setEnabled(false);
+                                    }
 
-                    BackEndInterface.get().storeEntity(user,
-                            new BackEndInterface.OnOperationCompleteListener() {
-                                @Override
-                                public void onSuccess() {
-                                    completedFeedBackMsg_tv.setVisibility(View.VISIBLE);
-                                    removeFeedback.setEnabled(true);
-                                }
+                                    @Override
+                                    public void onError() {
 
-                                @Override
-                                public void onError() {
+                                    }
+                                });
+                    }
 
-                                }
-                            });
-                }
-            }
-        });
+                    @Override
+                    public void onError() {
 
-        removeFeedback.setOnClickListener(v -> {
-            for(int i = 0; i < user.getFeedbacks().size(); ++i) {
-                if(userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
-                    user.getFeedbacks().remove(i);
+                    }
+                });
 
-                    BackEndInterface.get().storeEntity(user,
-                            new BackEndInterface.OnOperationCompleteListener() {
-                                @Override
-                                public void onSuccess() {
-                                    Toast.makeText(getApplicationContext(), "Hai rimosso " +
-                                            "il feedback", Toast.LENGTH_SHORT).show();
-                                    removeFeedback.setEnabled(false);
-                                }
+            });
+        } else{
+            feedbackTitle.setVisibility(View.GONE);
+            ratingBar.setVisibility(View.GONE);
+            textFieldBoxes.setVisibility(View.GONE);
+            sndFeedBtn.setVisibility(View.GONE);
+            removeFeedback.setVisibility(View.GONE);
+        }
 
-                                @Override
-                                public void onError() {
+        List<Feedback> feedbacks = new ArrayList<>();
 
-                                }
-                            });
-
-                    break;
-                }
-            }
-        });
-
-        List<Feedback> feedbacks = new ArrayList<Feedback>();
-
-        String IdUserLogged = AuthenticationManager.get().getUserLogged().getId();
         for(int i=0; i<user.getFeedbacks().size(); i++)
         {
-            if(!IdUserLogged.equals(user.getFeedbacks().get(i).getIdUser())){
+            if(!userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser()))
                 feedbacks.add(user.getFeedbacks().get(i));
-            }
         }
 
         recyclerView = findViewById(R.id.RecyclerView_Review);
