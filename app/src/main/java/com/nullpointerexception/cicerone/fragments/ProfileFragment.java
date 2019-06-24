@@ -35,6 +35,7 @@ public class ProfileFragment extends Fragment
     private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant,  goFeedBacksList;
     private ImageView profileImage, settings_btn;
     private RecyclerView recyclerView;
+    private RatingBar ratingBarAVG;
 
     public ProfileFragment() { }
 
@@ -70,6 +71,7 @@ public class ProfileFragment extends Fragment
         profileImage = v.findViewById(R.id.us_image);
         settings_btn = v.findViewById(R.id.settings_btn);
         goFeedBacksList = v.findViewById(R.id.goFeedBacksList);
+        ratingBarAVG = v.findViewById(R.id.ratingBarAVG);
     }
 
     /**
@@ -79,6 +81,8 @@ public class ProfileFragment extends Fragment
 
         //Get user form firebase
         User user = AuthenticationManager.get().getUserLogged();
+
+        ratingBarAVG.setRating(user.getAverageFeedback());
 
         new ProfileImageFetcher(v.getContext())
                 .fetchImageOf(user, drawable -> {
