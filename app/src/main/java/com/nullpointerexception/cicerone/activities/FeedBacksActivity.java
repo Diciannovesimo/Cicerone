@@ -1,6 +1,7 @@
 package com.nullpointerexception.cicerone.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -144,11 +145,13 @@ class AdapterReviewFeedBack extends RecyclerView.Adapter <AdapterReviewFeedBack.
 
 
         //Ascolto l'evento click
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
+            intent2.putExtra("id_cicerone_to_show",feedbacks.get(position).getIdUser());
+            intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            v.getContext().startActivity(intent2);
         });
+
 
     }
 

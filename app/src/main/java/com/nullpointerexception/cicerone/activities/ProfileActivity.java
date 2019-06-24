@@ -170,9 +170,6 @@ public class ProfileActivity extends AppCompatActivity {
         //Set telephone number
         mTelephone.setText(user.getPhoneNumber());
 
-        if(userLogged.getFeedbacks().size()<=2){
-            goFeedBacksList.setVisibility(View.GONE);
-        }
 
         //Set ratingBar listener
         if(!user.getId().equals(userLogged.getId())) {
@@ -283,12 +280,18 @@ public class ProfileActivity extends AppCompatActivity {
             removeFeedback.setVisibility(View.GONE);
         }
 
+
+
         List<Feedback> feedbacks = new ArrayList<>();
 
         for(int i=0; i<user.getFeedbacks().size(); i++)
         {
             if(!userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser()))
                 feedbacks.add(user.getFeedbacks().get(i));
+        }
+
+        if(feedbacks.size()<=2){
+            goFeedBacksList.setVisibility(View.GONE);
         }
 
         recyclerView = findViewById(R.id.RecyclerView_Review);
