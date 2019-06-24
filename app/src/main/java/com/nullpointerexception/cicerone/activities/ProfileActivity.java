@@ -61,32 +61,40 @@ public class ProfileActivity extends AppCompatActivity {
         //Change color of toolbar
         Window window = getWindow();
         window.setStatusBarColor(Color.parseColor("#FF5500"));
+        user = new User();
 
         Intent intent = getIntent();
-        String extra = intent.getExtras().getString("id_cicerone_to_show");
+        String extra = new String();
 
-        user = new User();
+        intent.getExtras().getString("id_cicerone_to_show");
+        extra = intent.getExtras().getString("id_cicerone_to_show");
+
         user.setId(extra);
 
-        BackEndInterface.get().getEntity(user, new BackEndInterface.OnOperationCompleteListener() {
-            @Override
-            public void onSuccess() {
-                if(user.getId().isEmpty() && user.getDisplayName().isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "Impossibile caricare le" +
-                            "informazioni di profilo", Toast.LENGTH_SHORT);
-                    finish();
 
-                }else {
-                    //Set text in the field
-                    setTextField();
+
+
+        if(intent.getExtras().getString("id_cicerone_to_show") != null) {
+            BackEndInterface.get().getEntity(user, new BackEndInterface.OnOperationCompleteListener() {
+                @Override
+                public void onSuccess() {
+                    if(user.getId().isEmpty() && user.getDisplayName().isEmpty()) {
+                        Toast.makeText(getApplicationContext(), "Impossibile caricare le" +
+                                "informazioni di profilo", Toast.LENGTH_SHORT);
+                        finish();
+
+                    }else {
+                        //Set text in the field
+                        setTextField();
+                    }
                 }
-            }
 
-            @Override
-            public void onError() {
+                @Override
+                public void onError() {
 
-            }
-        });
+                }
+            });
+        }
 
         goFeedBacksList.setOnClickListener(v -> {
             Intent intent2 = new Intent(this, FeedBacksActivity.class);
@@ -344,13 +352,9 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO chiamind do
-                /**
-                 Intent intent2 = new Intent(v.getContext(), FeedBacksActivity.class);
-                 ObjectSharer.get().shareObject("feedback_globetrotter", user);
+                 Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
+                 intent2.putExtra("id_cicerone_to_show",feedbacks.get(position).getIdUser());
                  v.getContext().startActivity(intent2);
-                 **/
-
             }
         });
 
@@ -375,9 +379,9 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            displayName = (TextView) itemView.findViewById(R.id.textView_DisplayName);
-            description = (TextView) itemView.findViewById(R.id.textView_Description);
-            imgProfile = (ImageView) itemView.findViewById(R.id.imageView_ProfileImage);
+            displayName = itemView.findViewById(R.id.textView_DisplayName);
+            description = itemView.findViewById(R.id.textView_Description);
+            imgProfile = itemView.findViewById(R.id.imageView_ProfileImage);
             ratingBar = itemView.findViewById(R.id.ratingBar2);
 
         }
