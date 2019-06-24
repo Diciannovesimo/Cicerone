@@ -87,20 +87,44 @@ public class LoginActivity extends AppCompatActivity
             if(touched == 5)
             {
                 EditText editText = new EditText(this);
-                editText.setHint("Codice");
+                editText.setHint("Code");
                 new AlertDialog.Builder(this)
-                        .setTitle("Modalità sviluppatore")
+                        .setTitle("Developer mode")
                         .setView(editText)
-                        .setPositiveButton("Accedi", (dialogInterface, i) ->
+                        .setPositiveButton("Access", (dialogInterface, i) ->
                         {
-                            if(editText.getText().toString().equalsIgnoreCase("corvo di bitritto"))
+                            String text = editText.getText().toString();
+
+                            if(text.equalsIgnoreCase("corvo di bitritto"))
                             {
                                 SharedPreferences sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
-                                sharedPreferences.edit().putBoolean("developer_enabled", true).apply();
-                                Toast.makeText(this, "Ora sei in modalità sviluppatore.", Toast.LENGTH_SHORT).show();
+
+                                if(sharedPreferences.getBoolean("developer_enabled", false))
+                                {
+                                    sharedPreferences.edit().putBoolean("developer_enabled", false).apply();
+                                    Toast.makeText(this, "Modalità sviluppatore disattivata.", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    sharedPreferences.edit().putBoolean("developer_enabled", true).apply();
+                                    Toast.makeText(this, "Ora sei in modalità sviluppatore.", Toast.LENGTH_SHORT).show();
+                                }
                             }
                             else
                                 Toast.makeText(this, "Codice errato", Toast.LENGTH_SHORT).show();
+
+                            if(text.equalsIgnoreCase("william"))
+                                Toast.makeText(this, "assertNotNull(everything);", Toast.LENGTH_SHORT).show();
+
+                            if(text.equalsIgnoreCase("claudio"))
+                                Toast.makeText(this, "Git master", Toast.LENGTH_SHORT).show();
+
+                            if(text.equalsIgnoreCase("mattia"))
+                                Toast.makeText(this, "Showdown master", Toast.LENGTH_SHORT).show();
+
+                            if(text.equalsIgnoreCase("luca"))
+                                Toast.makeText(this, "programmatore android java esperto", Toast.LENGTH_SHORT).show();
+
                         })
                         .setCancelable(false)
                         .create().show();

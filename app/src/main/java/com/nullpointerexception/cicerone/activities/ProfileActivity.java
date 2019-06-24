@@ -144,6 +144,7 @@ public class ProfileActivity extends AppCompatActivity {
                 sndFeedBtn.setText("Modifica");
                 position = i;
                 found = true;
+                break;
             }
         }
         //found is true if the user has already a feedback
@@ -179,11 +180,19 @@ public class ProfileActivity extends AppCompatActivity {
 
             sndFeedBtn.setOnClickListener(v -> {
 
+                for(int i = 0; i < user.getFeedbacks().size(); ++i) {
+                    if (userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser()))
+                        found = true;
+                }
+
+                rating = (int) ratingBar.getRating();
+
                 if (found) {
                     if(checkError()) {
                         feedback.setComment(mComment.getText().toString());
 
-                        if (rating != 0 && rating != user.getFeedbacks().get(position).getVote()) {
+                        if (rating != 0 && (rating != user.getFeedbacks().get(position).getVote() ||
+                                !feedback.getComment().equals(user.getFeedbacks().get(position).getComment()))) {
                             feedback.setVote((int) rating);
                             user.editFeedback(feedback);
 
@@ -218,7 +227,9 @@ public class ProfileActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess() {
                                         completedFeedBackMsg_tv.setVisibility(View.VISIBLE);
+                                        feedbackTitle.setVisibility(View.GONE);
                                         removeFeedback.setEnabled(true);
+                                        sndFeedBtn.setText("Modifica");
                                     }
 
                                     @Override
@@ -232,13 +243,12 @@ public class ProfileActivity extends AppCompatActivity {
 
             removeFeedback.setOnClickListener(v -> {
                 Log.i(TAG, "entrato");
-                for(int i = 0; i < user.getFeedbacks().size(); ++i) {
-                    if(userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
-                        user.getFeedbacks().remove(i);
-                        //break;
-                    }
-                }
-                BackEndInterface.get().removeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
+
+                Feedback temp_feedback = user.getFeedbacks().get(position);
+                user.removeFeedback(temp_feedback);
+
+                BackEndInterface.get().removeEntity(user,
+                        new BackEndInterface.OnOperationCompleteListener() {
                     @Override
                     public void onSuccess() {
                         BackEndInterface.get().storeEntity(user,
@@ -248,6 +258,8 @@ public class ProfileActivity extends AppCompatActivity {
                                         Toast.makeText(getApplicationContext(), "Hai rimosso " +
                                                 "il feedback", Toast.LENGTH_SHORT).show();
                                         removeFeedback.setEnabled(false);
+                                        sndFeedBtn.setText("Invia");
+                                        mComment.setText("");
                                     }
 
                                     @Override
@@ -262,7 +274,6 @@ public class ProfileActivity extends AppCompatActivity {
 
                     }
                 });
-
             });
         } else{
             feedbackTitle.setVisibility(View.GONE);
