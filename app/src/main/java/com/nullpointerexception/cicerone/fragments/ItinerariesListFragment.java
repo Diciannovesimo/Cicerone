@@ -26,6 +26,7 @@ import com.nullpointerexception.cicerone.activities.ItineraryCreationActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.Blocker;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.custom_views.ItineraryView;
@@ -49,6 +50,7 @@ public class ItinerariesListFragment extends Fragment
     private RecyclerView.LayoutManager layoutManager;
     private ItinerariesAdapter adapter;
     private List<Itinerary> itineraries = new Vector<>();
+    private Blocker mBlocker;
 
     public ItinerariesListFragment() { }
 
@@ -137,8 +139,16 @@ public class ItinerariesListFragment extends Fragment
         adapter = new ItinerariesAdapter(itineraries);
         recyclerView.setAdapter(adapter);
 
-        newItineraryButton.setOnClickListener(view1 ->
-                startActivityForResult(new Intent(getActivity(), ItineraryCreationActivity.class), 0));
+        newItineraryButton.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block(1000)) {
+                    startActivityForResult(new Intent(getActivity(), ItineraryCreationActivity.class), 0);
+                }
+            }
+        });
 
         return view;
     }

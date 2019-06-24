@@ -18,6 +18,7 @@ import com.nullpointerexception.cicerone.activities.ItineraryActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.Blocker;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.custom_views.ItineraryView;
@@ -73,7 +74,16 @@ public class TripsListFragment extends Fragment
 
         updateItineraryViews();
 
-        findItineraryFab.setOnClickListener(v -> startActivityForResult(new Intent(getContext(), FindItineraryActivty.class), 0));
+        findItineraryFab.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block(1000)) {
+                    startActivityForResult(new Intent(getContext(), FindItineraryActivty.class), 0);
+                }
+            }
+        });
 
         return view;
     }

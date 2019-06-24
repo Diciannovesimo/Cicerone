@@ -336,8 +336,6 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
         this.context = appContext;
         this.feedbacks = feedbacks;
         inflater = (LayoutInflater.from(appContext));
-
-
     }
 
     @NonNull
@@ -362,20 +360,16 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
 
         new ProfileImageFetcher(context).fetchImageOf(user, drawable ->
         {
-
             if(drawable != null)
                 holder.imgProfile.setImageDrawable(drawable);
         });
 
-
         //Ascolto l'evento click
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                 Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
-                 intent2.putExtra("id_cicerone_to_show",feedbacks.get(position).getIdUser());
-                 v.getContext().startActivity(intent2);
-            }
+        holder.itemView.setOnClickListener(v -> {
+             Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
+             intent2.putExtra("id_cicerone_to_show",feedbacks.get(position).getIdUser());
+             intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+             v.getContext().startActivity(intent2);
         });
 
     }
@@ -403,7 +397,6 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
             description = itemView.findViewById(R.id.textView_Description);
             imgProfile = itemView.findViewById(R.id.imageView_ProfileImage);
             ratingBar = itemView.findViewById(R.id.ratingBar2);
-
         }
     }
 }
