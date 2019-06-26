@@ -13,8 +13,8 @@ import androidx.fragment.app.Fragment;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.activities.FeedBacksActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
+import com.nullpointerexception.cicerone.activities.SettingsActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
-import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
 
@@ -94,9 +94,9 @@ public class ProfileFragment extends Fragment
         }
 
         //Set click listener for settings button
-        /*settings_btn.setOnClickListener(v1 -> {
-
-        });*/
+        settings_btn.setOnClickListener(v1 -> {
+            startActivity(new Intent(getContext(), SettingsActivity.class));
+        });
     }
 
 }

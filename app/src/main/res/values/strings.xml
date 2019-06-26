@@ -215,5 +215,6 @@
     <string name="homeButton2">Proponi un itinerario</string>
     <string name="title_activity_feed_backs">FeedBacksActivity</string>
     <string name="title_FeedBacksActivity">Recensioni</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 
 </resources>

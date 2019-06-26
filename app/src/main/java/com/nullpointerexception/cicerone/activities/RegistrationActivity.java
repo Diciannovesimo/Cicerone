@@ -4,16 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
@@ -129,77 +125,58 @@ public class RegistrationActivity extends AppCompatActivity {
             user.setEmail(fragment1.getEmailField().getText().toString());
 
             AuthenticationManager.get().createFirebaseUser(fragment1.getEmailField().getText().toString(),
-                    fragment1.getPasswordField().getText().toString(), new OnCompleteListener<AuthResult>()
-                    {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task)
+                    fragment1.getPasswordField().getText().toString(), task -> {
+                        if (task.isSuccessful())
                         {
-                            if (task.isSuccessful())
-                            {
 
-                                // It call the method for send the verification email
-                                AuthenticationManager.get().sendVerificationEmail(new OnCompleteListener<Void>()
+                            // It call the method for send the verification email
+                            AuthenticationManager.get().sendVerificationEmail(task1 -> {
+                                if(task1.isSuccessful())
                                 {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task)
-                                    {
-                                        if(task.isSuccessful())
-                                        {
-                                            AuthenticationManager.get().getUIdOf(user.getEmail(),
-                                                    fragment1.getPasswordField().getText().toString())
-                                                    .addOnUidListener(new AuthenticationManager.LoginAttempt.OnUIDListener()
-                                                    {
+                                    AuthenticationManager.get().getUIdOf(user.getEmail(),
+                                            fragment1.getPasswordField().getText().toString())
+                                            .addOnUidListener(new AuthenticationManager.LoginAttempt.OnUIDListener()
+                                            {
+                                                @Override
+                                                public void onIdObtained(String uid)
+                                                {
+                                                    user.setId(uid);
+                                                    BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
                                                         @Override
-                                                        public void onIdObtained(String uid)
+                                                        public void onSuccess()
                                                         {
-                                                            user.setId(uid);
-                                                            BackEndInterface.get().storeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
-                                                                @Override
-                                                                public void onSuccess()
-                                                                {
-                                                                    showDialog(true);
-                                                                }
-
-                                                                @Override
-                                                                public void onError()
-                                                                {
-                                                                    showDialog(false);
-                                                                }
-                                                            });
+                                                            showDialog(true);
                                                         }
 
                                                         @Override
                                                         public void onError()
                                                         {
-                                                            /*
-                                                            AuthenticationManager.get().deleteUser(user.getEmail(),
-                                                                    fragment1.getPasswordField().getText().toString());
-                                                                    */
                                                             showDialog(false);
                                                         }
                                                     });
-                                        }
-                                        else
-                                            showDialog(false);
-                                    }
-                                });
-                            }
-                            else
-                            {
-                                // If user is already register
-                                runOnUiThread(new Runnable()
-                                {
-                                    @Override
-                                    public void run()
-                                    {
-                                        // Show error message
-                                        new KAlertDialog(RegistrationActivity.this, KAlertDialog.ERROR_TYPE)
-                                                .setTitleText(getResources().getString(R.string.registrationDialogErrorText3))
-                                                .setConfirmText("OK")
-                                                .show();
-                                    }
-                                });
-                            }
+                                                }
+
+                                                @Override
+                                                public void onError()
+                                                {
+                                                    showDialog(false);
+                                                }
+                                            });
+                                }
+                                else
+                                    showDialog(false);
+                            });
+                        }
+                        else
+                        {
+                            // If user is already register
+                            runOnUiThread(() -> {
+                                // Show error message
+                                new KAlertDialog(RegistrationActivity.this, KAlertDialog.ERROR_TYPE)
+                                        .setTitleText(getResources().getString(R.string.registrationDialogErrorText3))
+                                        .setConfirmText("OK")
+                                        .show();
+                            });
                         }
                     });
         }
@@ -261,41 +238,28 @@ public class RegistrationActivity extends AppCompatActivity {
     private void showDialog(Boolean result) {
 
         if(!result) {
-            runOnUiThread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    // Show error message
-                    new KAlertDialog(RegistrationActivity.this, KAlertDialog.ERROR_TYPE)
-                            .setTitleText(getResources().getString(R.string.registrationDialogErrorText1))
-                            .setContentText(getResources().getString(R.string.registrationDialogErrorText2))
-                            .setConfirmText("OK")
-                            .show();
-                }
+            runOnUiThread(() -> {
+                // Show error message
+                new KAlertDialog(RegistrationActivity.this, KAlertDialog.ERROR_TYPE)
+                        .setTitleText(getResources().getString(R.string.registrationDialogErrorText1))
+                        .setContentText(getResources().getString(R.string.registrationDialogErrorText2))
+                        .setConfirmText("OK")
+                        .show();
             });
         }else {
-            runOnUiThread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    // Show message confirming
-                    new KAlertDialog(RegistrationActivity.this, KAlertDialog.SUCCESS_TYPE)
-                            .setTitleText(getResources().getString(R.string.registrationDialogSuccessText1))
-                            .setContentText(getResources().getString(R.string.registrationDialogSuccessText2))
-                            .setConfirmText("OK")
-                            .setConfirmClickListener(new KAlertDialog.OnSweetClickListener() {
-                                @Override
-                                public void onClick(KAlertDialog kAlertDialog) {
-                                    //Go to LoginActivity
-                                    Intent go_login = new Intent(RegistrationActivity.this, LoginActivity.class);
-                                    startActivity(go_login);
-                                    finish();
-                                }
-                            })
-                            .show();
-                }
+            runOnUiThread(() -> {
+                // Show message confirming
+                new KAlertDialog(RegistrationActivity.this, KAlertDialog.SUCCESS_TYPE)
+                        .setTitleText(getResources().getString(R.string.registrationDialogSuccessText1))
+                        .setContentText(getResources().getString(R.string.registrationDialogSuccessText2))
+                        .setConfirmText("OK")
+                        .setConfirmClickListener(kAlertDialog -> {
+                            //Go to LoginActivity
+                            Intent go_login = new Intent(RegistrationActivity.this, LoginActivity.class);
+                            startActivity(go_login);
+                            finish();
+                        })
+                        .show();
             });
         }
     }
