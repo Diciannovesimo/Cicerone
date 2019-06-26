@@ -19,16 +19,14 @@ import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.activities.FeedBacksActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.activities.ProfileActivity;
+import com.nullpointerexception.cicerone.activities.SettingsActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.Feedback;
-import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class ProfileFragment extends Fragment
 {
@@ -111,11 +109,10 @@ public class ProfileFragment extends Fragment
         }
 
         //Set click listener for settings button
-        /*settings_btn.setOnClickListener(v1 -> {
-
-        });*/
-
-
+        settings_btn.setOnClickListener(v1 -> {
+            startActivity(new Intent(getContext(), SettingsActivity.class));
+        });
+        
         List<Feedback> feedbacks = new ArrayList<>();
 
         for(int i=0; i<user.getFeedbacks().size(); i++)
