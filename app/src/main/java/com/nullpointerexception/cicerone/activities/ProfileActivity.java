@@ -36,11 +36,11 @@ import java.util.List;
 public class ProfileActivity extends AppCompatActivity {
 
     private static final String TAG = "ProfileActivity_log";
-    private TextView mEmail, mTelephone, mDate, mName, completedFeedBackMsg_tv, sndFeedBtn, removeFeedback, feedbackTitle, goFeedBacksList;
+    private TextView mEmail, mTelephone, mDate, mName, sndFeedBtn, removeFeedback, feedbackTitle, goFeedBacksList;
     private ExtendedEditText mComment;
     private TextFieldBoxes textFieldBoxes;
     private ImageView profileImage;
-    private RatingBar ratingBar;
+    private RatingBar ratingBar, ratingBarAVG;
     private float rating;
     private User user;
 
@@ -110,10 +110,10 @@ public class ProfileActivity extends AppCompatActivity {
         mName = findViewById(R.id.profileName_tv);
         profileImage = findViewById(R.id.us_image);
         ratingBar = findViewById(R.id.ratingBar);
+        ratingBarAVG = findViewById(R.id.ratingBarAVG);
         mComment = findViewById(R.id.commento_tv);
         sndFeedBtn = findViewById(R.id.sndFeed_btn);
         constraintLayout = findViewById(R.id.feedback_layout);
-        completedFeedBackMsg_tv = findViewById(R.id.completedFeedBackMsg_tv);
         removeFeedback = findViewById(R.id.deleteFeedback_tv);
         feedbackTitle = findViewById(R.id.feedbackTitle_tv);
         goFeedBacksList = findViewById(R.id.goFeedBacksList);
@@ -128,6 +128,9 @@ public class ProfileActivity extends AppCompatActivity {
         User userLogged = AuthenticationManager.get().getUserLogged();
         Feedback feedback = new Feedback(userLogged);
 
+        ratingBarAVG.setRating(user.getAverageFeedback());
+
+
         new ProfileImageFetcher(this)
                 .fetchImageOf(user, drawable -> {
                     profileImage.setImageDrawable(drawable);
@@ -140,7 +143,7 @@ public class ProfileActivity extends AppCompatActivity {
             if(userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
                 mComment.setText(user.getFeedbacks().get(i).getComment());
                 ratingBar.setRating((float) user.getFeedbacks().get(i).getVote());
-                feedbackTitle.setVisibility(View.GONE);
+                feedbackTitle.setText("Il tuo feedback");
                 sndFeedBtn.setText("Modifica");
                 position = i;
                 found = true;
@@ -170,9 +173,6 @@ public class ProfileActivity extends AppCompatActivity {
         //Set telephone number
         mTelephone.setText(user.getPhoneNumber());
 
-        if(userLogged.getFeedbacks().size()<=2){
-            goFeedBacksList.setVisibility(View.GONE);
-        }
 
         //Set ratingBar listener
         if(!user.getId().equals(userLogged.getId())) {
@@ -200,7 +200,7 @@ public class ProfileActivity extends AppCompatActivity {
                                     new BackEndInterface.OnOperationCompleteListener() {
                                         @Override
                                         public void onSuccess() {
-                                            completedFeedBackMsg_tv.setVisibility(View.VISIBLE);
+                                            Toast.makeText(v.getContext(), "Hai inserito il feedback", Toast.LENGTH_SHORT).show();
                                             removeFeedback.setEnabled(true);
 
                                         }
@@ -226,8 +226,8 @@ public class ProfileActivity extends AppCompatActivity {
                                 new BackEndInterface.OnOperationCompleteListener() {
                                     @Override
                                     public void onSuccess() {
-                                        completedFeedBackMsg_tv.setVisibility(View.VISIBLE);
-                                        feedbackTitle.setVisibility(View.GONE);
+                                        Toast.makeText(v.getContext(), "Hai inserito il feedback", Toast.LENGTH_SHORT).show();
+                                        feedbackTitle.setText("Il tuo feedback");
                                         removeFeedback.setEnabled(true);
                                         sndFeedBtn.setText("Modifica");
                                     }
@@ -283,12 +283,18 @@ public class ProfileActivity extends AppCompatActivity {
             removeFeedback.setVisibility(View.GONE);
         }
 
+
+
         List<Feedback> feedbacks = new ArrayList<>();
 
         for(int i=0; i<user.getFeedbacks().size(); i++)
         {
             if(!userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser()))
                 feedbacks.add(user.getFeedbacks().get(i));
+        }
+
+        if(feedbacks.size()<=2){
+            goFeedBacksList.setVisibility(View.GONE);
         }
 
         recyclerView = findViewById(R.id.RecyclerView_Review);

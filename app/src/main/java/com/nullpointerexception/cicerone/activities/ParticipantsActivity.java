@@ -1,6 +1,7 @@
 package com.nullpointerexception.cicerone.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -129,7 +130,10 @@ class AdapterPartecipants extends RecyclerView.Adapter <AdapterPartecipants.MyVi
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,participants.get(position).getName() + participants.get(position).getSurname(), Toast.LENGTH_LONG).show();
+                Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
+                intent2.putExtra("id_cicerone_to_show",participants.get(position).getId());
+                intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                v.getContext().startActivity(intent2);
             }
         });
 
