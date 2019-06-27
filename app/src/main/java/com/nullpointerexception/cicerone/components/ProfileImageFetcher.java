@@ -56,7 +56,7 @@ public class ProfileImageFetcher
     {
         String url = user.getProfileImageUrl();
 
-        if(url != null && !url.isEmpty())
+        if(url != null && ! url.isEmpty())
         {
             Glide.with(context)
                     .load(url)
@@ -158,8 +158,10 @@ class ProfileImageLetter extends ShapeDrawable
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(350);
+        paint.setTextAlign(Paint.Align.CENTER);
 
-        canvas.drawText( "" + letter , 150, 380, paint);
+        canvas.drawText( "" + letter , ((float) getBounds().width()/2),
+                ((float) getBounds().height()/2) - ((paint.descent() + paint.ascent()) /2), paint);
     }
 
     /**

@@ -1,7 +1,7 @@
 <resources>
 
-    <string name="facebook_app_id">576559802747671</string>
-    <string name="fb_login_protocol_scheme">fb576559802747671</string>
+    <string name="facebook_app_id" translatable="false">576559802747671</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb576559802747671</string>
 
     <string name="yes">Si</string>
     <string name="no">No</string>
@@ -13,7 +13,7 @@
     <string name="city">città</string>
 
     <!-- LoginActivity -->
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_login" translatable="false">LoginActivity</string>
     <string name="emailTextFieldHint">Email</string>
     <string name="emailTextFieldError">Email non valida!</string>
     <string name="passwordTextFieldHint">Password</string>
@@ -45,13 +45,13 @@
     <string name="surnameError">Cognome non valido</string>
     <string name="dateError">Il campo è obbligatorio</string>
     <string name="phoneError">Numero telefonico non valido</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="title_activity_main" translatable="false">MainActivity</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+    <string name="nav_header_title" translatable="false">Android Studio</string>
+    <string name="nav_header_subtitle" translatable="false">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Impostazioni</string>
 
     <!-- ItinerayEditActivity -->
     <string name="ItinerayEditActivity_Title">Modifica itinerario</string>
@@ -87,18 +87,18 @@
     <string name="deleteDialogTitle">Elimina itinerario</string>
     <string name="deleteDialogMessage">Sei sicuro di voler eliminare l\'itinerario selezionato?</string>
     <string name="deletedItineraryMessage">Itinerario eliminato con successo.</string>
-    <string name="title_activity_itinerary">activity_itinerary</string>
+    <string name="title_activity_itinerary" translatable="false">activity_itinerary</string>
 
     <!-- Google API -->
-    <string name="place_KEY">AIzaSyCoYirGU9t1T1lyAmy_0CsJeH7ikMTZYng</string>
-    <string name="title_activity_itinerary_edit">ItineraryEditActivity</string>
+    <string name="place_KEY" translatable="false">AIzaSyCoYirGU9t1T1lyAmy_0CsJeH7ikMTZYng</string>
+    <string name="title_activity_itinerary_edit" translatable="false">ItineraryEditActivity</string>
 
     <!-- ItinerayEditActivity -->
     <string name="time_picker">Scegli l\'ora</string>
     <string name="title_activity_show_place">Map</string>
 
     <!-- FindItineraryActivity -->
-    <string name="fields_not_inserted">Non hai inserito tutti i campi.</string>
+    <string name="fields_not_inserted" translatable="false">Non hai inserito tutti i campi.</string>
     <string name="newTripLabel1">Dove sara\' il tuo prossimo viaggio?</string>
     <string name="newTripLabel2">…e quando?</string>
     <string name="newTripField1">Cerca luogo…</string>
@@ -110,14 +110,14 @@
 
     <!-- ParticipantsActivity -->
     <string name="title_ParticipantsActivity">Partecipanti</string>
-    <string name="title_activity_participants">ParticipantsActivity</string>
+    <string name="title_activity_participants" translatable="false">ParticipantsActivity</string>
 
     <!-- ProposedStageActivity -->
-    <string name="title_activity_proposed_stage">ProposedStageActivity</string>
+    <string name="title_activity_proposed_stage" translatable="false">ProposedStageActivity</string>
     <string name="title_ProposedStageActivity">Tappe proposte</string>
-    <string name="title_activity_profile">ProfileActivity</string>
-    <string name="title_activity_test_profile">TestProfile</string>
-    <string name="large_text">
+    <string name="title_activity_profile" translatable="false">ProfileActivity</string>
+    <string name="title_activity_test_profile" translatable="false">TestProfile</string>
+    <string name="large_text" translatable="false">
         "Material is the metaphor.\n\n"
 
         "A material metaphor is the unifying theory of a rationalized space and a system of motion."
@@ -213,8 +213,8 @@
     <string name="homeLabel2">Conosci molto bene la tua città?\nProponi un itinerario e condividi la tua conoscenza con il resto del mondo!</string>
     <string name="homeButton1">Cerca un itinerario</string>
     <string name="homeButton2">Proponi un itinerario</string>
-    <string name="title_activity_feed_backs">FeedBacksActivity</string>
+    <string name="title_activity_feed_backs" translatable="false">FeedBacksActivity</string>
     <string name="title_FeedBacksActivity">Recensioni</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_settings" translatable="false">SettingsActivity</string>
 
 </resources>
