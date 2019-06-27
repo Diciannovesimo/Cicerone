@@ -41,13 +41,13 @@ public class SettingsActivity extends AppCompatActivity {
 
         toolbar.setTitle("Modifica profilo");
 
-        //Check if actionbar is initialized
-        if(getSupportActionBar() != null)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         //Set toolbar
         setSupportActionBar(toolbar);
 
+        //Check if actionbar is initialized
+        if(getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        
         //Change color of toolbar
         Window window = getWindow();
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimary));
