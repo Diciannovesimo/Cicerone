@@ -30,7 +30,7 @@ import java.util.List;
 
 public class ProfileFragment extends Fragment
 {
-    private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant,  goFeedBacksList;
+    private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant,  goFeedBacksList, feedbakcTitle;
     private ImageView profileImage, settings_btn;
     private RecyclerView recyclerView;
     private RatingBar ratingBarAVG;
@@ -70,6 +70,7 @@ public class ProfileFragment extends Fragment
         settings_btn = v.findViewById(R.id.settings_btn);
         goFeedBacksList = v.findViewById(R.id.goFeedBacksList);
         ratingBarAVG = v.findViewById(R.id.ratingBarAVG);
+        feedbakcTitle = v.findViewById(R.id.feedbackListTitle_tv);
     }
 
     /**
@@ -121,9 +122,11 @@ public class ProfileFragment extends Fragment
                 feedbacks.add(user.getFeedbacks().get(i));
         }
 
-        if(feedbacks.size()<=2){
+        if(feedbacks.size()<=2)
             goFeedBacksList.setVisibility(View.GONE);
-        }
+
+        if(feedbacks.size() == 0)
+            feedbakcTitle.setVisibility(View.GONE);
 
         recyclerView = v.findViewById(R.id.RecyclerView_Review);
 

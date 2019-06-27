@@ -49,6 +49,7 @@ import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.User;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -205,7 +206,9 @@ public class ItineraryActivity extends AppCompatActivity
             mDescriptionCard.setText(itinerary.getDescription());
 
         if(itinerary.getPrice() != 0.0) {
-            String price = itinerary.getCurrency() + " " + itinerary.getPrice();
+            final String COMMA_SEPERATED = "###,###.00";
+            DecimalFormat decimalFormat = new DecimalFormat(COMMA_SEPERATED);
+            String price = itinerary.getCurrency() + " " + decimalFormat.format(itinerary.getPrice());
             mPriceCard.setText(price);
         } else {
             mPriceCard.setText("Prezzo non specificato");

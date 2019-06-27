@@ -47,7 +47,7 @@ public class SettingsActivity extends AppCompatActivity {
         //Check if actionbar is initialized
         if(getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        
+
         //Change color of toolbar
         Window window = getWindow();
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimary));
