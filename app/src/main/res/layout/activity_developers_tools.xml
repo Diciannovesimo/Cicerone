@@ -35,4 +35,10 @@
         android:layout_height="wrap_content"
         android:text="Genera feedback"/>
 
+    <Button
+        android:id="@+id/btnGenerateNotification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Genera notifica"/>
+
 </LinearLayout>

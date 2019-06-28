@@ -173,7 +173,7 @@ public class ItineraryTest
         fakeIt.setId(ID_IT);
         fakeIt.setCurrency(CURRENCY);
         fakeIt.setDate(DATE);
-        //fakeIt.setIdCicerone(ID_CICERONE);
+        //fakeIt.setIdUser(ID_CICERONE);
         fakeIt.setLanguage(LANGUAGE);
         fakeIt.setLocation(LOCATION);
         fakeIt.setMaxParticipants(MAX_PART);
@@ -373,7 +373,7 @@ public class ItineraryTest
     public void generateIdTest()
     {
         Itinerary itinerary = new Itinerary();
-        //itinerary.setIdCicerone("34CCpLlS9Eb6aTUcOXLvt5gh0cu1");
+        //itinerary.setIdUser("34CCpLlS9Eb6aTUcOXLvt5gh0cu1");
         itinerary.setDate("2019-06-04");
         itinerary.setMeetingTime("20:30");
         itinerary.generateId();
@@ -388,7 +388,7 @@ public class ItineraryTest
         itinerary.setId("34CCpLlS9Eb6aTUcOXLvt5gh0cu12019-06-0420:30");
         itinerary.getFieldsFromId();
 
-        //assertEquals( itinerary.getIdCicerone(), "34CCpLlS9Eb6aTUcOXLvt5gh0cu1");
+        //assertEquals( itinerary.getIdUser(), "34CCpLlS9Eb6aTUcOXLvt5gh0cu1");
         assertEquals( itinerary.getDate(), "2019-06-04" );
         assertEquals( itinerary.getMeetingTime(), "20:30" );
     }
@@ -416,7 +416,7 @@ public class ItineraryTest
             currentDate.setDate( random.nextInt(20) );
             itinerary.setDate(new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(currentDate));
             //itinerary.setCicerone();
-            //itinerary.setIdCicerone(targetCiceroneId);
+            //itinerary.setIdUser(targetCiceroneId);
             itinerary.setLanguage("Italiano");
             String place = places.get( random.nextInt( places.size()-1 ));
             itinerary.setLocation(place);

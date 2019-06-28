@@ -221,7 +221,7 @@ public class BackEndInterfaceTest
         itinerary.setLanguage("italiano");
         itinerary.setDescription("Descrizione fake.");
         itinerary.setDate(Calendar.getInstance().toString());
-        //itinerary.setIdCicerone("FAKE_USER");
+        //itinerary.setIdUser("FAKE_USER");
         itinerary.setMaxParticipants(50);
         itinerary.setPrice(10f);
 

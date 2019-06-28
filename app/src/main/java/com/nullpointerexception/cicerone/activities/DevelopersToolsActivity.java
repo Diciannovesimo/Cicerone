@@ -1,5 +1,6 @@
 package com.nullpointerexception.cicerone.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,8 +14,10 @@ import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Feedback;
 import com.nullpointerexception.cicerone.components.Itinerary;
+import com.nullpointerexception.cicerone.components.NotificationsListener;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.User;
+import com.nullpointerexception.cicerone.components.UserNotification;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -52,6 +55,8 @@ public class DevelopersToolsActivity extends AppCompatActivity
         });
 
         generateFeedback.setOnClickListener(v -> generateFeedback());
+
+        findViewById(R.id.btnGenerateNotification).setOnClickListener(v -> generateNotification());
     }
 
     private void generateItinerary()
@@ -195,4 +200,30 @@ public class DevelopersToolsActivity extends AppCompatActivity
         });
 
     }
+
+    private void generateNotification()
+    {
+        String id = AuthenticationManager.get().getUserLogged().getId();
+
+        UserNotification notification = new UserNotification(id);
+        notification.setTitle("Prova notifica");
+        notification.setContent("Test notifica");
+
+        BackEndInterface.get().storeEntity(notification, new BackEndInterface.OnOperationCompleteListener()
+        {
+            @Override
+            public void onSuccess()
+            {
+                Toast.makeText(DevelopersToolsActivity.this, "Notifica generata", Toast.LENGTH_SHORT).show();
+                startService(new Intent(DevelopersToolsActivity.this, NotificationsListener.class));
+            }
+
+            @Override
+            public void onError()
+            {
+                Toast.makeText(DevelopersToolsActivity.this, "Errore", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }
