@@ -29,6 +29,13 @@
         android:layout_height="wrap_content"
         android:text="Genera itinerario"/>
 
+    <EditText
+        android:id="@+id/notificationTargetText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Email target (Notifiche e feedback)" />
+
     <Button
         android:id="@+id/btnGenerateFeedback"
         android:layout_width="match_parent"

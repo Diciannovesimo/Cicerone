@@ -1,5 +1,6 @@
 package com.nullpointerexception.cicerone.components;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -513,7 +514,7 @@ public class BackEndInterface
      *      @param notification
      *      @param onOperationCompleteListener
      */
-    public void checkNotificationFor(UserNotification notification, OnOperationCompleteListener onOperationCompleteListener)
+    public void checkNotificationFor(UserNotification notification, Context context, OnOperationCompleteListener onOperationCompleteListener)
     {
         if(notification == null || onOperationCompleteListener == null)
             return;
@@ -522,11 +523,18 @@ public class BackEndInterface
                 .getReference("usernotification")
                 .child(notification.getIdUser());
         Query query = ref.orderByKey().limitToFirst(1);
-        query.addValueEventListener(new ValueEventListener()
+
+        ValueEventListener valueEventListener = new ValueEventListener()
         {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
             {
+                Log.i("NotificationsListener", "checking...");
+
+                //  Check if app is in foreground
+                if(AuthenticationManager.get().getUserLogged() != null)
+                    query.removeEventListener(this);
+
                 for(DataSnapshot ds : dataSnapshot.getChildren())
                 {
                     notification.setTitle(ds.child("title").getValue(String.class));
@@ -544,7 +552,10 @@ public class BackEndInterface
                 if(onOperationCompleteListener != null)
                     onOperationCompleteListener.onError();
             }
-        });
+        };
+
+        query.removeEventListener(valueEventListener);
+        query.addValueEventListener(valueEventListener);
     }
 
     /**

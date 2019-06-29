@@ -1,6 +1,5 @@
 package com.nullpointerexception.cicerone.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,7 +13,6 @@ import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Feedback;
 import com.nullpointerexception.cicerone.components.Itinerary;
-import com.nullpointerexception.cicerone.components.NotificationsListener;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.User;
 import com.nullpointerexception.cicerone.components.UserNotification;
@@ -31,7 +29,7 @@ import java.util.Vector;
 public class DevelopersToolsActivity extends AppCompatActivity
 {
 
-    private EditText cityItinerary, dateItinerary;
+    private EditText cityItinerary, dateItinerary, targetNotification;
     private Button generateItinerary, generateFeedback;
 
     List<User> users = new Vector<>();
@@ -46,6 +44,7 @@ public class DevelopersToolsActivity extends AppCompatActivity
         dateItinerary = findViewById(R.id.dateGenItinerary);
         generateItinerary = findViewById(R.id.btnGenItinerary);
         generateFeedback = findViewById(R.id.btnGenerateFeedback);
+        targetNotification = findViewById(R.id.notificationTargetText);
 
         generateItinerary.setOnClickListener(v -> generateItinerary());
         generateItinerary.setOnLongClickListener(v ->
@@ -57,6 +56,8 @@ public class DevelopersToolsActivity extends AppCompatActivity
         generateFeedback.setOnClickListener(v -> generateFeedback());
 
         findViewById(R.id.btnGenerateNotification).setOnClickListener(v -> generateNotification());
+
+        getAllUsers();
     }
 
     private void generateItinerary()
@@ -140,7 +141,7 @@ public class DevelopersToolsActivity extends AppCompatActivity
             @Override
             public void onSuccess()
             {
-                generateFeedback();
+
             }
 
             @Override
@@ -153,20 +154,29 @@ public class DevelopersToolsActivity extends AppCompatActivity
 
     private void generateFeedback()
     {
-        if(users.isEmpty())
-        {
-            getAllUsers();
-            return;
-        }
-
         Random random = new Random();
 
         User currentUser = AuthenticationManager.get().getUserLogged();
-        User userSender;
-        do
+        User userSender = null;
+
+        String target = targetNotification.getText().toString();
+        if( ! target.isEmpty())
         {
-            userSender = users.get( random.nextInt(users.size()) );
-        } while(userSender.getId().equals(currentUser.getId()));
+            for(User user : users)
+                if(user.getEmail().equalsIgnoreCase(target))
+                {
+                    userSender = user;
+                    break;
+                }
+        }
+
+        if(userSender == null)
+        {
+            do
+            {
+                userSender = users.get( random.nextInt(users.size()) );
+            } while(userSender.getId().equals(currentUser.getId()));
+        }
 
         Feedback feedback = new Feedback(userSender);
 
@@ -203,19 +213,37 @@ public class DevelopersToolsActivity extends AppCompatActivity
 
     private void generateNotification()
     {
-        String id = AuthenticationManager.get().getUserLogged().getId();
+
+        String id = null;
+        boolean found = false;
+
+        String target = targetNotification.getText().toString();
+        if( ! target.isEmpty())
+        {
+            for(User user : users)
+                if(user.getEmail() != null && user.getEmail().equalsIgnoreCase(target))
+                {
+                    id = user.getId();
+                    found = true;
+                    break;
+                }
+        }
+
+        if(! found)
+            id = AuthenticationManager.get().getUserLogged().getId();
+        else if(id == null)
+            return;
 
         UserNotification notification = new UserNotification(id);
-        notification.setTitle("Prova notifica");
-        notification.setContent("Test notifica");
+        notification.setTitle("Poke #" + new Random().nextInt(999999));
+        notification.setContent("Hi " + id);
 
         BackEndInterface.get().storeEntity(notification, new BackEndInterface.OnOperationCompleteListener()
         {
             @Override
             public void onSuccess()
             {
-                Toast.makeText(DevelopersToolsActivity.this, "Notifica generata", Toast.LENGTH_SHORT).show();
-                startService(new Intent(DevelopersToolsActivity.this, NotificationsListener.class));
+                Toast.makeText(DevelopersToolsActivity.this, "Notifica generata per " + notification.getIdUser(), Toast.LENGTH_SHORT).show();
             }
 
             @Override

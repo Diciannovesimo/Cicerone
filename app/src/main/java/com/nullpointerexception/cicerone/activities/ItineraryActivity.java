@@ -48,6 +48,7 @@ import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.User;
+import com.nullpointerexception.cicerone.components.UserNotification;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -363,7 +364,19 @@ public class ItineraryActivity extends AppCompatActivity
                         try {
                             BackEndInterface.get().storeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener() {
                                 @Override
-                                public void onSuccess() {
+                                public void onSuccess()
+                                {
+                                    /*
+                                          Send notification
+                                     */
+                                    UserNotification notification = new UserNotification(
+                                            itinerary.getCicerone().getId()
+                                    );
+                                    notification.setTitle("Nuova tappa");
+                                    notification.setContent(user.getDisplayName() + " ha proposto una nuova tappa al tuo itinerario per " +
+                                            itinerary.getLocation());
+                                    BackEndInterface.get().storeEntity(notification);
+
                                     dialog.dismiss();
                                 }
 
@@ -538,6 +551,17 @@ public class ItineraryActivity extends AppCompatActivity
                                                     new BackEndInterface.OnOperationCompleteListener() {
                                                 @Override
                                                 public void onSuccess() {
+                                                    /*
+                                                        Send notification
+                                                    */
+                                                    UserNotification notification = new UserNotification(
+                                                            itinerary.getCicerone().getId()
+                                                    );
+                                                    notification.setTitle("Nuovo partecipante");
+                                                    notification.setContent(user.getDisplayName() + " si è unito al tuo itinerario per " +
+                                                            itinerary.getLocation());
+                                                    BackEndInterface.get().storeEntity(notification);
+
                                                     KAlertDialog kAlertDialog = new KAlertDialog(v.getContext())
                                                             .setTitleText("Complimenti")
                                                             .setContentText("Ti sei iscritto a" +
@@ -588,7 +612,19 @@ public class ItineraryActivity extends AppCompatActivity
                                         BackEndInterface.get().storeEntity(user,
                                                 new BackEndInterface.OnOperationCompleteListener() {
                                             @Override
-                                            public void onSuccess() {
+                                            public void onSuccess()
+                                            {
+                                                /*
+                                                     Send notification
+                                                 */
+                                                UserNotification notification = new UserNotification(
+                                                        itinerary.getCicerone().getId()
+                                                );
+                                                notification.setTitle("Nuovo partecipante");
+                                                notification.setContent(user.getDisplayName() + " si è unito al tuo itinerario per " +
+                                                        itinerary.getLocation());
+                                                BackEndInterface.get().storeEntity(notification);
+
                                                 KAlertDialog kAlertDialog = new KAlertDialog(v.getContext())
                                                         .setTitleText("Complimenti")
                                                         .setContentText("Ti sei iscritto a" +

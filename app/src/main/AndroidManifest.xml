@@ -29,7 +29,8 @@
         tools:ignore="GoogleAppIndexingWarning">
         <service
             android:name=".components.NotificationsListener"
-            android:exported="false"></service>
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
 
         <activity
             android:name=".activities.SettingsActivity"
@@ -130,6 +131,14 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".components.AlarmReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.nullpointerexception.cicerone.ALARM"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

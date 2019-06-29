@@ -50,6 +50,8 @@ import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.Stage;
+import com.nullpointerexception.cicerone.components.User;
+import com.nullpointerexception.cicerone.components.UserNotification;
 import com.nullpointerexception.cicerone.components.googleAutocompletationField;
 
 import java.text.SimpleDateFormat;
@@ -701,6 +703,18 @@ public class ItineraryCreationActivity extends AppCompatActivity {
 
                                                     //Delete received itinerary
                                                     ObjectSharer.get().remove("edit_itinerary");
+
+                                                    /*
+                                                         Send notifications
+                                                    */
+                                                    for(User user : new_itinerary.getParticipants())
+                                                    {
+                                                        UserNotification notification = new UserNotification(user.getId());
+                                                        notification.setTitle("Itinerario modificato");
+                                                        notification.setContent("L'itinerario per " + new_itinerary.getLocation() +
+                                                                " a cui sei iscritto è stato modificato.");
+                                                        BackEndInterface.get().storeEntity(notification);
+                                                    }
 
                                                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.succes_edit_toast), Toast.LENGTH_SHORT).show();
                                                     finish();

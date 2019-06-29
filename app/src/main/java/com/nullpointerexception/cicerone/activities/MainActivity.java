@@ -18,6 +18,7 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.AlarmReceiver;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
@@ -49,6 +50,14 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /*
+                Enable service
+         */
+        SharedPreferences sharedPreferences = getSharedPreferences("notificationsListener", MODE_PRIVATE);
+        String id = AuthenticationManager.get().getUserLogged().getId();
+        sharedPreferences.edit().putString("idUser", id).apply();
+        AlarmReceiver.setAlarm(getApplicationContext(), false);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -152,10 +161,11 @@ public class MainActivity extends AppCompatActivity
                 )
                 .withOnDrawerItemClickListener((view, position, drawerItem) ->
                 {
-                    if(drawerItem.getIdentifier() == 123)
+                    if(drawerItem.getIdentifier() == 123)   //  Logout
                     {
                         AuthenticationManager.get().logout();
                         startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        sharedPreferences.edit().putString("idUser", null).apply();
                         finish();
                     }
 
