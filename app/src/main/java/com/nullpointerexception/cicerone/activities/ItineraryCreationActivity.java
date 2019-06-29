@@ -681,6 +681,9 @@ public class ItineraryCreationActivity extends AppCompatActivity {
 
                         new_itinerary.setStages(placeInterface);
 
+                        new_itinerary.setParticipants(itinerary.getParticipants());
+                        new_itinerary.setProposedStages(itinerary.getProposedStages());
+
                         final Itinerary checkItinerary = new Itinerary();
                         checkItinerary.setId(new_itinerary.getId());
 
