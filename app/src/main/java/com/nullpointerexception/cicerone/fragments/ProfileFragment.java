@@ -21,6 +21,7 @@ import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.activities.ProfileActivity;
 import com.nullpointerexception.cicerone.activities.SettingsActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.Blocker;
 import com.nullpointerexception.cicerone.components.Feedback;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
@@ -52,10 +53,16 @@ public class ProfileFragment extends Fragment
         //Set text in the field
         setTextField(view);
 
+        goFeedBacksList.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
 
-        goFeedBacksList.setOnClickListener(v -> {
-            Intent intent2 = new Intent(getContext(), FeedBacksActivity.class);
-            startActivity(intent2);
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    Intent intent2 = new Intent(getContext(), FeedBacksActivity.class);
+                    startActivity(intent2);
+                }
+            }
         });
 
         return view;
@@ -125,9 +132,16 @@ public class ProfileFragment extends Fragment
         }
 
         //Set click listener for settings button
-        settings_btn.setOnClickListener(v1 -> {
-            startActivity(new Intent(getContext(), SettingsActivity.class));
-            ObjectSharer.get().shareObject("view", v);
+        settings_btn.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    startActivity(new Intent(getContext(), SettingsActivity.class));
+                    ObjectSharer.get().shareObject("view", v);
+                }
+            }
         });
         
         List<Feedback> feedbacks = new ArrayList<>();
@@ -204,13 +218,19 @@ class AdapterReviewProfileFragment extends RecyclerView.Adapter <AdapterReviewPr
         });
 
         //Ascolto l'evento click
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
-            intent2.putExtra("id_cicerone_to_show",feedbacks.get(position).getIdUser());
-            intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            v.getContext().startActivity(intent2);
-        });
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
 
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
+                    intent2.putExtra("id_cicerone_to_show",feedbacks.get(position).getIdUser());
+                    intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    v.getContext().startActivity(intent2);
+                }
+            }
+        });
     }
 
     @Override

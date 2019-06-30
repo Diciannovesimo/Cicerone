@@ -22,6 +22,7 @@ import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.Blocker;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -61,68 +62,86 @@ public class FindItineraryActivityFragment extends Fragment
         Places.initialize(view.getContext(), getResources().getString(R.string.place_KEY));
         fields = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG);
 
-        findLocation.setOnClickListener(v ->
-        {
-            Intent intent = new Autocomplete.IntentBuilder(
-                    AutocompleteActivityMode.OVERLAY, fields)
-                    .build(findLocation.getContext());
-            startActivityForResult(intent, 123);
-        });
+        findLocation.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
 
-        insertDate.setOnClickListener(v ->
-        {
-            Calendar calendar = Calendar.getInstance();
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            int month = calendar.get(Calendar.MONTH);
-            int year = calendar.get(Calendar.YEAR);
-
-            new DatePickerDialog(v.getContext(), R.style.DialogTheme, (v2, yearS, monthS, dayOfMonth) ->
-            {
-                String dateString = "";
-
-                if(dayOfMonth < 10)
-                    dateString += "0" + dayOfMonth + "/";
-                else
-                    dateString = dayOfMonth + "/";
-
-                if((monthS + 1) < 10)
-                    dateString += "0" + (monthS + 1) + "/" + yearS;
-                else
-                    dateString += (monthS + 1) + "/" + yearS;
-
-                insertDate.setText(dateString);
-
-            }, year, month, day)
-            .show();
-        });
-
-        findButton.setOnClickListener(v ->
-        {
-            if(checkFields())
-            {
-                Date date = null;
-                try
-                {
-                    date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(insertDate.getText().toString());
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    Intent intent = new Autocomplete.IntentBuilder(
+                            AutocompleteActivityMode.OVERLAY, fields)
+                            .build(findLocation.getContext());
+                    startActivityForResult(intent, 123);
                 }
-                catch (ParseException e)
-                {
-                    Log.e("FindItinerary", e.toString());
-                    return;
-                }
-                String formattedDate = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(date);
-
-                if(getActivity() != null && getActivity() instanceof OnUIInteractionListener)
-                    ((OnUIInteractionListener) getActivity())
-                            .onButtonSearchPressed(findLocation.getText().toString(), formattedDate);
             }
-            else
-            {
-                new KAlertDialog(findButton.getContext(), KAlertDialog.ERROR_TYPE)
-                        .setTitleText( getResources().getString(R.string.error) )
-                        .setContentText( getResources().getString(R.string.fields_not_inserted) )
-                        .setConfirmText("OK")
-                        .show();
+        });
+
+        insertDate.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block(1000)) {
+                    Calendar calendar = Calendar.getInstance();
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    int month = calendar.get(Calendar.MONTH);
+                    int year = calendar.get(Calendar.YEAR);
+
+                    new DatePickerDialog(v.getContext(), R.style.DialogTheme, (v2, yearS, monthS, dayOfMonth) ->
+                    {
+                        String dateString = "";
+
+                        if(dayOfMonth < 10)
+                            dateString += "0" + dayOfMonth + "/";
+                        else
+                            dateString = dayOfMonth + "/";
+
+                        if((monthS + 1) < 10)
+                            dateString += "0" + (monthS + 1) + "/" + yearS;
+                        else
+                            dateString += (monthS + 1) + "/" + yearS;
+
+                        insertDate.setText(dateString);
+
+                    }, year, month, day)
+                            .show();
+                }
+            }
+        });
+
+        findButton.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    if(checkFields())
+                    {
+                        Date date = null;
+                        try
+                        {
+                            date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(insertDate.getText().toString());
+                        }
+                        catch (ParseException e)
+                        {
+                            Log.e("FindItinerary", e.toString());
+                            return;
+                        }
+                        String formattedDate = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(date);
+
+                        if(getActivity() != null && getActivity() instanceof OnUIInteractionListener)
+                            ((OnUIInteractionListener) getActivity())
+                                    .onButtonSearchPressed(findLocation.getText().toString(), formattedDate);
+                    }
+                    else
+                    {
+                        new KAlertDialog(findButton.getContext(), KAlertDialog.ERROR_TYPE)
+                                .setTitleText( getResources().getString(R.string.error) )
+                                .setContentText( getResources().getString(R.string.fields_not_inserted) )
+                                .setConfirmText("OK")
+                                .show();
+                    }
+                }
             }
         });
 

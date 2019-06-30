@@ -24,6 +24,7 @@ import com.kinda.mtextfield.TextFieldBoxes;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.Blocker;
 import com.nullpointerexception.cicerone.components.Feedback;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
@@ -94,10 +95,17 @@ public class ProfileActivity extends AppCompatActivity
             });
         }
 
-        goFeedBacksList.setOnClickListener(v -> {
-            Intent intent2 = new Intent(this, FeedBacksActivity.class);
-            ObjectSharer.get().shareObject("feedback", user);
-            startActivity(intent2);
+        goFeedBacksList.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    Intent intent2 = new Intent(v.getContext(), FeedBacksActivity.class);
+                    ObjectSharer.get().shareObject("feedback", user);
+                    startActivity(intent2);
+                }
+            }
         });
 
     }
@@ -177,109 +185,120 @@ public class ProfileActivity extends AppCompatActivity
         if(!user.getId().equals(userLogged.getId())) {
             ratingBarListener();
 
-            sndFeedBtn.setOnClickListener(v -> {
+            sndFeedBtn.setOnClickListener(new View.OnClickListener() {
+                private Blocker mBlocker = new Blocker();
 
-                for(int i = 0; i < user.getFeedbacks().size(); ++i) {
-                    if (userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
-                        found = true;
-                        position = i;
-                    }
-                }
-
-                rating = (int) ratingBar.getRating();
-
-                if (found) {
-                    if(checkError()) {
-                        feedback.setComment(mComment.getText().toString());
-
-                        if (rating != 0 && (rating != user.getFeedbacks().get(position).getVote() ||
-                                !feedback.getComment().equals(user.getFeedbacks().get(position).getComment()))) {
-                            feedback.setVote((int) rating);
-                            user.editFeedback(feedback);
-
-                            BackEndInterface.get().storeEntity(user,
-                                    new BackEndInterface.OnOperationCompleteListener() {
-                                        @Override
-                                        public void onSuccess() {
-                                            Toast.makeText(v.getContext(), "Hai inserito il feedback", Toast.LENGTH_SHORT).show();
-                                            removeFeedback.setEnabled(true);
-
-                                        }
-
-                                        @Override
-                                        public void onError() {
-
-                                        }
-                                    });
-                        } else{
-                            Toast.makeText(getApplicationContext(), "Hai inserito lo stesso voto", Toast.LENGTH_SHORT).show();
+                @Override
+                public void onClick(View v) {
+                    if(!mBlocker.block()) {
+                        for(int i = 0; i < user.getFeedbacks().size(); ++i) {
+                            if (userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
+                                found = true;
+                                position = i;
+                            }
                         }
-                    }
-                } else {
-                    if(mComment != null && !mComment.getText().toString().isEmpty()) {
-                        feedback.setComment(mComment.getText().toString());
-                    }
-                    if (rating != 0) {
-                        feedback.setVote((int) rating);
-                        user.addFeedback(feedback);
 
-                        BackEndInterface.get().storeEntity(user,
-                                new BackEndInterface.OnOperationCompleteListener() {
-                                    @Override
-                                    public void onSuccess() {
-                                        Toast.makeText(v.getContext(), "Hai inserito il feedback", Toast.LENGTH_SHORT).show();
-                                        feedbackTitle.setText("Il tuo feedback");
-                                        removeFeedback.setEnabled(true);
-                                        sndFeedBtn.setText("Modifica");
-                                    }
+                        rating = (int) ratingBar.getRating();
 
-                                    @Override
-                                    public void onError() {
+                        if (found) {
+                            if(checkError()) {
+                                feedback.setComment(mComment.getText().toString());
 
-                                    }
-                                });
+                                if (rating != 0 && (rating != user.getFeedbacks().get(position).getVote() ||
+                                        !feedback.getComment().equals(user.getFeedbacks().get(position).getComment()))) {
+                                    feedback.setVote((int) rating);
+                                    user.editFeedback(feedback);
+
+                                    BackEndInterface.get().storeEntity(user,
+                                            new BackEndInterface.OnOperationCompleteListener() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    Toast.makeText(v.getContext(), "Hai inserito il feedback", Toast.LENGTH_SHORT).show();
+                                                    removeFeedback.setEnabled(true);
+
+                                                }
+
+                                                @Override
+                                                public void onError() {
+
+                                                }
+                                            });
+                                } else{
+                                    Toast.makeText(getApplicationContext(), "Hai inserito lo stesso voto", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        } else {
+                            if(mComment != null && !mComment.getText().toString().isEmpty()) {
+                                feedback.setComment(mComment.getText().toString());
+                            }
+                            if (rating != 0) {
+                                feedback.setVote((int) rating);
+                                user.addFeedback(feedback);
+
+                                BackEndInterface.get().storeEntity(user,
+                                        new BackEndInterface.OnOperationCompleteListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                Toast.makeText(v.getContext(), "Hai inserito il feedback", Toast.LENGTH_SHORT).show();
+                                                feedbackTitle.setText("Il tuo feedback");
+                                                removeFeedback.setEnabled(true);
+                                                sndFeedBtn.setText("Modifica");
+                                            }
+
+                                            @Override
+                                            public void onError() {
+
+                                            }
+                                        });
+                            }
+                        }
                     }
                 }
             });
 
-            removeFeedback.setOnClickListener(v -> {
+            removeFeedback.setOnClickListener(new View.OnClickListener() {
+                private Blocker mBlocker = new Blocker();
 
-                for(int i = 0; i < user.getFeedbacks().size(); ++i) {
-                    if (userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
-                        position = i;
-                    }
-                }
-                Feedback temp_feedback = user.getFeedbacks().get(position);
-                user.removeFeedback(temp_feedback);
+                @Override
+                public void onClick(View v) {
+                    if(!mBlocker.block()) {
+                        for(int i = 0; i < user.getFeedbacks().size(); ++i) {
+                            if (userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser()))
+                                position = i;
+                        }
+                        Feedback temp_feedback = user.getFeedbacks().get(position);
+                        user.removeFeedback(temp_feedback);
 
-                BackEndInterface.get().removeEntity(user,
-                        new BackEndInterface.OnOperationCompleteListener() {
-                    @Override
-                    public void onSuccess() {
-                        BackEndInterface.get().storeEntity(user,
+                        BackEndInterface.get().removeEntity(user,
                                 new BackEndInterface.OnOperationCompleteListener() {
                                     @Override
                                     public void onSuccess() {
-                                        Toast.makeText(getApplicationContext(), "Hai rimosso " +
-                                                "il feedback", Toast.LENGTH_SHORT).show();
-                                        removeFeedback.setEnabled(false);
-                                        sndFeedBtn.setText("Invia");
-                                        mComment.setText("");
-                                        found = false;
+                                        BackEndInterface.get().storeEntity(user,
+                                                new BackEndInterface.OnOperationCompleteListener() {
+                                                    @Override
+                                                    public void onSuccess() {
+                                                        Toast.makeText(getApplicationContext(), "Hai rimosso " +
+                                                                "il feedback", Toast.LENGTH_SHORT).show();
+                                                        removeFeedback.setEnabled(false);
+                                                        sndFeedBtn.setText("Invia");
+                                                        mComment.setText("");
+                                                        found = false;
+                                                    }
+
+                                                    @Override
+                                                    public void onError() {
+
+                                                    }
+                                                });
                                     }
 
                                     @Override
                                     public void onError() {
 
                                     }
-                                });
+                        });
                     }
-
-                    @Override
-                    public void onError() {
-
-                    }
-                });
+                }
             });
         } else{
             feedbackTitle.setVisibility(View.GONE);
@@ -288,8 +307,6 @@ public class ProfileActivity extends AppCompatActivity
             sndFeedBtn.setVisibility(View.GONE);
             removeFeedback.setVisibility(View.GONE);
         }
-
-
 
         List<Feedback> feedbacks = new ArrayList<>();
 
@@ -387,13 +404,19 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
         });
 
         //Ascolto l'evento click
-        holder.itemView.setOnClickListener(v -> {
-             Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
-             intent2.putExtra("id_cicerone_to_show",feedbacks.get(position).getIdUser());
-             intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-             v.getContext().startActivity(intent2);
-        });
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
 
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
+                    intent2.putExtra("id_cicerone_to_show",feedbacks.get(position).getIdUser());
+                    intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    v.getContext().startActivity(intent2);
+                }
+            }
+        });
     }
 
     @Override
@@ -406,7 +429,7 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
 
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    class MyViewHolder extends RecyclerView.ViewHolder{
 
         TextView displayName, description;
         ImageView imgProfile;

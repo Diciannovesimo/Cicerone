@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.Blocker;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.Stage;
@@ -125,53 +126,65 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>
         holder.description.setText(listPlaces.get(position).getDescription());
 
         //Ascolto l'evento click relativo a "Aggiungi tappa"
-        holder.addstage.setOnClickListener(v ->
-        {
-            //Aggiungo la nuova tappa
-            List<Stage> newStage = itinerary.getStages();
-            newStage.add(listPlaces.get(position));
-            itinerary.setStages(newStage);
+        holder.addstage.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
 
-            //Rimuovo l'itinerario da quelli proposti
-            listPlaces.remove(position);
-            notifyItemRemoved(position);
-            itinerary.setProposedStages(listPlaces);
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    //Aggiungo la nuova tappa
+                    List<Stage> newStage = itinerary.getStages();
+                    newStage.add(listPlaces.get(position));
+                    itinerary.setStages(newStage);
 
-            //Aggiungere il nuovo itinerario
-            BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener()
-            {
-                @Override
-                public void onSuccess()
-                {
-                    BackEndInterface.get().storeEntity(itinerary);
+                    //Rimuovo l'itinerario da quelli proposti
+                    listPlaces.remove(position);
+                    notifyItemRemoved(position);
+                    itinerary.setProposedStages(listPlaces);
 
-                    ObjectSharer.get().shareObject("show_trip_as_cicerone", itinerary);
-                    if(context instanceof Activity)
+                    //Aggiungere il nuovo itinerario
+                    BackEndInterface.get().removeEntity(itinerary, new BackEndInterface.OnOperationCompleteListener()
                     {
-                        ((Activity) context).setResult(Activity.RESULT_OK);
-                    }
-                }
+                        @Override
+                        public void onSuccess()
+                        {
+                            BackEndInterface.get().storeEntity(itinerary);
 
-                @Override
-                public void onError()
-                {
+                            ObjectSharer.get().shareObject("show_trip_as_cicerone", itinerary);
+                            if(context instanceof Activity)
+                            {
+                                ((Activity) context).setResult(Activity.RESULT_OK);
+                            }
+                        }
 
+                        @Override
+                        public void onError()
+                        {
+
+                        }
+                    });
                 }
-            });
+            }
         });
 
         //Ascolto l'evento click relativo a "Visualizza posizione GPS"
-        holder.imgGPS.setOnClickListener(v ->
-        {
-            LatLng coordinates = listPlaces.get(position).getCoordinates();
-            Double lat = coordinates.latitude;
-            Double lng = coordinates.longitude;
-            Intent intent = new Intent(context, showPlaceActivity.class);
-            intent.putExtra("latitude", lat);
-            intent.putExtra("longitude", lng);
-            intent.putExtra("marker", listPlaces.get(position).getName());
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
+        holder.imgGPS.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    LatLng coordinates = listPlaces.get(position).getCoordinates();
+                    Double lat = coordinates.latitude;
+                    Double lng = coordinates.longitude;
+                    Intent intent = new Intent(context, showPlaceActivity.class);
+                    intent.putExtra("latitude", lat);
+                    intent.putExtra("longitude", lng);
+                    intent.putExtra("marker", listPlaces.get(position).getName());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                }
+            }
         });
     }
 

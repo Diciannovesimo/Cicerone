@@ -34,6 +34,7 @@ import com.kinda.alert.KAlertDialog;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.Blocker;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -142,45 +143,29 @@ public class LoginActivity extends AppCompatActivity
                     public void onSuccess(LoginResult loginResult)
                     {
                         AuthenticationManager.get().setFacebookUser(loginResult)
-                            .addOnLoginResultListener(new AuthenticationManager.LoginAttempt.OnLoginResultListener()
-                            {
-                                @Override
-                                public void onLoginResult(boolean result)
+                            .addOnLoginResultListener(result -> {
+                                if(result)
                                 {
-                                    if(result)
+                                    BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
+                                    new BackEndInterface.OnOperationCompleteListener()
                                     {
-                                        BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
-                                        new BackEndInterface.OnOperationCompleteListener()
+                                        @Override
+                                        public void onSuccess()
                                         {
-                                            @Override
-                                            public void onSuccess()
-                                            {
-                                                BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
+                                            BackEndInterface.get().storeEntity( AuthenticationManager.get().getUserLogged() );
 
-                                                LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                                finish();
-                                            }
+                                            LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                            finish();
+                                        }
 
-                                            @Override
-                                            public void onError()
-                                            {
-                                                runOnUiThread(new Runnable()
-                                                {
-                                                    @Override
-                                                    public void run()
-                                                    {
-                                                        Toast.makeText(LoginActivity.this,
-                                                                getResources().getString(R.string.generic_error),
-                                                                Toast.LENGTH_SHORT).show();
-                                                    }
-                                                });
-                                            }
-                                        });
-                                    }
-                                    else
-                                    {
-
-                                    }
+                                        @Override
+                                        public void onError()
+                                        {
+                                            runOnUiThread(() -> Toast.makeText(LoginActivity.this,
+                                                    getResources().getString(R.string.generic_error),
+                                                    Toast.LENGTH_SHORT).show());
+                                        }
+                                    });
                                 }
                             });
                     }
@@ -188,31 +173,17 @@ public class LoginActivity extends AppCompatActivity
                     @Override
                     public void onCancel()
                     {
-                        runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                Toast.makeText(LoginActivity.this,
-                                        getResources().getString(R.string.generic_error),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        runOnUiThread(() -> Toast.makeText(LoginActivity.this,
+                                getResources().getString(R.string.generic_error),
+                                Toast.LENGTH_SHORT).show());
                     }
 
                     @Override
                     public void onError(FacebookException exception)
                     {
-                        runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                Toast.makeText(LoginActivity.this,
-                                        getResources().getString(R.string.generic_error),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        runOnUiThread(() -> Toast.makeText(LoginActivity.this,
+                                getResources().getString(R.string.generic_error),
+                                Toast.LENGTH_SHORT).show());
                     }
                 });
 
@@ -278,26 +249,30 @@ public class LoginActivity extends AppCompatActivity
         /*
                 Set interaction events
           */
+        registrationButton.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
 
-        registrationButton.setOnClickListener(view ->
-        {
-            Intent register_activity = new Intent(getApplicationContext(), RegistrationActivity.class);
-            startActivity(register_activity);
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    Intent register_activity = new Intent(getApplicationContext(), RegistrationActivity.class);
+                    startActivity(register_activity);
+                }
+            }
         });
 
         loginButton.setOnClickListener(view -> checkFields());
 
         googleSignInButton.setOnClickListener(new View.OnClickListener()
         {
+            private Blocker mBlocker = new Blocker();
+
             @Override
             public void onClick(View view)
             {
-                AuthenticationManager.get().requestLoginWithGoogle(LoginActivity.this)
-                        .addOnLoginResultListener(new AuthenticationManager.LoginAttempt.OnLoginResultListener()
-                        {
-                            @Override
-                            public void onLoginResult(boolean result)
-                            {
+                if (!mBlocker.block()) {
+                    AuthenticationManager.get().requestLoginWithGoogle(LoginActivity.this)
+                            .addOnLoginResultListener(result -> {
                                 if(result)  //  Login successful
                                 {
                                     BackEndInterface.get().getEntity(AuthenticationManager.get().getUserLogged(),
@@ -315,29 +290,26 @@ public class LoginActivity extends AppCompatActivity
                                                 @Override
                                                 public void onError()
                                                 {
-                                                    runOnUiThread(new Runnable()
-                                                    {
-                                                        @Override
-                                                        public void run()
-                                                        {
-                                                            Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.generic_error),
-                                                                    Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    });
+                                                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.generic_error),
+                                                            Toast.LENGTH_SHORT).show());
                                                 }
                                             });
                                 }
-                            }
-                        });
+                            });
+                }
             }
         });
 
         facebookSignInButton.setOnClickListener(new View.OnClickListener()
         {
+            private Blocker mBlocker = new Blocker();
+
             @Override
             public void onClick(View view)
             {
-                AuthenticationManager.get().loginWithFacebook(LoginActivity.this);
+                if (!mBlocker.block()) {
+                    AuthenticationManager.get().loginWithFacebook(LoginActivity.this);
+                }
             }
         });
     }
@@ -402,8 +374,7 @@ public class LoginActivity extends AppCompatActivity
         animationView.playAnimation();
         container.addView(animationView);
         //  Disables interactions with others views under this
-        container.setOnTouchListener(new View.OnTouchListener()
-        { public boolean onTouch(View view, MotionEvent motionEvent) { return true; }});
+        container.setOnTouchListener((view, motionEvent) -> true);
         root.addView(container);
 
         /*
@@ -442,33 +413,21 @@ public class LoginActivity extends AppCompatActivity
                                     @Override
                                     public void onError()
                                     {
-                                        LoginActivity.this.runOnUiThread(new Runnable()
-                                        {
-                                            @Override
-                                            public void run()
-                                            {
-                                                Toast.makeText(getApplicationContext(),
-                                                        getApplicationContext().getResources().getString(R.string.generic_error),
-                                                        Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
+                                        LoginActivity.this.runOnUiThread(() -> Toast.makeText(getApplicationContext(),
+                                                getApplicationContext().getResources().getString(R.string.generic_error),
+                                                Toast.LENGTH_SHORT).show());
                                     }
                                 });
                     }
                     else        // Login failed
                     {
-                        runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                // Show error message
-                                new KAlertDialog(LoginActivity.this, KAlertDialog.ERROR_TYPE)
-                                        .setTitleText(getResources().getString(R.string.loginDialogText1))
-                                        .setContentText(getResources().getString(R.string.loginDialogText2))
-                                        .setConfirmText("OK")
-                                        .show();
-                            }
+                        runOnUiThread(() -> {
+                            // Show error message
+                            new KAlertDialog(LoginActivity.this, KAlertDialog.ERROR_TYPE)
+                                    .setTitleText(getResources().getString(R.string.loginDialogText1))
+                                    .setContentText(getResources().getString(R.string.loginDialogText2))
+                                    .setConfirmText("OK")
+                                    .show();
                         });
                     }
                 });
@@ -482,17 +441,12 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                runOnUiThread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        //  Remove login animation
-                        ViewGroup root = (ViewGroup) passwordField.getRootView();
-                        View target = root.findViewWithTag(LOGIN_ANIMATION_TAG);
-                        if(target != null)
-                            root.removeView(target);
-                    }
+                runOnUiThread(() -> {
+                    //  Remove login animation
+                    ViewGroup root12 = (ViewGroup) passwordField.getRootView();
+                    View target = root12.findViewWithTag(LOGIN_ANIMATION_TAG);
+                    if(target != null)
+                        root12.removeView(target);
                 });
             }
         }, LOGIN_TIMEOUT);

@@ -10,6 +10,7 @@ import android.widget.EditText;
 import androidx.fragment.app.Fragment;
 
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.Blocker;
 
 import java.util.Calendar;
 
@@ -35,17 +36,24 @@ public class Fragment_register2 extends Fragment
         date_birthField = view.findViewById(R.id.dateTextField);
         phonePicker = view.findViewById(R.id.phoneTextField);
 
-        date_birthField.setOnClickListener(v -> {
-            calendar = Calendar.getInstance();
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            int month = calendar.get(Calendar.MONTH);
-            int year = calendar.get(Calendar.YEAR);
+        date_birthField.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
 
-            dpd = new DatePickerDialog(view.getContext(), R.style.DialogTheme, (view1, year1, month1, dayOfMonth) -> {
-                birthdayString = dayOfMonth + "/" + (month1 + 1) + "/" + year1;
-                date_birthField.setText(birthdayString);
-            }, year, month, day);
-            dpd.show();
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    calendar = Calendar.getInstance();
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    int month = calendar.get(Calendar.MONTH);
+                    int year = calendar.get(Calendar.YEAR);
+
+                    dpd = new DatePickerDialog(view.getContext(), R.style.DialogTheme, (view1, year1, month1, dayOfMonth) -> {
+                        birthdayString = dayOfMonth + "/" + (month1 + 1) + "/" + year1;
+                        date_birthField.setText(birthdayString);
+                    }, year, month, day);
+                    dpd.show();
+                }
+            }
         });
 
         return view;

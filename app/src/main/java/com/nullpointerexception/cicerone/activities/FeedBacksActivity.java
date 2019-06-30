@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.Blocker;
 import com.nullpointerexception.cicerone.components.Feedback;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
@@ -101,7 +102,7 @@ class AdapterReviewFeedBack extends RecyclerView.Adapter <AdapterReviewFeedBack.
     private List<Feedback> feedbacks;
     private LayoutInflater inflater;
 
-    public AdapterReviewFeedBack(Context appContext,List<Feedback> feedbacks)
+    AdapterReviewFeedBack(Context appContext, List<Feedback> feedbacks)
     {
         this.context = appContext;
         this.feedbacks = feedbacks;
@@ -146,12 +147,18 @@ class AdapterReviewFeedBack extends RecyclerView.Adapter <AdapterReviewFeedBack.
         });
 
         //Ascolto l'evento click
-        holder.itemView.setOnClickListener(v ->
-        {
-            Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
-            intent2.putExtra("id_cicerone_to_show",feedbacks.get(position).getIdUser());
-            intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            v.getContext().startActivity(intent2);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
+                    intent2.putExtra("id_cicerone_to_show",feedbacks.get(position).getIdUser());
+                    intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    v.getContext().startActivity(intent2);
+                }
+            }
         });
     }
 
@@ -161,21 +168,18 @@ class AdapterReviewFeedBack extends RecyclerView.Adapter <AdapterReviewFeedBack.
         return feedbacks.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
-
-
+    class MyViewHolder extends RecyclerView.ViewHolder{
 
         TextView displayName, description;
         ImageView imgProfile;
         RatingBar ratingBar;
 
-        public MyViewHolder(@NonNull View itemView) {
+        MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
-
-            displayName = (TextView) itemView.findViewById(R.id.textView_DisplayName);
-            description = (TextView) itemView.findViewById(R.id.textView_Description);
-            imgProfile = (ImageView) itemView.findViewById(R.id.imageView_ProfileImage);
+            displayName = itemView.findViewById(R.id.textView_DisplayName);
+            description = itemView.findViewById(R.id.textView_Description);
+            imgProfile = itemView.findViewById(R.id.imageView_ProfileImage);
             ratingBar = itemView.findViewById(R.id.ratingBar2);
 
         }

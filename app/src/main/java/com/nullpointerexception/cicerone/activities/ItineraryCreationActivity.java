@@ -47,6 +47,7 @@ import com.kinda.mtextfield.ExtendedEditText;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.Blocker;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.Stage;
@@ -183,250 +184,303 @@ public class ItineraryCreationActivity extends AppCompatActivity {
          * Listener for Data field
          *
          */
-        data_box.setOnClickListener(v -> {
-            calendar = Calendar.getInstance();
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            int month = calendar.get(Calendar.MONTH);
-            int year = calendar.get(Calendar.YEAR);
+        data_box.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
 
-            dpd = new DatePickerDialog(v.getContext(), R.style.DialogTheme, (view, year12, month12, dayOfMonth) -> {
-                if(dayOfMonth < 10)
-                    birthdayString += "0" + dayOfMonth + "/";
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    calendar = Calendar.getInstance();
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    int month = calendar.get(Calendar.MONTH);
+                    int year = calendar.get(Calendar.YEAR);
 
-                birthdayString = dayOfMonth + "/";
-                if((month12 + 1) < 10)
-                    birthdayString += "0" + (month12 + 1) + "/" + year12;
-                else
-                    birthdayString += (month12 + 1) + "/" + year12;
-                mData.setText(birthdayString);
-            }, year, month, day);
-            dpd.show();
+                    dpd = new DatePickerDialog(v.getContext(), R.style.DialogTheme, (view, year12, month12, dayOfMonth) -> {
+                        if(dayOfMonth < 10)
+                            birthdayString += "0" + dayOfMonth + "/";
+
+                        birthdayString = dayOfMonth + "/";
+                        if((month12 + 1) < 10)
+                            birthdayString += "0" + (month12 + 1) + "/" + year12;
+                        else
+                            birthdayString += (month12 + 1) + "/" + year12;
+                        mData.setText(birthdayString);
+                    }, year, month, day);
+                    dpd.show();
+                }
+            }
         });
 
         /**
          * Listener for time field
          */
-        orario_box.setOnClickListener(v -> {
-            Calendar mcurrentTime = Calendar.getInstance();
-            int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-            int minute = mcurrentTime.get(Calendar.MINUTE);
-            TimePickerDialog mTimePicker;
-            mTimePicker = new TimePickerDialog(ItineraryCreationActivity.this, R.style.DialogTheme, (timePicker, selectedHour, selectedMinute) -> {
-                String text = "";
-                text += selectedHour;
-                text += ":";
+        orario_box.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
 
-                if(selectedMinute == 0)
-                    text += "00";
-                else if(selectedMinute < 10) {
-                    text += "0";
-                    text += selectedMinute;
-                } else{
-                    text += selectedMinute;
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    Calendar mcurrentTime = Calendar.getInstance();
+                    int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+                    int minute = mcurrentTime.get(Calendar.MINUTE);
+                    TimePickerDialog mTimePicker;
+                    mTimePicker = new TimePickerDialog(ItineraryCreationActivity.this, R.style.DialogTheme, (timePicker, selectedHour, selectedMinute) -> {
+                        String text = "";
+                        text += selectedHour;
+                        text += ":";
+
+                        if(selectedMinute == 0)
+                            text += "00";
+                        else if(selectedMinute < 10) {
+                            text += "0";
+                            text += selectedMinute;
+                        } else{
+                            text += selectedMinute;
+                        }
+
+                        mOra.setText(text);
+                    }, hour, minute, true);
+                    mTimePicker.setTitle(getResources().getString(R.string.time_picker));
+                    mTimePicker.show();
                 }
-
-                mOra.setText(text);
-            }, hour, minute, true);
-            mTimePicker.setTitle(getResources().getString(R.string.time_picker));
-            mTimePicker.show();
+            }
         });
 
         /**
          * Listener to add a place in a itinerary
          */
-        mAddStage.setOnClickListener(v -> {
+        mAddStage.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
 
-            //New layout for place's dialog
-            AlertDialog.Builder mBuilder = new AlertDialog.Builder(ItineraryCreationActivity.this);
-            View mView = getLayoutInflater().inflate(R.layout.activity_dialog_tappe, null);
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    //New layout for place's dialog
+                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(ItineraryCreationActivity.this);
+                    View mView = getLayoutInflater().inflate(R.layout.activity_dialog_tappe, null);
 
-            //Init field of place's layout
-            descrizione_tappa_box = mView.findViewById(R.id.feedback_box);
-            mPlace = mView.findViewById(R.id.place_et);
-            mPlaceDesc = mView.findViewById(R.id.placeDesc_et);
-            place_box = mView.findViewById(R.id.place_box);
-            create_stage = mView.findViewById(R.id.createStage_btn);
-            findPosition = mView.findViewById(R.id.findPosition);
+                    //Init field of place's layout
+                    descrizione_tappa_box = mView.findViewById(R.id.feedback_box);
+                    mPlace = mView.findViewById(R.id.place_et);
+                    mPlaceDesc = mView.findViewById(R.id.placeDesc_et);
+                    place_box = mView.findViewById(R.id.place_box);
+                    create_stage = mView.findViewById(R.id.createStage_btn);
+                    findPosition = mView.findViewById(R.id.findPosition);
 
-            mPlace.setEnabled(false);
+                    mPlace.setEnabled(false);
 
-            //Create a new dialog
-            mBuilder.setView(mView);
-            AlertDialog dialog = mBuilder.create();
+                    //Create a new dialog
+                    mBuilder.setView(mView);
+                    AlertDialog dialog = mBuilder.create();
 
-            //If dialog is dismissed, shows the listStage_title
-            dialog.setOnDismissListener(dialog1 -> {
-                if(tappe.size() == 0 && (listStage_title.getVisibility() == View.GONE) && (errorMsg_tv.getVisibility() == View.GONE))
-                    listStage_title.setVisibility(View.VISIBLE);
-            });
-
-            //Listener to open Google Place autocomplete intent
-            place_box.setOnClickListener(v1 -> {
-                actual_field = Google_field.PLACE.getN();
-                Intent intent = new Autocomplete.IntentBuilder(
-                        AutocompleteActivityMode.FULLSCREEN, fields)
-                        .build(v1.getContext());
-                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-            });
-
-            //Listener to capture user's position
-            findPosition.setOnClickListener(v14 -> {
-
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-
-                gpsPermission = checkLocationPermission();
-
-                if(gpsPermission) {
-
-                    if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
-                        placeResponse.addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                FindCurrentPlaceResponse response = task.getResult();
-                                MaxPlaceLikelihood = null;
-                                int counter = 0;
-
-                                for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                                    if(counter == 0)
-                                        MaxPlaceLikelihood = placeLikelihood;
-
-                                    counter++;
-
-                                    if(MaxPlaceLikelihood.getLikelihood() <= placeLikelihood.getLikelihood())
-                                        MaxPlaceLikelihood = placeLikelihood;
-
-                                    Log.i(TAG, String.format("Place '%s' has likelihood: %f",
-                                            placeLikelihood.getPlace().getName(),
-                                            placeLikelihood.getLikelihood()));
-                                }
-                                //Set the name of Stage in EditText
-                                mPlace.setText(MaxPlaceLikelihood.getPlace().getName());
-                                Log.i(TAG, MaxPlaceLikelihood.getPlace().getName());
-                                //Set attributes of Place in stage
-                                stage = new Stage();
-                                stage.setName(MaxPlaceLikelihood.getPlace().getName());
-                                stage.setCoordinates(MaxPlaceLikelihood.getPlace().getLatLng());
-                                Log.i(TAG, MaxPlaceLikelihood.getPlace().getLatLng().toString());
-                                stage.setAddress(MaxPlaceLikelihood.getPlace().getAddress());
-                                Log.i(TAG, MaxPlaceLikelihood.getPlace().getAddress());
-                            } else {
-                                Exception exception = task.getException();
-                                if (exception instanceof ApiException) {
-                                    ApiException apiException = (ApiException) exception;
-                                    Log.e(TAG, "Place not found: " + apiException.getStatusCode());
-                                }
-                            }
-                        });
-                    }
-                }else {
-                    ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                }
-
-            });
-
-            //Check if the number of character in description field is more than 250 character
-            descrizione_tappa_box.setSimpleTextChangeWatcher((theNewText, isError) -> {
-                if(theNewText.length() > 250)
-                    descrizione_tappa_box.setError(getResources().getString(R.string.max_char), false);
-            });
-
-            //Listener to create a new place for a itinerary
-            create_stage.setOnClickListener(v12 -> {
-                //Check if the number of character in description field is more than 250 character
-                if(mPlaceDesc.getText().toString().length() > 250) {
-
-                    descrizione_tappa_box.setError(getResources().getString(R.string.insert_shorter_desc), false);
-
-                    //Check if the description is empty
-                }else if(mPlaceDesc.getText().toString().isEmpty()) {
-
-                    descrizione_tappa_box.setError(getResources().getString(R.string.no_desc), false);
-
-                    //Check if the name's field is empty
-                }else if(mPlace.getText().toString().isEmpty()) {
-
-                    place_box.setError(getResources().getString(R.string.no_place_name), false);
-
-                    //Check if the place already exist
-                }else if(placeAlreadyExist(stage.getCoordinates())){
-
-                    runOnUiThread(() -> {
-                        // Show error message
-                        new KAlertDialog(mView.getContext(), KAlertDialog.ERROR_TYPE)
-                                .setTitleText(getResources().getString(R.string.error_dialog_title))
-                                .setContentText(getResources().getString(R.string.error_dialog_content))
-                                .setConfirmText(getResources().getString(R.string.error_dialog_confirmText))
-                                .show();
-                    });
-
-                    //It proceeds with the creation of the place both graphically and by adding it
-                    // to the hashmap.
-                }else{
-                    if(errorMsg_tv.getVisibility() == View.VISIBLE)
-                        errorMsg_tv.setVisibility(View.GONE);
-
-                    listStage_title.setVisibility(View.GONE);
-
-                    //Creo nuovo Layout
-                    View newPlace = getLayoutInflater().inflate(R.layout.stage_layout, null);
-                    placeDescription_tv = newPlace.findViewById(R.id.placeDescription_tv);
-                    placeName_tv = newPlace.findViewById(R.id.placeName_tv);
-                    placeAddress_tv = newPlace.findViewById(R.id.placeAddress_tv);
-                    mRemoveStage = newPlace.findViewById(R.id.mRemoveStage);
-
-                    placeName_tv.setText(mPlace.getText().toString());
-                    placeDescription_tv.setText(mPlaceDesc.getText().toString());
-                    placeAddress_tv.setText(stage.getAddress());
-
-                    //Add a tag to the view to allow the tracking of the view
-                    newPlace.setTag(stage.getName());
-
-                    //Listener to remove a place
-                    mRemoveStage.setOnClickListener(v13 -> {
-                        tappe.remove(newPlace.getTag());
-                        linearLayout.removeView(newPlace);
-
-                        if(listStage_title.getVisibility() == View.GONE && tappe.size() == 0)
+                    //If dialog is dismissed, shows the listStage_title
+                    dialog.setOnDismissListener(dialog1 -> {
+                        if(tappe.size() == 0 && (listStage_title.getVisibility() == View.GONE) && (errorMsg_tv.getVisibility() == View.GONE))
                             listStage_title.setVisibility(View.VISIBLE);
                     });
 
-                    linearLayout.addView(newPlace, 0);
+                    //Listener to open Google Place autocomplete intent
+                    place_box.setOnClickListener(new View.OnClickListener() {
+                        private Blocker mBlocker = new Blocker();
 
-                    stage.setDescription(mPlaceDesc.getText().toString());
+                        @Override
+                        public void onClick(View v) {
+                            if (!mBlocker.block()) {
+                                actual_field = Google_field.PLACE.getN();
+                                Intent intent = new Autocomplete.IntentBuilder(
+                                        AutocompleteActivityMode.FULLSCREEN, fields)
+                                        .build(v.getContext());
+                                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+                            }
+                        }
+                    });
 
-                    //Add a place to place list
-                    tappe.put(stage.getName(), stage);
+                    //Listener to capture user's position
+                    findPosition.setOnClickListener(new View.OnClickListener() {
+                        private Blocker mBlocker = new Blocker();
 
-                    dialog.dismiss();
+                        @Override
+                        public void onClick(View v) {
+                            if (!mBlocker.block()) {
+                                ActivityCompat.requestPermissions(ItineraryCreationActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
-                    //Scroll to the end of the scrollView
-                    scrollView.post(() -> ObjectAnimator.ofInt(scrollView, "scrollY",  scrollView.getBottom()).setDuration(800).start());
+                                gpsPermission = checkLocationPermission();
+
+                                if(gpsPermission) {
+
+                                    if (ContextCompat.checkSelfPermission(v.getContext(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                        Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
+                                        placeResponse.addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                FindCurrentPlaceResponse response = task.getResult();
+                                                MaxPlaceLikelihood = null;
+                                                int counter = 0;
+
+                                                for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+                                                    if(counter == 0)
+                                                        MaxPlaceLikelihood = placeLikelihood;
+
+                                                    counter++;
+
+                                                    if(MaxPlaceLikelihood.getLikelihood() <= placeLikelihood.getLikelihood())
+                                                        MaxPlaceLikelihood = placeLikelihood;
+
+                                                    Log.i(TAG, String.format("Place '%s' has likelihood: %f",
+                                                            placeLikelihood.getPlace().getName(),
+                                                            placeLikelihood.getLikelihood()));
+                                                }
+                                                //Set the name of Stage in EditText
+                                                mPlace.setText(MaxPlaceLikelihood.getPlace().getName());
+                                                Log.i(TAG, MaxPlaceLikelihood.getPlace().getName());
+                                                //Set attributes of Place in stage
+                                                stage = new Stage();
+                                                stage.setName(MaxPlaceLikelihood.getPlace().getName());
+                                                stage.setCoordinates(MaxPlaceLikelihood.getPlace().getLatLng());
+                                                Log.i(TAG, MaxPlaceLikelihood.getPlace().getLatLng().toString());
+                                                stage.setAddress(MaxPlaceLikelihood.getPlace().getAddress());
+                                                Log.i(TAG, MaxPlaceLikelihood.getPlace().getAddress());
+                                            } else {
+                                                Exception exception = task.getException();
+                                                if (exception instanceof ApiException) {
+                                                    ApiException apiException = (ApiException) exception;
+                                                    Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+                                                }
+                                            }
+                                        });
+                                    }
+                                }else {
+                                    ActivityCompat.requestPermissions(ItineraryCreationActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                                }
+                            }
+                        }
+                    });
+
+                    //Check if the number of character in description field is more than 250 character
+                    descrizione_tappa_box.setSimpleTextChangeWatcher((theNewText, isError) -> {
+                        if(theNewText.length() > 250)
+                            descrizione_tappa_box.setError(getResources().getString(R.string.max_char), false);
+                    });
+
+                    //Listener to create a new place for a itinerary
+                    create_stage.setOnClickListener(new View.OnClickListener() {
+                        private Blocker mBlocker = new Blocker();
+
+                        @Override
+                        public void onClick(View v) {
+                            if (!mBlocker.block()) {
+                                //Check if the number of character in description field is more than 250 character
+                                if(mPlaceDesc.getText().toString().length() > 250) {
+
+                                    descrizione_tappa_box.setError(getResources().getString(R.string.insert_shorter_desc), false);
+
+                                    //Check if the description is empty
+                                }else if(mPlaceDesc.getText().toString().isEmpty()) {
+
+                                    descrizione_tappa_box.setError(getResources().getString(R.string.no_desc), false);
+
+                                    //Check if the name's field is empty
+                                }else if(mPlace.getText().toString().isEmpty()) {
+
+                                    place_box.setError(getResources().getString(R.string.no_place_name), false);
+
+                                    //Check if the place already exist
+                                }else if(placeAlreadyExist(stage.getCoordinates())){
+
+                                    runOnUiThread(() -> {
+                                        // Show error message
+                                        new KAlertDialog(mView.getContext(), KAlertDialog.ERROR_TYPE)
+                                                .setTitleText(getResources().getString(R.string.error_dialog_title))
+                                                .setContentText(getResources().getString(R.string.error_dialog_content))
+                                                .setConfirmText(getResources().getString(R.string.error_dialog_confirmText))
+                                                .show();
+                                    });
+
+                                    //It proceeds with the creation of the place both graphically and by adding it
+                                    // to the hashmap.
+                                }else{
+                                    if(errorMsg_tv.getVisibility() == View.VISIBLE)
+                                        errorMsg_tv.setVisibility(View.GONE);
+
+                                    listStage_title.setVisibility(View.GONE);
+
+                                    //Creo nuovo Layout
+                                    View newPlace = getLayoutInflater().inflate(R.layout.stage_layout, null);
+                                    placeDescription_tv = newPlace.findViewById(R.id.placeDescription_tv);
+                                    placeName_tv = newPlace.findViewById(R.id.placeName_tv);
+                                    placeAddress_tv = newPlace.findViewById(R.id.placeAddress_tv);
+                                    mRemoveStage = newPlace.findViewById(R.id.mRemoveStage);
+
+                                    placeName_tv.setText(mPlace.getText().toString());
+                                    placeDescription_tv.setText(mPlaceDesc.getText().toString());
+                                    placeAddress_tv.setText(stage.getAddress());
+
+                                    //Add a tag to the view to allow the tracking of the view
+                                    newPlace.setTag(stage.getName());
+
+                                    //Listener to remove a place
+                                    mRemoveStage.setOnClickListener(v13 -> {
+                                        tappe.remove(newPlace.getTag());
+                                        linearLayout.removeView(newPlace);
+
+                                        if(listStage_title.getVisibility() == View.GONE && tappe.size() == 0)
+                                            listStage_title.setVisibility(View.VISIBLE);
+                                    });
+
+                                    linearLayout.addView(newPlace, 0);
+
+                                    stage.setDescription(mPlaceDesc.getText().toString());
+
+                                    //Add a place to place list
+                                    tappe.put(stage.getName(), stage);
+
+                                    dialog.dismiss();
+
+                                    //Scroll to the end of the scrollView
+                                    scrollView.post(() -> ObjectAnimator.ofInt(scrollView, "scrollY",  scrollView.getBottom()).setDuration(800).start());
+                                }
+                            }
+                        }
+                    });
+
+                    dialog.show();
                 }
-            });
-
-            dialog.show();
+            }
         });
 
         /**
          * Listener for location's field
          */
-        luogo_box.setOnClickListener(v -> {
-            actual_field = Google_field.LUOGO.getN();
-            Intent intent = new Autocomplete.IntentBuilder(
-                    AutocompleteActivityMode.FULLSCREEN, fields)
-                    .build(v.getContext());
-            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+        luogo_box.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    actual_field = googleAutocompletationField.LUOGO.getN();
+                    Intent intent = new Autocomplete.IntentBuilder(
+                            AutocompleteActivityMode.FULLSCREEN, fields)
+                            .build(v.getContext());
+                    startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+                }
+            }
         });
 
         /**
          * Listener for meeting place's field
          */
-        punto_box.setOnClickListener(v -> {
-            actual_field = Google_field.PUNTO_DI_INCONTRO.getN();
-            Intent intent = new Autocomplete.IntentBuilder(
-                    AutocompleteActivityMode.FULLSCREEN, fields)
-                    .build(v.getContext());
-            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+        punto_box.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    actual_field = googleAutocompletationField.PUNTO_DI_INCONTRO.getN();
+                    Intent intent = new Autocomplete.IntentBuilder(
+                            AutocompleteActivityMode.FULLSCREEN, fields)
+                            .build(v.getContext());
+                    startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+                }
+            }
         });
 
         /**
@@ -828,12 +882,19 @@ public class ItineraryCreationActivity extends AppCompatActivity {
 
                 newPlace.setTag(entry.getValue().getName());
 
-                mRemoveStage.setOnClickListener(v13 -> {
-                    tappe.remove(newPlace.getTag());
-                    linearLayout.removeView(newPlace);
+                mRemoveStage.setOnClickListener(new View.OnClickListener() {
+                    private Blocker mBlocker = new Blocker();
 
-                    if(listStage_title.getVisibility() == View.GONE && tappe.size() == 0)
-                        listStage_title.setVisibility(View.VISIBLE);
+                    @Override
+                    public void onClick(View v) {
+                        if (!mBlocker.block()) {
+                            tappe.remove(newPlace.getTag());
+                            linearLayout.removeView(newPlace);
+
+                            if(listStage_title.getVisibility() == View.GONE && tappe.size() == 0)
+                                listStage_title.setVisibility(View.VISIBLE);
+                        }
+                    }
                 });
 
                 linearLayout.addView(newPlace, 0);

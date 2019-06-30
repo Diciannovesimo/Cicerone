@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
 
@@ -14,6 +15,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.Blocker;
 import com.nullpointerexception.cicerone.components.User;
 
 import java.util.Calendar;
@@ -92,6 +94,27 @@ public class SettingsActivity extends AppCompatActivity {
                         mDate.setText(birthdayString);
                     }, year, month, day);
             dpd.show();
+        });
+
+        mDate.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onClick(View v) {
+                if (!mBlocker.block()) {
+                    calendar = Calendar.getInstance();
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    int month = calendar.get(Calendar.MONTH);
+                    int year = calendar.get(Calendar.YEAR);
+
+                    dpd = new DatePickerDialog(v.getContext(), R.style.DialogTheme,
+                            (view1, year1, month1, dayOfMonth) -> {
+                                String birthdayString = dayOfMonth + "/" + (month1 + 1) + "/" + year1;
+                                mDate.setText(birthdayString);
+                            }, year, month, day);
+                    dpd.show();
+                }
+            }
         });
     }
 

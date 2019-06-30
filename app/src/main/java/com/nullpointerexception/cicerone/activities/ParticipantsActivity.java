@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nullpointerexception.cicerone.R;
-import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.Blocker;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
@@ -120,7 +119,6 @@ class AdapterPartecipants extends RecyclerView.Adapter <AdapterPartecipants.MyVi
 
         new ProfileImageFetcher(context).fetchImageOf(participants.get(position), drawable ->
         {
-
             if(drawable != null)
                 holder.imgProfile.setImageDrawable(drawable);
         });
@@ -128,12 +126,16 @@ class AdapterPartecipants extends RecyclerView.Adapter <AdapterPartecipants.MyVi
 
         //Ascolto l'evento click
         holder.itemView.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
             @Override
             public void onClick(View v) {
-                Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
-                intent2.putExtra("id_cicerone_to_show",participants.get(position).getId());
-                intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                v.getContext().startActivity(intent2);
+                if (!mBlocker.block(1000)) {
+                    Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
+                    intent2.putExtra("id_cicerone_to_show",participants.get(position).getId());
+                    intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    v.getContext().startActivity(intent2);
+                }
             }
         });
 
@@ -144,18 +146,17 @@ class AdapterPartecipants extends RecyclerView.Adapter <AdapterPartecipants.MyVi
         return participants.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    class MyViewHolder extends RecyclerView.ViewHolder{
 
         TextView name, surname;
         ImageView imgProfile;
 
-        public MyViewHolder(@NonNull View itemView) {
+        MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            name = (TextView) itemView.findViewById(R.id.textView_Name);
-            surname = (TextView) itemView.findViewById(R.id.textView_Surname);
-            imgProfile = (ImageView) itemView.findViewById(R.id.imageView_ProfileImage);
-
+            name = itemView.findViewById(R.id.textView_Name);
+            surname = itemView.findViewById(R.id.textView_Surname);
+            imgProfile = itemView.findViewById(R.id.imageView_ProfileImage);
         }
     }
 

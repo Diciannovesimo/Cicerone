@@ -194,11 +194,17 @@ class ItinerariesAdapter extends RecyclerView.Adapter
 
         viewHolder.getView().setAsLastElement((position == dataSet.size() -1 && dataSet.size() > 3));
 
-        viewHolder.getView().setOnViewClickListener(() ->
-        {
-            Context context = viewHolder.getView().getContext();
-            ObjectSharer.get().shareObject("show_trip_as_cicerone", dataSet.get(position));
-            context.startActivity(new Intent(context, ItineraryActivity.class));
+        viewHolder.getView().setOnViewClickListener(new ItineraryView.OnViewClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onViewClick() {
+                if (!mBlocker.block()) {
+                    Context context = viewHolder.getView().getContext();
+                    ObjectSharer.get().shareObject("show_trip_as_cicerone", dataSet.get(position));
+                    context.startActivity(new Intent(context, ItineraryActivity.class));
+                }
+            }
         });
 
         viewHolder.getView().setOnEditButtonClickListener(() ->
