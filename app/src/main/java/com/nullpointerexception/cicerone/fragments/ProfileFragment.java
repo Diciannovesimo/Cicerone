@@ -22,6 +22,7 @@ import com.nullpointerexception.cicerone.activities.ProfileActivity;
 import com.nullpointerexception.cicerone.activities.SettingsActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.Feedback;
+import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
 
@@ -73,6 +74,20 @@ public class ProfileFragment extends Fragment
         feedbakcTitle = v.findViewById(R.id.feedbackListTitle_tv);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        View view = null;
+        if(ObjectSharer.get().getSharedObject("view") != null)
+            view = (View) ObjectSharer.get().getSharedObject("view");
+
+        if(view != null)
+            setTextField(view);
+
+        ObjectSharer.get().remove("view");
+    }
+
     /**
      * @brief Set text field
      */
@@ -112,6 +127,7 @@ public class ProfileFragment extends Fragment
         //Set click listener for settings button
         settings_btn.setOnClickListener(v1 -> {
             startActivity(new Intent(getContext(), SettingsActivity.class));
+            ObjectSharer.get().shareObject("view", v);
         });
         
         List<Feedback> feedbacks = new ArrayList<>();
