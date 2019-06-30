@@ -44,8 +44,10 @@
 
         <studio.carbonylgroup.textfieldboxes.TextFieldBoxes
             android:id="@+id/place_box"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
+            android:layout_width="350dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:visibility="visible"
             app:labelText="Luogo"
             app:primaryColor="@color/colorPrimary"
             app:secondaryColor="@color/notPressedEt">
@@ -61,14 +63,11 @@
 
         <ImageView
             android:id="@+id/findPosition"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="end"
-            android:clickable="true"
-            android:padding="5dp"
-            android:visibility="visible"
+            android:layout_marginStart="5dp"
             app:srcCompat="@drawable/ic_placeholder" />
-
     </LinearLayout>
 
     <com.kinda.mtextfield.TextFieldBoxes

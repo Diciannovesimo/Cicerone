@@ -197,7 +197,15 @@ public class ItineraryActivity extends AppCompatActivity
         else
             cityImage.setImageDrawable(resource);
 
-        mDateCard.setText(itinerary.getDate());
+        try {
+            Date day = new SimpleDateFormat("yyyy/MM/dd", Locale.ITALY).parse(itinerary.getDate());
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
+            String dayString = formatter.format(day);
+            mDateCard.setText(dayString);
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+        }
+
         mPlaceCard.setText(itinerary.getMeetingPlace());
         mTimeCard.setText(itinerary.getMeetingTime());
 
