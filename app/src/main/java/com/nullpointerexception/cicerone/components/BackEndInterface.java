@@ -199,7 +199,11 @@ public class BackEndInterface
             }
             else
             {
-                String fieldValue = encrypt(storedFieldValue.getValue());
+                String fieldValue;
+                if(ref.getKey().equalsIgnoreCase("date"))
+                    fieldValue = storedFieldValue.getValue();
+                else
+                    fieldValue = encrypt(storedFieldValue.getValue());
                 result = ref.setValue( fieldValue );
             }
         }
