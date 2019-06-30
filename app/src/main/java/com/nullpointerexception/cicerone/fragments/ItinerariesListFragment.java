@@ -150,6 +150,12 @@ public class ItinerariesListFragment extends Fragment
             }
         });
 
+        if(getActivity().getIntent().hasExtra("notification_info"))
+        {
+            startActivity(new Intent(getContext(), ItineraryActivity.class));
+            getActivity().getIntent().removeExtra("notification_info");
+        }
+
         return view;
     }
 

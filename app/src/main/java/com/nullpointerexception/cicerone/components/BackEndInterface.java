@@ -511,10 +511,10 @@ public class BackEndInterface
     /**
      *      Check and retrieve a notification from a given user.
      *
-     *      @param notification
-     *      @param onOperationCompleteListener
+     *      @param notification notification to set
+     *      @param onOperationCompleteListener  Implementation of callback method
      */
-    public void checkNotificationFor(UserNotification notification, Context context, OnOperationCompleteListener onOperationCompleteListener)
+    public void checkNotificationsFor(UserNotification notification, Context context, OnOperationCompleteListener onOperationCompleteListener)
     {
         if(notification == null || onOperationCompleteListener == null)
             return;
@@ -522,38 +522,32 @@ public class BackEndInterface
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("usernotification")
                 .child(notification.getIdUser());
-        Query query = ref.orderByKey().limitToFirst(1);
+        Query query = ref.orderByKey();
 
-        ValueEventListener valueEventListener = new ValueEventListener()
+        query.addValueEventListener(new ValueEventListener()
         {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
             {
-                //  Check if app is in foreground
-                if(AuthenticationManager.get().getUserLogged() != null)
-                    query.removeEventListener(this);
+                query.removeEventListener(this);
 
                 for(DataSnapshot ds : dataSnapshot.getChildren())
                 {
                     notification.setTitle(ds.child("title").getValue(String.class));
                     notification.setContent(ds.child("content").getValue(String.class));
-                }
+                    notification.setIdItinerary(ds.child("idItinerary").getValue(String.class));
 
-                if(onOperationCompleteListener != null)
                     onOperationCompleteListener.onSuccess();
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError)
             {
                 Log.e(TAG, "Error: " + databaseError.toString());
-                if(onOperationCompleteListener != null)
-                    onOperationCompleteListener.onError();
+                onOperationCompleteListener.onError();
             }
-        };
-
-        query.removeEventListener(valueEventListener);
-        query.addValueEventListener(valueEventListener);
+        });
     }
 
     /**

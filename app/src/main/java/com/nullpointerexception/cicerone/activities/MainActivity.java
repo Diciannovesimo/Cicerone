@@ -4,6 +4,7 @@ package com.nullpointerexception.cicerone.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -20,6 +21,9 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AlarmReceiver;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.BackEndInterface;
+import com.nullpointerexception.cicerone.components.Itinerary;
+import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
 import com.nullpointerexception.cicerone.fragments.HomeFragment;
@@ -90,6 +94,39 @@ public class MainActivity extends AppCompatActivity
         }
 
         drawMenuWith(profileDrawerItem);
+
+        if(getIntent().hasExtra("notification_info"))
+        {
+            Log.i("Notifiche", "MainActivity -> checking extra");
+
+            Itinerary itinerary = new Itinerary();
+            itinerary.setId(getIntent().getExtras().getString("notification_info"));
+            itinerary.getFieldsFromId();
+
+            BackEndInterface.get().getEntity(itinerary, new BackEndInterface.OnOperationCompleteListener()
+            {
+                @Override
+                public void onSuccess()
+                {
+                    //  If itinerary has been created by this user
+                    if(itinerary.getCicerone().getId().equals(AuthenticationManager.get().getUserLogged().getId()))
+                    {
+                        showSection(BOTTOM_NAVIGATION_ITINERARIES);
+                        bottomNavigation.setCurrentActiveItem(BOTTOM_NAVIGATION_ITINERARIES);
+                        ObjectSharer.get().shareObject("show_trip_as_cicerone", itinerary);
+                    }
+                    else
+                    {
+                        showSection(BOTTOM_NAVIGATION_TRIPS);
+                        bottomNavigation.setCurrentActiveItem(BOTTOM_NAVIGATION_TRIPS);
+                        ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
+                    }
+                }
+
+                @Override
+                public void onError() { }
+            });
+        }
     }
 
     private void showSection(int index)

@@ -17,7 +17,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.nullpointerexception.cicerone.R;
-import com.nullpointerexception.cicerone.activities.MainActivity;
+import com.nullpointerexception.cicerone.activities.SplashScreen;
 
 /**
  *      An {@link IntentService} subclass for handling asynchronous task requests in
@@ -28,10 +28,19 @@ import com.nullpointerexception.cicerone.activities.MainActivity;
  */
 public class NotificationsListener extends JobIntentService
 {
+    /**   Id of job done from this class  */
     private static final int JOB_ID = 3492;
+    /**   Counter used to assign an unique id to notifications */
     private static int counterId = 0;
+    /**   Context used by this service */
     private static Context context;
 
+    /**
+     *      Starts service.
+     *
+     *      @param ctx  context from where si called.
+     *      @param intent   intent from where is called.
+     */
     public static void enqueueWork(Context ctx, Intent intent)
     {
         context = ctx;
@@ -43,6 +52,13 @@ public class NotificationsListener extends JobIntentService
     {
         Log.i("NotificationsListener", "Service is running...");
 
+        SharedPreferences sharedPreferences = getSharedPreferences("notificationsListener", MODE_PRIVATE);
+        if( ! sharedPreferences.getBoolean("notificationsEnabled", true))
+        {
+            stopSelf();
+            return;
+        }
+
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         if(alarmManager == null)
@@ -53,13 +69,8 @@ public class NotificationsListener extends JobIntentService
 
         checkForNotifications();
 
-        //  Used to check if app is running
-        if(AuthenticationManager.get().getUserLogged() != null)
-        {
-            //  App is running
-            AlarmReceiver.setAlarm(context, false);
-            stopSelf();
-        }
+        AlarmReceiver.setAlarm(context, false);
+        stopSelf();
     }
 
     @Override
@@ -69,6 +80,9 @@ public class NotificationsListener extends JobIntentService
         super.onDestroy();
     }
 
+    /**
+     *      Checks on database if there are pending notifications to show.
+     */
     private void checkForNotifications()
     {
         SharedPreferences sharedPreferences = getSharedPreferences("notificationsListener", MODE_PRIVATE);
@@ -86,7 +100,7 @@ public class NotificationsListener extends JobIntentService
 
         UserNotification notification = new UserNotification(id);
 
-        BackEndInterface.get().checkNotificationFor(notification, this, new BackEndInterface.OnOperationCompleteListener()
+        BackEndInterface.get().checkNotificationsFor(notification, this, new BackEndInterface.OnOperationCompleteListener()
         {
             @Override
             public void onSuccess()
@@ -105,20 +119,29 @@ public class NotificationsListener extends JobIntentService
             }
 
             @Override
-            public void onError()
-            {
-
-            }
+            public void onError() { }
         });
     }
 
+    /**
+     *      Show the specified notification.
+     *
+     *      @param notification notification to show.
+     */
     private void displayNotification(UserNotification notification)
     {
         createNotificationChannel();
 
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, counterId, intent, 0);
+        Intent intent = new Intent(this, SplashScreen.class);
+        if(notification.getIdItinerary() != null && ! notification.getIdItinerary().trim().isEmpty())
+        {
+            Log.i("Notifiche", "displayNotification() -> putExtra");
+            intent.putExtra("notification_info", notification.getIdItinerary());
+        }
+        else
+            Log.i("Notifiche", "displayNotification() -> Error: no id itinerary");
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, counterId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, String.valueOf("app_notifications".hashCode()))
                 .setSmallIcon(R.drawable.ic_notification)
@@ -132,6 +155,9 @@ public class NotificationsListener extends JobIntentService
         notificationManager.notify(counterId++, builder.build());
     }
 
+    /**
+     *      Create notification channel to support notifications system on versions higher than Android Nougat
+     */
     private void createNotificationChannel()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)

@@ -85,6 +85,12 @@ public class TripsListFragment extends Fragment
             }
         });
 
+        if(getActivity().getIntent().hasExtra("notification_info"))
+        {
+            startActivityForResult(new Intent(getContext(), ItineraryActivity.class), 0);
+            getActivity().getIntent().removeExtra("notification_info");
+        }
+
         return view;
     }
 

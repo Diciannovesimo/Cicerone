@@ -20,7 +20,9 @@ public class UserNotification extends StorableEntity
     /**    Text to show as notification title */
     protected String title,
     /**    Text to show as notification content */
-                   content;
+                     content,
+    /**    Id of itinerary to show when this notification get clicked */
+                     idItinerary;
 
     public UserNotification(String userTarget)
     {
@@ -58,6 +60,14 @@ public class UserNotification extends StorableEntity
         this.content = content;
     }
 
+    public String getIdItinerary() {
+        return idItinerary;
+    }
+
+    public void setIdItinerary(String idItinerary) {
+        this.idItinerary = idItinerary;
+    }
+
     @Override
     public String getId()
     {
@@ -78,11 +88,12 @@ public class UserNotification extends StorableEntity
         UserNotification that = (UserNotification) o;
         return Objects.equals(getIdUser(), that.getIdUser()) &&
                 Objects.equals(getTitle(), that.getTitle()) &&
-                Objects.equals(getContent(), that.getContent());
+                Objects.equals(getContent(), that.getContent()) &&
+                Objects.equals(getIdItinerary(), that.getIdItinerary());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getIdUser(), getTitle(), getContent());
+        return Objects.hash(getIdUser(), getTitle(), getContent(), getIdItinerary());
     }
 }

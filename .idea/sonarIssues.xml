@@ -48,6 +48,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/activities/FeedBacksActivity.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/activities/FindItineraryActivty.java">
           <value>
             <set />
@@ -79,6 +84,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/activities/ParticipantsActivity.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/nullpointerexception/cicerone/activities/ProfileActivity.java">
           <value>
             <set />
           </value>
@@ -279,6 +289,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/res/layout/activity_dialog_tappe.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/layout/activity_profile.xml">
           <value>
             <set />
           </value>

@@ -713,6 +713,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
                                                     for(User user : new_itinerary.getParticipants())
                                                     {
                                                         UserNotification notification = new UserNotification(user.getId());
+                                                        notification.setIdItinerary(new_itinerary.getId());
                                                         notification.setTitle("Itinerario modificato");
                                                         notification.setContent("L'itinerario per " + new_itinerary.getLocation() +
                                                                 " a cui sei iscritto è stato modificato.");

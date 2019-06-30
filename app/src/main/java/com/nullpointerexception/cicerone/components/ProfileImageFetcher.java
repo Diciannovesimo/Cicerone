@@ -56,7 +56,7 @@ public class ProfileImageFetcher
     {
         String url = user.getProfileImageUrl();
 
-        if(url != null && ! url.isEmpty())
+        if(url != null && ! url.trim().isEmpty())
         {
             Glide.with(context)
                     .load(url)

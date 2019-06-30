@@ -187,6 +187,14 @@ class AdapterReviewProfileFragment extends RecyclerView.Adapter <AdapterReviewPr
 
         User user = new User();
         user.setId(feedbacks.get(position).getIdUser());
+        String displayName = feedbacks.get(position).getDisplayNameUser();
+        if(displayName.contains(" "))
+        {
+            user.setName(displayName.substring(0, displayName.indexOf(" ")));
+            user.setSurname(displayName.substring(displayName.indexOf(" ")+1));
+        }
+        else
+            user.setName(displayName);
         user.setProfileImageUrl(feedbacks.get(position).getProfileImageUrlUser());
 
         new ProfileImageFetcher(context).fetchImageOf(user, drawable ->
