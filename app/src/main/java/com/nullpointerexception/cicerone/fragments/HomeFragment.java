@@ -15,6 +15,7 @@ import com.nullpointerexception.cicerone.activities.FindItineraryActivty;
 import com.nullpointerexception.cicerone.activities.ItineraryCreationActivity;
 import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.Blocker;
 
 public class HomeFragment extends Fragment
 {
@@ -47,11 +48,27 @@ public class HomeFragment extends Fragment
                     getResources().getString(R.string.homePre) + " " +
                             AuthenticationManager.get().getUserLogged().getName() + " !");
 
-        buttonCreateItinerary.setOnClickListener(v ->
-                startActivity(new Intent(getContext(), ItineraryCreationActivity.class)));
+        buttonCreateItinerary.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
 
-        buttonFindItinerary.setOnClickListener(v ->
-                startActivity(new Intent(getContext(), FindItineraryActivty.class)));
+            @Override
+            public void onClick(View v) {
+                if(!mBlocker.block()) {
+                    startActivity(new Intent(getContext(), ItineraryCreationActivity.class));
+                }
+            }
+        });
+
+        buttonFindItinerary.setOnClickListener(new View.OnClickListener() {
+            private Blocker mBlocker = new Blocker();
+
+            @Override
+            public void onClick(View v) {
+                if(!mBlocker.block()) {
+                    startActivity(new Intent(getContext(), FindItineraryActivty.class));
+                }
+            }
+        });
 
         return view;
     }

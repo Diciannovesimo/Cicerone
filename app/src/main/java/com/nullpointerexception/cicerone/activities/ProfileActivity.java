@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -181,8 +180,10 @@ public class ProfileActivity extends AppCompatActivity {
             sndFeedBtn.setOnClickListener(v -> {
 
                 for(int i = 0; i < user.getFeedbacks().size(); ++i) {
-                    if (userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser()))
+                    if (userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
                         found = true;
+                        position = i;
+                    }
                 }
 
                 rating = (int) ratingBar.getRating();
@@ -242,8 +243,12 @@ public class ProfileActivity extends AppCompatActivity {
             });
 
             removeFeedback.setOnClickListener(v -> {
-                Log.i(TAG, "entrato");
 
+                for(int i = 0; i < user.getFeedbacks().size(); ++i) {
+                    if (userLogged.getId().equals(user.getFeedbacks().get(i).getIdUser())) {
+                        position = i;
+                    }
+                }
                 Feedback temp_feedback = user.getFeedbacks().get(position);
                 user.removeFeedback(temp_feedback);
 
@@ -260,6 +265,7 @@ public class ProfileActivity extends AppCompatActivity {
                                         removeFeedback.setEnabled(false);
                                         sndFeedBtn.setText("Invia");
                                         mComment.setText("");
+                                        found = false;
                                     }
 
                                     @Override
@@ -310,12 +316,14 @@ public class ProfileActivity extends AppCompatActivity {
     private boolean checkError() {
         boolean alright = true;
 
-        if (mComment != null &&
-                mComment.getText().toString().equals(user.getFeedbacks().get(position).getComment())
-                && !user.getFeedbacks().get(position).getComment().isEmpty()
-                && !mComment.getText().toString().isEmpty()) {
-            textFieldBoxes.setError("Hai inserito lo stesso commento", true);
-            alright = false;
+        if(user.getFeedbacks().get(position) != null) {
+            if (mComment != null &&
+                    mComment.getText().toString().equals(user.getFeedbacks().get(position).getComment())
+                    && !user.getFeedbacks().get(position).getComment().isEmpty()
+                    && !mComment.getText().toString().isEmpty()) {
+                textFieldBoxes.setError("Hai inserito lo stesso commento", true);
+                alright = false;
+            }
         }
 
         return alright;
