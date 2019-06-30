@@ -38,7 +38,8 @@
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
         android:background="@drawable/circle_text_bg"
-        android:paddingStart="5dp"
+        android:padding="8dp"
+        android:paddingStart="10dp"
         tools:text="Indirizzo" />
 
     <TextView
@@ -50,7 +51,8 @@
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
         android:background="@drawable/circle_text_bg"
-        android:paddingStart="5dp"
+        android:padding="8dp"
+        android:paddingStart="25dp"
         tools:text="Descrizione tappa" />
 
     <View

@@ -493,7 +493,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
                 n_part = Integer.parseInt(theNewText);
 
             if(n_part > 100) {
-                partecipanti_box.setError(getResources().getString(R.string.max_char), true);
+                partecipanti_box.setError("Superato numero massimo partecipanti", true);
             }
         });
 
