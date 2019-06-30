@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import ru.bullyboo.encoder.Encoder;
+import ru.bullyboo.encoder.methods.AES;
+
 /**
  *      Interfaces components to FireBase Database,
  *      encrypting/decrypting data, giving a clear output.
@@ -54,14 +57,12 @@ public class BackEndInterface
         if(string == null)
             string = "";
 
-        /*
         return Encoder.BuilderAES()
                 .message(string)
                 .method(AES.Method.AES_CBC_ISO10126PADDING)
                 .key(ENCRYPTION_KEY)
                 .keySize(AES.Key.SIZE_256)
-                .encrypt();*/
-        return string;
+                .encrypt();
     }
 
     /**
@@ -75,15 +76,12 @@ public class BackEndInterface
         if(string == null)
             string = "";
 
-        /*
         return Encoder.BuilderAES()
                 .message(string)
                 .method(AES.Method.AES_CBC_ISO10126PADDING)
                 .key(ENCRYPTION_KEY)
                 .keySize(AES.Key.SIZE_256)
-                .decrypt();*/
-
-        return string;
+                .decrypt();
     }
 
     /**
@@ -266,7 +264,7 @@ public class BackEndInterface
                                     String subFieldName = dsChild2.getKey();
 
                                     if(subFieldName != null)
-                                        map.put(subFieldName, dsChild2.getValue(String.class));
+                                        map.put(subFieldName, decrypt(dsChild2.getValue(String.class)) );
                                 }
 
                                 fieldValues.add(new FieldValue(new StorableAsField()
@@ -301,7 +299,7 @@ public class BackEndInterface
                                 String subFieldName = dsChild.getKey();
 
                                 if(subFieldName != null)
-                                    map.put(subFieldName, dsChild.getValue(String.class));
+                                    map.put(subFieldName, decrypt(dsChild.getValue(String.class)) );
                             }
 
                             fields.put(fieldName, new FieldValue(new StorableAsField()
@@ -533,9 +531,9 @@ public class BackEndInterface
 
                 for(DataSnapshot ds : dataSnapshot.getChildren())
                 {
-                    notification.setTitle(ds.child("title").getValue(String.class));
-                    notification.setContent(ds.child("content").getValue(String.class));
-                    notification.setIdItinerary(ds.child("idItinerary").getValue(String.class));
+                    notification.setTitle( decrypt(ds.child("title").getValue(String.class)) );
+                    notification.setContent( decrypt(ds.child("content").getValue(String.class)) );
+                    notification.setIdItinerary( decrypt(ds.child("idItinerary").getValue(String.class)) );
 
                     onOperationCompleteListener.onSuccess();
                 }
@@ -584,7 +582,7 @@ public class BackEndInterface
                             String subFieldName = dsChild2.getKey();
 
                             if(subFieldName != null)
-                                map.put(subFieldName, dsChild2.getValue(String.class));
+                                map.put(subFieldName, decrypt(dsChild2.getValue(String.class)) );
                         }
 
                         fieldValues.add(new FieldValue(new StorableAsField()
@@ -629,7 +627,7 @@ public class BackEndInterface
                         String subFieldName = dsChild.getKey();
 
                         if(subFieldName != null)
-                            map.put(subFieldName, dsChild.getValue(String.class));
+                            map.put(subFieldName, decrypt(dsChild.getValue(String.class)) );
                     }
 
                     saf.restoreSubFields(map);
