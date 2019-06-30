@@ -120,7 +120,7 @@ public class NotificationsListener extends JobIntentService
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, counterId, intent, 0);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "app_notifications")
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, String.valueOf("app_notifications"))
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(notification.getTitle())
                 .setContentText(notification.getContent())
