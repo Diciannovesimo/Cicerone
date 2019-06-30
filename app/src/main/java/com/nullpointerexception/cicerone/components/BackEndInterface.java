@@ -529,8 +529,6 @@ public class BackEndInterface
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
             {
-                Log.i("NotificationsListener", "checking...");
-
                 //  Check if app is in foreground
                 if(AuthenticationManager.get().getUserLogged() != null)
                     query.removeEventListener(this);

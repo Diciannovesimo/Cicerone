@@ -29,6 +29,7 @@ import com.nullpointerexception.cicerone.activities.MainActivity;
 public class NotificationsListener extends JobIntentService
 {
     private static final int JOB_ID = 3492;
+    private static int counterId = 0;
     private static Context context;
 
     public static void enqueueWork(Context ctx, Intent intent)
@@ -117,7 +118,7 @@ public class NotificationsListener extends JobIntentService
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, counterId, intent, 0);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "app_notifications")
                 .setSmallIcon(R.drawable.ic_notification)
@@ -128,7 +129,7 @@ public class NotificationsListener extends JobIntentService
                 .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(notification.getId().hashCode(), builder.build());
+        notificationManager.notify(counterId++, builder.build());
     }
 
     private void createNotificationChannel()
@@ -138,9 +139,10 @@ public class NotificationsListener extends JobIntentService
             CharSequence name = "app_notifications";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(String.valueOf(name.hashCode()), name, importance);
+            channel.setDescription("Notifications of itineraries.");
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            if(notificationManager != null)
-                notificationManager.createNotificationChannel(channel);
+            notificationManager.createNotificationChannel(channel);
         }
     }
+
 }
