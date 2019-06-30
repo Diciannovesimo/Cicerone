@@ -681,7 +681,11 @@ public class BackEndInterface
         }
         else
         {
-            String fieldValue = decrypt(ds.getValue(String.class));
+            String fieldValue;
+            if(ds.getKey().equalsIgnoreCase("date"))
+                fieldValue = ds.getValue(String.class);
+            else
+                fieldValue = decrypt(ds.getValue(String.class));
 
             if(fieldValue != null)
                 return fieldValue;
