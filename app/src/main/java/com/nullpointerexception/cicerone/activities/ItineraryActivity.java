@@ -372,6 +372,7 @@ public class ItineraryActivity extends AppCompatActivity
                                     UserNotification notification = new UserNotification(
                                             itinerary.getCicerone().getId()
                                     );
+                                    notification.setIdItinerary(itinerary.getId());
                                     notification.setTitle("Nuova tappa");
                                     notification.setContent(user.getDisplayName() + " ha proposto una nuova tappa al tuo itinerario per " +
                                             itinerary.getLocation());
@@ -557,6 +558,7 @@ public class ItineraryActivity extends AppCompatActivity
                                                     UserNotification notification = new UserNotification(
                                                             itinerary.getCicerone().getId()
                                                     );
+                                                    notification.setIdItinerary(itinerary.getId());
                                                     notification.setTitle("Nuovo partecipante");
                                                     notification.setContent(user.getDisplayName() + " si è unito al tuo itinerario per " +
                                                             itinerary.getLocation());
@@ -620,6 +622,7 @@ public class ItineraryActivity extends AppCompatActivity
                                                 UserNotification notification = new UserNotification(
                                                         itinerary.getCicerone().getId()
                                                 );
+                                                notification.setIdItinerary(itinerary.getId());
                                                 notification.setTitle("Nuovo partecipante");
                                                 notification.setContent(user.getDisplayName() + " si è unito al tuo itinerario per " +
                                                         itinerary.getLocation());

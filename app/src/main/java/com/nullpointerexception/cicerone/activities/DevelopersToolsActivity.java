@@ -1,7 +1,10 @@
 package com.nullpointerexception.cicerone.activities;
 
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -9,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nullpointerexception.cicerone.R;
+import com.nullpointerexception.cicerone.components.AlarmReceiver;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Feedback;
@@ -31,8 +35,10 @@ public class DevelopersToolsActivity extends AppCompatActivity
 
     private EditText cityItinerary, dateItinerary, targetNotification;
     private Button generateItinerary, generateFeedback;
+    private CheckBox checkBox;
 
-    List<User> users = new Vector<>();
+    private SharedPreferences sharedPreferences;
+    private List<User> users = new Vector<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -45,6 +51,9 @@ public class DevelopersToolsActivity extends AppCompatActivity
         generateItinerary = findViewById(R.id.btnGenItinerary);
         generateFeedback = findViewById(R.id.btnGenerateFeedback);
         targetNotification = findViewById(R.id.notificationTargetText);
+        checkBox = findViewById(R.id.checkBoxNotificationListener);
+
+        sharedPreferences = getSharedPreferences("notificationsListener", MODE_PRIVATE);
 
         generateItinerary.setOnClickListener(v -> generateItinerary());
         generateItinerary.setOnLongClickListener(v ->
@@ -56,6 +65,15 @@ public class DevelopersToolsActivity extends AppCompatActivity
         generateFeedback.setOnClickListener(v -> generateFeedback());
 
         findViewById(R.id.btnGenerateNotification).setOnClickListener(v -> generateNotification());
+
+        checkBox.setChecked(sharedPreferences.getBoolean("notificationsEnabled", true));
+        checkBox.setTextColor( checkBox.isChecked()? Color.GREEN : Color.GRAY );
+        checkBox.setOnCheckedChangeListener((compoundButton, b) ->
+        {
+            sharedPreferences.edit().putBoolean("notificationsEnabled", b).apply();
+            checkBox.setTextColor( b? Color.GREEN : Color.GRAY );
+            if(b) AlarmReceiver.setAlarm(this, false);
+        });
 
         getAllUsers();
     }

@@ -33,8 +33,8 @@ import com.nullpointerexception.cicerone.components.User;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfileActivity extends AppCompatActivity {
-
+public class ProfileActivity extends AppCompatActivity
+{
     private static final String TAG = "ProfileActivity_log";
     private TextView mEmail, mTelephone, mDate, mName, sndFeedBtn, removeFeedback, feedbackTitle, goFeedBacksList;
     private ExtendedEditText mComment;
@@ -66,7 +66,7 @@ public class ProfileActivity extends AppCompatActivity {
         user = new User();
 
         Intent intent = getIntent();
-        String extra = new String();
+        String extra = "";
 
         intent.getExtras().getString("id_cicerone_to_show");
         extra = intent.getExtras().getString("id_cicerone_to_show");
@@ -362,6 +362,14 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
 
         User user = new User();
         user.setId(feedbacks.get(position).getIdUser());
+        String displayName = feedbacks.get(position).getDisplayNameUser();
+        if(displayName.contains(" "))
+        {
+            user.setName(displayName.substring(0, displayName.indexOf(" ")));
+            user.setSurname(displayName.substring(displayName.indexOf(" ")+1));
+        }
+        else
+            user.setName(displayName);
         user.setProfileImageUrl(feedbacks.get(position).getProfileImageUrlUser());
 
         new ProfileImageFetcher(context).fetchImageOf(user, drawable ->

@@ -20,7 +20,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textPersonName"
         android:hint="Data" />
 
     <Button
@@ -47,5 +46,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Genera notifica"/>
+
+    <CheckBox
+        android:id="@+id/checkBoxNotificationListener"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="attivare/disattivare NotificationsListener" />
 
 </LinearLayout>

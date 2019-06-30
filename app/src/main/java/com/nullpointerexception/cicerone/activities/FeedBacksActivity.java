@@ -4,16 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +12,15 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.Feedback;
-import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
@@ -134,25 +129,30 @@ class AdapterReviewFeedBack extends RecyclerView.Adapter <AdapterReviewFeedBack.
 
         User user = new User();
         user.setId(feedbacks.get(position).getIdUser());
+        String displayName = feedbacks.get(position).getDisplayNameUser();
+        if(displayName.contains(" "))
+        {
+            user.setName(displayName.substring(0, displayName.indexOf(" ")));
+            user.setSurname(displayName.substring(displayName.indexOf(" ")+1));
+        }
+        else
+            user.setName(displayName);
         user.setProfileImageUrl(feedbacks.get(position).getProfileImageUrlUser());
 
         new ProfileImageFetcher(context).fetchImageOf(user, drawable ->
         {
-
             if(drawable != null)
                 holder.imgProfile.setImageDrawable(drawable);
         });
 
-
         //Ascolto l'evento click
-        holder.itemView.setOnClickListener(v -> {
+        holder.itemView.setOnClickListener(v ->
+        {
             Intent intent2 = new Intent(v.getContext(), ProfileActivity.class);
             intent2.putExtra("id_cicerone_to_show",feedbacks.get(position).getIdUser());
             intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             v.getContext().startActivity(intent2);
         });
-
-
     }
 
     @Override
