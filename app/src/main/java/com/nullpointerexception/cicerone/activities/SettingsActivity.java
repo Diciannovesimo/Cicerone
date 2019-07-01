@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -135,7 +136,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+        boolean alright = false;
         if(id == R.id.modify_menu_btn) {
 
             if(!mName.getText().toString().isEmpty())
@@ -147,21 +148,27 @@ public class SettingsActivity extends AppCompatActivity {
             if(!mDate.getText().toString().isEmpty())
                 user.setDateBirth(mDate.getText().toString());
 
-            if(!mPhone.getText().toString().isEmpty() && mPhone.getText().toString().length() == 10)
+            if(!mPhone.getText().toString().isEmpty() && mPhone.getText().toString().length() == 10) {
                 user.setPhoneNumber(mPhone.getText().toString());
+                alright = true;
+            }
 
-            BackEndInterface.get().removeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
-                @Override
-                public void onSuccess() {
-                    BackEndInterface.get().storeEntity(user);
-                    finish();
-                }
+            if(alright) {
+                BackEndInterface.get().removeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
+                    @Override
+                    public void onSuccess() {
+                        BackEndInterface.get().storeEntity(user);
+                        finish();
+                    }
 
-                @Override
-                public void onError() {
+                    @Override
+                    public void onError() {
 
-                }
-            });
+                    }
+                });
+            } else
+                Toast.makeText(getApplicationContext(),
+                        "Inserisci un numerod i telefono corretto", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
