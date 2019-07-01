@@ -147,7 +147,7 @@ public class SettingsActivity extends AppCompatActivity {
             if(!mDate.getText().toString().isEmpty())
                 user.setDateBirth(mDate.getText().toString());
 
-            if(!mPhone.getText().toString().isEmpty())
+            if(!mPhone.getText().toString().isEmpty() && mPhone.getText().toString().length() == 10)
                 user.setPhoneNumber(mPhone.getText().toString());
 
             BackEndInterface.get().removeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
