@@ -168,7 +168,7 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             } else
                 Toast.makeText(getApplicationContext(),
-                        "Inserisci un numerod i telefono corretto", Toast.LENGTH_SHORT).show();
+                        "Inserisci un numero i telefono corretto", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
