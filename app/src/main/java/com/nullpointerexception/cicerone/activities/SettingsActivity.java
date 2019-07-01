@@ -137,6 +137,8 @@ public class SettingsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         boolean alright;
+
+
         if(id == R.id.modify_menu_btn) {
 
             if(!mName.getText().toString().isEmpty())
@@ -151,10 +153,16 @@ public class SettingsActivity extends AppCompatActivity {
             if(mPhone.getText().toString().length() == 10) {
                 user.setPhoneNumber(mPhone.getText().toString());
                 alright = true;
-            } else if(mPhone.getHint().toString().equals(user.getPhoneNumber())){
-                alright = true;
-            } else
-                alright= false;
+            }else{
+                if(mPhone.getText().toString().length() != 0){
+                    if(mPhone.getHint().toString().equals(user.getPhoneNumber()) && mPhone.getText().toString().length() == 10 ){
+                        alright = true;
+                    } else
+                        alright= false;
+                } else {
+                    alright = true;
+                }
+            }
 
             if(alright) {
                 BackEndInterface.get().removeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
