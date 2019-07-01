@@ -139,14 +139,20 @@ public class SettingsActivity extends AppCompatActivity {
         boolean alright = false;
         if(id == R.id.modify_menu_btn) {
 
-            if(!mName.getText().toString().isEmpty())
+            if(!mName.getText().toString().isEmpty()) {
                 user.setName(mName.getText().toString());
+                alright =true;
+            }
 
-            if(!mSurname.getText().toString().isEmpty())
+            if(!mSurname.getText().toString().isEmpty()) {
                 user.setSurname(mSurname.getText().toString());
+                alright = true;
+            }
 
-            if(!mDate.getText().toString().isEmpty())
+            if(!mDate.getText().toString().isEmpty()) {
                 user.setDateBirth(mDate.getText().toString());
+                alright = true;
+            }
 
             if(!mPhone.getText().toString().isEmpty() && mPhone.getText().toString().length() == 10) {
                 user.setPhoneNumber(mPhone.getText().toString());
