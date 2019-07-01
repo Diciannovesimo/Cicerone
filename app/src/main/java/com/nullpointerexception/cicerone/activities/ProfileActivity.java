@@ -215,7 +215,7 @@ public class ProfileActivity extends AppCompatActivity
                                                 public void onSuccess() {
                                                     Toast.makeText(v.getContext(), "Hai inserito il feedback", Toast.LENGTH_SHORT).show();
                                                     removeFeedback.setEnabled(true);
-
+                                                    ratingBarAVG.setRating(user.getAverageFeedback());
                                                 }
 
                                                 @Override
@@ -243,6 +243,7 @@ public class ProfileActivity extends AppCompatActivity
                                                 feedbackTitle.setText("Il tuo feedback");
                                                 removeFeedback.setEnabled(true);
                                                 sndFeedBtn.setText("Modifica");
+                                                ratingBarAVG.setRating(user.getAverageFeedback());
                                             }
 
                                             @Override
@@ -335,7 +336,8 @@ public class ProfileActivity extends AppCompatActivity
 
         if(user.getFeedbacks().get(position) != null) {
             if (mComment != null &&
-                    mComment.getText().toString().equals(user.getFeedbacks().get(position).getComment())
+                    (mComment.getText().toString().equals(user.getFeedbacks().get(position).getComment())
+                            && ratingBar.getRating() == user.getFeedbacks().get(position).getVote())
                     && !user.getFeedbacks().get(position).getComment().isEmpty()
                     && !mComment.getText().toString().isEmpty()) {
                 textFieldBoxes.setError("Hai inserito lo stesso commento", true);

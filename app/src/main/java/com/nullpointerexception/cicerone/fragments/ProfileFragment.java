@@ -153,9 +153,6 @@ public class ProfileFragment extends Fragment
                 feedbacks.add(user.getFeedbacks().get(i));
         }
 
-        if(feedbacks.size()<=2)
-            goFeedBacksList.setVisibility(View.GONE);
-
         if(feedbacks.size() == 0)
             feedbakcTitle.setVisibility(View.GONE);
 
