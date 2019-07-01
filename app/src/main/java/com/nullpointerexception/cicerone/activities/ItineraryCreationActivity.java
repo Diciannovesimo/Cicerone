@@ -91,7 +91,6 @@ public class ItineraryCreationActivity extends AppCompatActivity {
     private Stage stage;
     private HashMap<String, Stage> tappe = new HashMap<>();
     private static int AUTOCOMPLETE_REQUEST_CODE = 1;
-    private googleAutocompletationField Google_field;
     private LinearLayout linearLayout;
     private ScrollView scrollView;
     private String currency;
@@ -286,7 +285,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
                             if (!mBlocker.block()) {
-                                actual_field = Google_field.PLACE.getN();
+                                actual_field = googleAutocompletationField.PLACE.getN();
                                 Intent intent = new Autocomplete.IntentBuilder(
                                         AutocompleteActivityMode.FULLSCREEN, fields)
                                         .build(v.getContext());

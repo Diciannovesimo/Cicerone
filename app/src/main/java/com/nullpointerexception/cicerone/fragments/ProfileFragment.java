@@ -79,6 +79,7 @@ public class ProfileFragment extends Fragment
         goFeedBacksList = v.findViewById(R.id.goFeedBacksList);
         ratingBarAVG = v.findViewById(R.id.ratingBarAVG);
         feedbakcTitle = v.findViewById(R.id.feedbackListTitle_tv);
+        recyclerView = v.findViewById(R.id.RecyclerView_Review);
     }
 
     @Override
@@ -157,8 +158,6 @@ public class ProfileFragment extends Fragment
 
         if(feedbacks.size() == 0)
             feedbakcTitle.setVisibility(View.GONE);
-
-        recyclerView = v.findViewById(R.id.RecyclerView_Review);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(v.getContext(),
                 LinearLayoutManager.HORIZONTAL, false);
