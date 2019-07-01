@@ -157,7 +157,8 @@ public class SettingsActivity extends AppCompatActivity {
             if(!mPhone.getText().toString().isEmpty() && mPhone.getText().toString().length() == 10) {
                 user.setPhoneNumber(mPhone.getText().toString());
                 alright = true;
-            }
+            } else
+                alright= false;
 
             if(alright) {
                 BackEndInterface.get().removeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
