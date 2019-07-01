@@ -136,26 +136,22 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        boolean alright = false;
+        boolean alright;
         if(id == R.id.modify_menu_btn) {
 
-            if(!mName.getText().toString().isEmpty()) {
+            if(!mName.getText().toString().isEmpty())
                 user.setName(mName.getText().toString());
-                alright =true;
-            }
 
-            if(!mSurname.getText().toString().isEmpty()) {
+            if(!mSurname.getText().toString().isEmpty())
                 user.setSurname(mSurname.getText().toString());
-                alright = true;
-            }
 
-            if(!mDate.getText().toString().isEmpty()) {
+            if(!mDate.getText().toString().isEmpty())
                 user.setDateBirth(mDate.getText().toString());
-                alright = true;
-            }
 
-            if(!mPhone.getText().toString().isEmpty() && mPhone.getText().toString().length() == 10) {
+            if(mPhone.getText().toString().length() == 10) {
                 user.setPhoneNumber(mPhone.getText().toString());
+                alright = true;
+            } else if(mPhone.getHint().toString().equals(user.getPhoneNumber())){
                 alright = true;
             } else
                 alright= false;
@@ -175,7 +171,7 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             } else
                 Toast.makeText(getApplicationContext(),
-                        "Inserisci un numero i telefono corretto", Toast.LENGTH_SHORT).show();
+                        "Inserisci un numero di telefono corretto", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
