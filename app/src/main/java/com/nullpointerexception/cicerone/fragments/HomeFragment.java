@@ -17,12 +17,14 @@ import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.Blocker;
 
+/**
+ * HomeFragment
+ * TODO: documenta
+ */
 public class HomeFragment extends Fragment
 {
 
     public HomeFragment() { }
-
-    public View buttonCreateItinerary, buttonFindItinerary;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -37,8 +39,8 @@ public class HomeFragment extends Fragment
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        buttonCreateItinerary = view.findViewById(R.id.buttonCreateItinerary);
-        buttonFindItinerary = view.findViewById(R.id.buttonFindItinerary);
+        View buttonCreateItinerary = view.findViewById(R.id.buttonCreateItinerary);
+        View buttonFindItinerary = view.findViewById(R.id.buttonFindItinerary);
 
         if(getActivity() != null && ((MainActivity) getActivity()).getSupportActionBar() != null)
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.menu_home);

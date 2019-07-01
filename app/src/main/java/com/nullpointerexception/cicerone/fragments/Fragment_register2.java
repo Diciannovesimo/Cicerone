@@ -14,7 +14,11 @@ import com.nullpointerexception.cicerone.components.Blocker;
 
 import java.util.Calendar;
 
-
+/**
+ * Fragment_register1
+ *
+ * Allow insertion of name, surname, date of birth and telephone number
+ */
 public class Fragment_register2 extends Fragment
 {
 

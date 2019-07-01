@@ -29,9 +29,14 @@ import com.nullpointerexception.cicerone.components.User;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * FeedbacksActivity
+ *
+ * Show the list of feedback.
+ * Used class = {@link Feedback} {@link Blocker} {@link AuthenticationManager} {@link ObjectSharer} {@link ProfileImageFetcher} {@link User}
+ * @author Mattia
+ */
 public class FeedBacksActivity extends AppCompatActivity {
-
-    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +73,7 @@ public class FeedBacksActivity extends AppCompatActivity {
         }
 
 
-        recyclerView = findViewById(R.id.RecyclerView_Review);
+        RecyclerView recyclerView = findViewById(R.id.RecyclerView_Review);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -79,6 +84,9 @@ public class FeedBacksActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Catch the click on back arrow and remove object on objectSherer
+     */
     @Override
     public boolean onSupportNavigateUp()
     {
@@ -107,8 +115,6 @@ class AdapterReviewFeedBack extends RecyclerView.Adapter <AdapterReviewFeedBack.
         this.context = appContext;
         this.feedbacks = feedbacks;
         inflater = (LayoutInflater.from(appContext));
-
-
     }
 
     @NonNull

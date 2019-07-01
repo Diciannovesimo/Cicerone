@@ -13,7 +13,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.nullpointerexception.cicerone.R;
 
-public class showPlaceActivity extends FragmentActivity implements OnMapReadyCallback {
+/**
+ * ShowPlaceActivity
+ *
+ * Allow the user to see in the map the selected stage
+ * @author Claudio
+ */
+public class ShowPlaceActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private LatLng coordinates;
@@ -45,6 +51,10 @@ public class showPlaceActivity extends FragmentActivity implements OnMapReadyCal
         moveToCurrentLocation(coordinates);
     }
 
+    /**
+     * Zoom on the marker
+     * @param currentLocation: coordinates of the place
+     */
     private void moveToCurrentLocation(LatLng currentLocation)
     {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation,15));
@@ -52,7 +62,5 @@ public class showPlaceActivity extends FragmentActivity implements OnMapReadyCal
         mMap.animateCamera(CameraUpdateFactory.zoomIn());
         // Zoom out to zoom level 10, animating with a duration of 2 seconds.
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-
-
     }
 }

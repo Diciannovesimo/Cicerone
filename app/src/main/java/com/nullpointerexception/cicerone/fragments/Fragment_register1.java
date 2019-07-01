@@ -10,7 +10,11 @@ import androidx.fragment.app.Fragment;
 
 import com.nullpointerexception.cicerone.R;
 
-
+/**
+ * Fragment_register1
+ *
+ * Allow insertion of email, password e confirm password
+ */
 public class Fragment_register1 extends Fragment
 {
 

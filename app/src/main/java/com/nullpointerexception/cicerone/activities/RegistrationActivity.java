@@ -18,6 +18,14 @@ import com.nullpointerexception.cicerone.components.User;
 import com.nullpointerexception.cicerone.fragments.Fragment_register1;
 import com.nullpointerexception.cicerone.fragments.Fragment_register2;
 
+/**
+ * RegistrationActivity
+ *
+ * Activity that allow a potential user to subscribe to Cicerone
+ *
+ * Used class = {@link User} {@link AuthenticationManager}
+ * @author Claudio e Mattia
+ */
 public class RegistrationActivity extends AppCompatActivity {
 
     //Universal tag for RegistrationActivity
@@ -45,7 +53,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
     /**
      *      It allows to switch the fragment of registration.
-     *      @param view
+     *      @param view = reference of view
      */
     public void switchRegisterFragment(View view)
     {
@@ -104,9 +112,7 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     /**
-     *
-     *
-     *      @param view
+     * @param view = reference of view
      */
     public void startRegistration(View view)
     {
@@ -186,7 +192,6 @@ public class RegistrationActivity extends AppCompatActivity {
         }
     }
 
-
     /**
      *      Check if fields are correctly inserted by user,
      *      provides errors else.
@@ -233,7 +238,8 @@ public class RegistrationActivity extends AppCompatActivity {
     /**
      *  Shows an error message if the registration has not occurred,
      *  otherwise shows an message confirming
-     *  @param result
+     *
+     *  @param result: A boolean value to indicate if the registration was successful
      */
     private void showDialog(Boolean result) {
 

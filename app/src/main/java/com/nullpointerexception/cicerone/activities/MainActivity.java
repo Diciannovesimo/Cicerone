@@ -31,6 +31,9 @@ import com.nullpointerexception.cicerone.fragments.ItinerariesListFragment;
 import com.nullpointerexception.cicerone.fragments.ProfileFragment;
 import com.nullpointerexception.cicerone.fragments.TripsListFragment;
 
+/**
+ * TODO: Documenta
+ */
 public class MainActivity extends AppCompatActivity
 {
 

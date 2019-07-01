@@ -62,6 +62,17 @@ import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
+/**
+ * ItineraryActivity
+ *
+ * This class allow user to show itinerary information
+ *
+ * This class use = {@link Stage} {@link User} {@link Itinerary} {@link ObjectSharer} {@link AuthenticationManager}
+ * {@link BackEndInterface} {@link BackEndInterface} {@link Blocker} {@link ImageFetcher} {@link ProfileImageFetcher}
+ * {@link UserNotification}
+ *
+ * @author Claudio
+ */
 public class ItineraryActivity extends AppCompatActivity
 {
 
@@ -69,7 +80,6 @@ public class ItineraryActivity extends AppCompatActivity
     private final int PROPOSED_STAGES_CODE = 321;
     private final int PARTICIPANT_CODE = 123;
     private TextView mDateCard, mPlaceCard, mTimeCard, mLanguageCard, mDescriptionCard, mParticipantsCard, mPriceCard;
-    private TextView placeName, placeDescription, mShowLocation;
     private EditText mPlace, mPlaceDesc;
     private TextFieldBoxes place_box;
     private ImageView ciceronePhoto, cityImage, findPosition;
@@ -148,6 +158,9 @@ public class ItineraryActivity extends AppCompatActivity
         request = FindCurrentPlaceRequest.builder(fields).build();
     }
 
+    /**
+     * Initialize itinerary activity fields
+     */
     private void initUI() {
         mDateCard  = findViewById(R.id.date_card);
         mPlaceCard = findViewById(R.id.place_card);
@@ -164,6 +177,9 @@ public class ItineraryActivity extends AppCompatActivity
         mPartecipantsList = findViewById(R.id.partecipantsList_btn);
     }
 
+    /**
+     * Set text in activity field
+     */
     private void setTextField()
     {
         ImageFetcher imageFetcher = new ImageFetcher();
@@ -733,6 +749,9 @@ public class ItineraryActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * Refresh activity for new stages
+     */
     public void refreshStagesList() {
         linearLayout.removeAllViews();
 
@@ -744,9 +763,9 @@ public class ItineraryActivity extends AppCompatActivity
             for (int i = 0; i < itinerary.getStages().size(); ++i)
             {
                 View stageView = getLayoutInflater().inflate(R.layout.place_layout, null);
-                placeName = stageView.findViewById(R.id.placeName);
-                placeDescription = stageView.findViewById(R.id.placeDescription);
-                mShowLocation = stageView.findViewById(R.id.showStage_btn);
+                TextView placeName = stageView.findViewById(R.id.placeName);
+                TextView placeDescription = stageView.findViewById(R.id.placeDescription);
+                TextView mShowLocation = stageView.findViewById(R.id.showStage_btn);
 
                 placeName.setText(itinerary.getStages().get(i).getName());
                 placeDescription.setText(itinerary.getStages().get(i).getDescription());
@@ -762,7 +781,7 @@ public class ItineraryActivity extends AppCompatActivity
                             LatLng coordinates = itinerary.getStages().get(finalI).getCoordinates();
                             Double lat = coordinates.latitude;
                             Double lng = coordinates.longitude;
-                            Intent intent = new Intent(v.getContext(), showPlaceActivity.class);
+                            Intent intent = new Intent(v.getContext(), ShowPlaceActivity.class);
                             intent.putExtra("latitude", lat);
                             intent.putExtra("longitude", lng);
                             intent.putExtra("marker", itinerary.getStages().get(finalI).getName());
@@ -776,6 +795,9 @@ public class ItineraryActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Update the number of participants after the inscription
+     */
     public void updateParticipants() {
         if(itinerary.getMaxParticipants() != 0) {
             if(itinerary.getParticipants() != null){
@@ -791,6 +813,11 @@ public class ItineraryActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Check if the app has the GPS access permission
+     *
+     * @return res: Value of return of the check
+     */
     public boolean checkLocationPermission() {
         String permission = "android.permission.ACCESS_FINE_LOCATION";
         int res = this.checkCallingOrSelfPermission(permission);
@@ -832,8 +859,6 @@ public class ItineraryActivity extends AppCompatActivity
         } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
             Status status = Autocomplete.getStatusFromIntent(data);
             Log.i("it_view", status.getStatusMessage());
-        } else if (resultCode == RESULT_CANCELED) {
-            // The user canceled the operation.
         }
 
         if(requestCode == PROPOSED_STAGES_CODE && resultCode == RESULT_OK)
@@ -849,6 +874,9 @@ public class ItineraryActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Catch the click on back arrow and remove object on objectSherer
+     */
     @Override
     public boolean onSupportNavigateUp()
     {

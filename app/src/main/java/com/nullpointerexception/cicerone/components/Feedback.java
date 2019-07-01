@@ -4,6 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Represents the feedback given from every user to a Cicerone
+ *
+ * TODO: continua
+ */
 public class Feedback implements StorableAsField
 {
     private String idUser,

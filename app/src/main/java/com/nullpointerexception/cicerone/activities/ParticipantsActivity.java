@@ -24,21 +24,17 @@ import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.ProfileImageFetcher;
 import com.nullpointerexception.cicerone.components.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  *      ParticipantsActivity
  *
  *      Activity to see participants of itinerary
- *
+ *      Used class = {@link User} {@link Itinerary} {@link Blocker} {@link ObjectSharer} {@link ProfileImageFetcher}
  *      @author Mattia
  */
 public class ParticipantsActivity extends AppCompatActivity
 {
-
-    private List<User> participants = new ArrayList<User>();
-
 
     private RecyclerView recyclerView;
 
@@ -72,6 +68,9 @@ public class ParticipantsActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Catch the click on back arrow and remove object on objectSherer
+     */
     @Override
     public boolean onSupportNavigateUp()
     {

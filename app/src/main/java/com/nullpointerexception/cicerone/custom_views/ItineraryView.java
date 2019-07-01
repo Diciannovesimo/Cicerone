@@ -46,7 +46,6 @@ import java.util.Locale;
  */
 public class ItineraryView extends FrameLayout
 {
-
     /*
             Inner views
      */

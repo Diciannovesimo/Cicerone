@@ -26,7 +26,6 @@ import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.Stage;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,13 +34,12 @@ import java.util.List;
  *
  *      Activity to see proposed stages of itinerary
  *
+ *      User class = {@link ObjectSharer} {@link Itinerary} {@link BackEndInterface}
  *      @author Mattia
  */
 public class ProposedStageActivity extends AppCompatActivity
 {
 
-    private RecyclerView recyclerView;
-    private List<Stage> proposedStage = new ArrayList<Stage>();
     private Itinerary itinerary;
 
     @Override
@@ -59,13 +57,13 @@ public class ProposedStageActivity extends AppCompatActivity
 
         itinerary = (Itinerary) ObjectSharer.get().getSharedObject("lista_proposte");
 
-        proposedStage = itinerary.getProposedStages();
+        List<Stage> proposedStage = itinerary.getProposedStages();
 
         //Check if actionbar is initialized
         if(getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        recyclerView = findViewById(R.id.RecyclerView_ProposedStage);
+        RecyclerView recyclerView = findViewById(R.id.RecyclerView_ProposedStage);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -77,6 +75,9 @@ public class ProposedStageActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Catch the click on back arrow and remove object on objectSherer
+     */
     @Override
     public boolean onSupportNavigateUp()
     {
@@ -100,7 +101,7 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>
     private LayoutInflater inflater;
     private Itinerary itinerary ;
 
-    public AdapterStage(Context appContext, List<Stage> listPlace_test, Itinerary itinerary)
+    AdapterStage(Context appContext, List<Stage> listPlace_test, Itinerary itinerary)
     {
         this.context = appContext;
         this.listPlaces = listPlace_test;
@@ -177,7 +178,7 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>
                     LatLng coordinates = listPlaces.get(position).getCoordinates();
                     Double lat = coordinates.latitude;
                     Double lng = coordinates.longitude;
-                    Intent intent = new Intent(context, showPlaceActivity.class);
+                    Intent intent = new Intent(context, ShowPlaceActivity.class);
                     intent.putExtra("latitude", lat);
                     intent.putExtra("longitude", lng);
                     intent.putExtra("marker", listPlaces.get(position).getName());
@@ -193,14 +194,14 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>
         return listPlaces.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder
+    class MyViewHolder extends RecyclerView.ViewHolder
     {
 
         TextView name, description, addstage;
         ImageView imgGPS;
 
 
-        public MyViewHolder(@NonNull View itemView)
+        MyViewHolder(@NonNull View itemView)
         {
             super(itemView);
 

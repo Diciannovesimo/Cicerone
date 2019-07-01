@@ -35,6 +35,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
+/**
+ * ItinerariesListFragment
+ * TODO: documenta
+ */
 public class ItinerariesListFragment extends Fragment
 {
     /*

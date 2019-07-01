@@ -8,6 +8,9 @@ import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.fragments.FindItineraryActivityFragment;
 import com.nullpointerexception.cicerone.fragments.SearchResultsFragment;
 
+/**
+ * TODO: Documenta
+ */
 public class FindItineraryActivty extends AppCompatActivity
         implements FindItineraryActivityFragment.OnUIInteractionListener
 {

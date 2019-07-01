@@ -21,6 +21,12 @@ import com.nullpointerexception.cicerone.components.User;
 
 import java.util.Calendar;
 
+/**
+ * SettingsActivity
+ *
+ * This activity allows the user to change some user field
+ * Class used = {@link BackEndInterface} {@link User}
+ */
 public class SettingsActivity extends AppCompatActivity {
 
     private EditText mName, mSurname, mPhone, mDate;
@@ -61,6 +67,9 @@ public class SettingsActivity extends AppCompatActivity {
         setTextField();
     }
 
+    /**
+     * Initialize user interface
+     */
     private void initUI() {
         mName = findViewById(R.id.name_et);
         mSurname = findViewById(R.id.surname_et);
@@ -69,6 +78,9 @@ public class SettingsActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
     }
 
+    /**
+     * Set text in activity fields.
+     */
     private void setTextField() {
         //set name in hint
         mName.setHint(user.getName());
@@ -133,6 +145,11 @@ public class SettingsActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     *
+     * @param item: id of menu item.
+     *
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

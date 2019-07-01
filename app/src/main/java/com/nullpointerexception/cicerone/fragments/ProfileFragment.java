@@ -30,6 +30,12 @@ import com.nullpointerexception.cicerone.components.User;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ProfileFragment
+ *
+ * Allow user to see own information
+ * Used class = {@link User} {@link ObjectSharer} {@link Feedback} {@link ProfileImageFetcher} {@link AuthenticationManager} {@link Blocker}
+ */
 public class ProfileFragment extends Fragment
 {
     private TextView mEmail, mTelephone, mDate, mName, mItinerariesAsParticipant,  goFeedBacksList, feedbakcTitle;
@@ -68,7 +74,11 @@ public class ProfileFragment extends Fragment
         return view;
     }
 
-    public void initUI(View v) {
+    /**
+     * Initialize itinerary activity fields
+     * @param v: View reference
+     */
+    private void initUI(View v) {
         mEmail = v.findViewById(R.id.profileMail_tv);
         mTelephone = v.findViewById(R.id.profilePhone_tv);
         mDate = v.findViewById(R.id.profileDate_tv);
@@ -99,7 +109,7 @@ public class ProfileFragment extends Fragment
     /**
      * @brief Set text field
      */
-    public void setTextField(View v) {
+    private void setTextField(View v) {
 
         //Get user form firebase
         User user = AuthenticationManager.get().getUserLogged();
@@ -172,7 +182,7 @@ class AdapterReviewProfileFragment extends RecyclerView.Adapter <AdapterReviewPr
     private List<Feedback> feedbacks;
     private LayoutInflater inflater;
 
-    public AdapterReviewProfileFragment(Context appContext,List<Feedback> feedbacks)
+    AdapterReviewProfileFragment(Context appContext, List<Feedback> feedbacks)
     {
         this.context = appContext;
         this.feedbacks = feedbacks;
@@ -239,13 +249,13 @@ class AdapterReviewProfileFragment extends RecyclerView.Adapter <AdapterReviewPr
 
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    class MyViewHolder extends RecyclerView.ViewHolder{
 
         TextView displayName, description;
         ImageView imgProfile;
         RatingBar ratingBar;
 
-        public MyViewHolder(@NonNull View itemView) {
+        MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
             displayName = itemView.findViewById(R.id.textView_DisplayName);

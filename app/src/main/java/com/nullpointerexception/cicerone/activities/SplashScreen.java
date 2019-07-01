@@ -12,6 +12,9 @@ import com.facebook.appevents.AppEventsLogger;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 
+/**
+ * TODO: documenta
+ */
 public class SplashScreen extends AppCompatActivity
 {
 

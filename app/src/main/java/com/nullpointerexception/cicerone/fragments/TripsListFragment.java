@@ -29,6 +29,7 @@ import java.util.List;
  *      TripsListFragment
  *
  *      Shows a list with itineraries which user want to participate.
+ *      Used class = {@link Itinerary} {@link ObjectSharer} {@link Blocker} {@link BackEndInterface} {@link AuthenticationManager}
  */
 public class TripsListFragment extends Fragment
 {

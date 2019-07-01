@@ -48,12 +48,12 @@ import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Blocker;
+import com.nullpointerexception.cicerone.components.GoogleAutocompletationField;
 import com.nullpointerexception.cicerone.components.Itinerary;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.Stage;
 import com.nullpointerexception.cicerone.components.User;
 import com.nullpointerexception.cicerone.components.UserNotification;
-import com.nullpointerexception.cicerone.components.googleAutocompletationField;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,6 +74,8 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
  *
  *      Activity where user can create a new Itinerary.
  *
+ *      User class = {@link AuthenticationManager} {@link BackEndInterface} {@link Blocker} {@link Itinerary} {@link ObjectSharer} {@link Stage}
+ *      {@link User} {@link UserNotification} {@link GoogleAutocompletationField}
  *      @author Claudio
  */
 public class ItineraryCreationActivity extends AppCompatActivity {
@@ -285,7 +287,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
                             if (!mBlocker.block()) {
-                                actual_field = googleAutocompletationField.PLACE.getN();
+                                actual_field = GoogleAutocompletationField.PLACE.getN();
                                 Intent intent = new Autocomplete.IntentBuilder(
                                         AutocompleteActivityMode.FULLSCREEN, fields)
                                         .build(v.getContext());
@@ -455,7 +457,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!mBlocker.block()) {
-                    actual_field = googleAutocompletationField.LUOGO.getN();
+                    actual_field = GoogleAutocompletationField.LUOGO.getN();
                     Intent intent = new Autocomplete.IntentBuilder(
                             AutocompleteActivityMode.FULLSCREEN, fields)
                             .build(v.getContext());
@@ -473,7 +475,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!mBlocker.block()) {
-                    actual_field = googleAutocompletationField.PUNTO_DI_INCONTRO.getN();
+                    actual_field = GoogleAutocompletationField.PUNTO_DI_INCONTRO.getN();
                     Intent intent = new Autocomplete.IntentBuilder(
                             AutocompleteActivityMode.FULLSCREEN, fields)
                             .build(v.getContext());
@@ -548,7 +550,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
     }
 
     /**
-     * initialize the ui
+     * Initialize the ui
      */
     private void initUI() {
         toolbar = findViewById(R.id.toolbar);
@@ -908,8 +910,7 @@ public class ItineraryCreationActivity extends AppCompatActivity {
      *
      *      @return true if all fields are successfully checked, false if there's a problem
      */
-    private boolean checkField()
-    {
+    private boolean checkField() {
         boolean alright = true;
 
         if(mLuogo.getText().toString().isEmpty()) {
@@ -979,6 +980,9 @@ public class ItineraryCreationActivity extends AppCompatActivity {
         return false;
     }
 
+    /**
+     * Catch the click on back arrow and remove object on objectSherer
+     */
     @Override
     public boolean onSupportNavigateUp()
     {
@@ -986,6 +990,9 @@ public class ItineraryCreationActivity extends AppCompatActivity {
         return super.onSupportNavigateUp();
     }
 
+    /**
+     * Set the name of menu item
+     */
     private void setItemTitle() {
         MenuItem button = menu.findItem(R.id.createItinerary);
 
@@ -995,6 +1002,11 @@ public class ItineraryCreationActivity extends AppCompatActivity {
             button.setTitle("crea");
     }
 
+    /**
+     * Check if the app has the GPS access permission
+     *
+     * @return res: Value of return of the check
+     */
     public boolean checkLocationPermission()
     {
         String permission = "android.permission.ACCESS_FINE_LOCATION";

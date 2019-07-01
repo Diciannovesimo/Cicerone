@@ -5,6 +5,13 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Stage
+ *
+ * Represents stage of a itinerary.
+ *
+ * TODO: continua
+ */
 public class Stage implements StorableAsField
 {
 

@@ -33,6 +33,15 @@ import com.nullpointerexception.cicerone.components.User;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *  ProfileActivity
+ *
+ *  Is used to show user's Profile from another user access.
+ *  User class = {@link User} {@link ObjectSharer} {@link BackEndInterface} {@link AuthenticationManager} {@link Blocker} {@link Feedback}
+ *  {@link ProfileImageFetcher}
+ *
+ * @author Claudio
+ */
 public class ProfileActivity extends AppCompatActivity
 {
     private static final String TAG = "ProfileActivity_log";
@@ -47,12 +56,10 @@ public class ProfileActivity extends AppCompatActivity
     private int position = 0;
     private boolean found = false;
 
-    private RecyclerView recyclerView;
     ConstraintLayout constraintLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Window w = getWindow();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
@@ -128,7 +135,7 @@ public class ProfileActivity extends AppCompatActivity
     }
 
     /**
-     * @brief Set text field
+     * Set text field
      */
     public void setTextField() {
 
@@ -321,7 +328,7 @@ public class ProfileActivity extends AppCompatActivity
             goFeedBacksList.setVisibility(View.GONE);
         }
 
-        recyclerView = findViewById(R.id.RecyclerView_Review);
+        RecyclerView recyclerView = findViewById(R.id.RecyclerView_Review);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(),
                 LinearLayoutManager.HORIZONTAL, false);
@@ -331,6 +338,9 @@ public class ProfileActivity extends AppCompatActivity
         recyclerView.setAdapter(adapter);
     }
 
+    /**
+     * @return alright: false if there are a error, true if not.
+     */
     private boolean checkError() {
         boolean alright = true;
 
@@ -347,6 +357,10 @@ public class ProfileActivity extends AppCompatActivity
 
         return alright;
     }
+
+    /**
+     * Set in real time the feedback of the user
+     */
     private void ratingBarListener() {
 
         ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
@@ -364,7 +378,7 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
     private List<Feedback> feedbacks;
     private LayoutInflater inflater;
 
-    public AdapterReview(Context appContext,List<Feedback> feedbacks)
+    AdapterReview(Context appContext, List<Feedback> feedbacks)
     {
         this.context = appContext;
         this.feedbacks = feedbacks;
@@ -437,7 +451,7 @@ class AdapterReview extends RecyclerView.Adapter <AdapterReview.MyViewHolder>
         ImageView imgProfile;
         RatingBar ratingBar;
 
-        public MyViewHolder(@NonNull View itemView) {
+        MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
             displayName = itemView.findViewById(R.id.textView_DisplayName);

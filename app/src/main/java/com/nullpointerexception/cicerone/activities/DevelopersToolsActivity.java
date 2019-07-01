@@ -30,6 +30,9 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Vector;
 
+/**
+ * @TODO: Non so se devi documentare
+ */
 public class DevelopersToolsActivity extends AppCompatActivity
 {
 

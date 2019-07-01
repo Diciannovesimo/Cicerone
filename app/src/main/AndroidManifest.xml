@@ -63,7 +63,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".activities.showPlaceActivity"
+            android:name=".activities.ShowPlaceActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.ItineraryActivity"
