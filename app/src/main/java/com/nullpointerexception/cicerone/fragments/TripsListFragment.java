@@ -75,12 +75,15 @@ public class TripsListFragment extends Fragment
 
         updateItineraryViews();
 
-        findItineraryFab.setOnClickListener(new View.OnClickListener() {
+        findItineraryFab.setOnClickListener(new View.OnClickListener()
+        {
             private Blocker mBlocker = new Blocker();
 
             @Override
-            public void onClick(View v) {
-                if (!mBlocker.block(1000)) {
+            public void onClick(View v)
+            {
+                if (!mBlocker.block(1000))
+                {
                     startActivityForResult(new Intent(getContext(), FindItineraryActivty.class), 0);
                 }
             }

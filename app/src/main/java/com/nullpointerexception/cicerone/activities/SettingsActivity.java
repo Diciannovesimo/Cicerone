@@ -27,7 +27,8 @@ import java.util.Calendar;
  * This activity allows the user to change some user field
  * Class used = {@link BackEndInterface} {@link User}
  */
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity
+{
 
     private EditText mName, mSurname, mPhone, mDate;
     private Menu menu;

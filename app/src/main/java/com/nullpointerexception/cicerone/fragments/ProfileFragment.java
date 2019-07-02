@@ -200,7 +200,8 @@ class AdapterReviewProfileFragment extends RecyclerView.Adapter <AdapterReviewPr
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AdapterReviewProfileFragment.MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull AdapterReviewProfileFragment.MyViewHolder holder, int position)
+    {
         holder.displayName.setText(feedbacks.get(position).getDisplayNameUser());
         holder.description.setText(feedbacks.get(position).getComment());
         holder.ratingBar.setRating((float) feedbacks.get(position).getVote());

@@ -136,7 +136,8 @@ public class RegistrationActivity extends AppCompatActivity {
                         {
 
                             // It call the method for send the verification email
-                            AuthenticationManager.get().sendVerificationEmail(task1 -> {
+                            AuthenticationManager.get().sendVerificationEmail(task1 ->
+                            {
                                 if(task1.isSuccessful())
                                 {
                                     AuthenticationManager.get().getUIdOf(user.getEmail(),

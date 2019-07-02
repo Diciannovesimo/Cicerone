@@ -9,7 +9,9 @@ import com.nullpointerexception.cicerone.fragments.FindItineraryActivityFragment
 import com.nullpointerexception.cicerone.fragments.SearchResultsFragment;
 
 /**
- * TODO: Documenta
+ *      FindItineraryActivity
+ *
+ *      Activity used to get parameters to search itineraries of the specified location and date on database.
  */
 public class FindItineraryActivty extends AppCompatActivity
         implements FindItineraryActivityFragment.OnUIInteractionListener
