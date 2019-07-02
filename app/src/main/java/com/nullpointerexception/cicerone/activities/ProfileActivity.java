@@ -291,6 +291,7 @@ public class ProfileActivity extends AppCompatActivity
                                                         sndFeedBtn.setText("Invia");
                                                         mComment.setText("");
                                                         found = false;
+                                                        ratingBarAVG.setRating(user.getAverageFeedback());
                                                     }
 
                                                     @Override
