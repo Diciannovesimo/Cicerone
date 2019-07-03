@@ -71,6 +71,7 @@ public class TripsListFragment extends Fragment
         recyclerView.setLayoutManager(layoutManager);
         adapter = new ParticipatedItinerariesAdapter(this,
                 AuthenticationManager.get().getUserLogged().getItineraries());
+        adapter.setOnUpdatedItineraryListener(this::updateItineraryViews);
         recyclerView.setAdapter(adapter);
 
         updateItineraryViews();
@@ -121,6 +122,7 @@ class ParticipatedItinerariesAdapter extends RecyclerView.Adapter
 {
     private Fragment reference;
     private List<Itinerary> dataSet;
+    private OnUpdatedItineraryListener onUpdatedItineraryListener;
 
     ParticipatedItinerariesAdapter(Fragment reference, List<Itinerary> dataSet)
     {
@@ -149,30 +151,24 @@ class ParticipatedItinerariesAdapter extends RecyclerView.Adapter
 
         viewHolder.getView().setOnViewClickListener(() ->
         {
-            Itinerary itinerary = viewHolder.getView().getItinerary();
+            Itinerary itinerary = dataSet.get(position);
+            String lastMeetingPlace = itinerary.getMeetingPlace();
 
-            if(itinerary.getParticipants() == null || itinerary.getParticipants().isEmpty())
-            {
-                BackEndInterface.get().getEntity(itinerary,
-                        new BackEndInterface.OnOperationCompleteListener()
+            BackEndInterface.get().getEntity(itinerary,
+                    new BackEndInterface.OnOperationCompleteListener()
+                    {
+                        @Override
+                        public void onSuccess()
                         {
-                            @Override
-                            public void onSuccess()
-                            {
-                                ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
-                                reference.startActivityForResult(new Intent(reference.getContext(), ItineraryActivity.class), 0);
-                            }
+                            if( ! itinerary.getMeetingPlace().equals(lastMeetingPlace))
+                                onUpdatedItineraryListener.onUpdatedItinerary();
+                            ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
+                            reference.startActivityForResult(new Intent(reference.getContext(), ItineraryActivity.class), 0);
+                        }
 
-                            @Override
-                            public void onError() { }
-                        });
-            }
-            else
-            {
-                ObjectSharer.get().shareObject("show_trip_as_user", itinerary);
-                reference.startActivityForResult(new Intent(reference.getContext(), ItineraryActivity.class), 0);
-            }
-
+                        @Override
+                        public void onError() { }
+                    });
         });
     }
 
@@ -201,4 +197,9 @@ class ParticipatedItinerariesAdapter extends RecyclerView.Adapter
         public ItineraryView getView()  { return itineraryView; }
     }
 
+    interface OnUpdatedItineraryListener { void onUpdatedItinerary(); }
+
+    public void setOnUpdatedItineraryListener(OnUpdatedItineraryListener onUpdatedItineraryListener) {
+        this.onUpdatedItineraryListener = onUpdatedItineraryListener;
+    }
 }
