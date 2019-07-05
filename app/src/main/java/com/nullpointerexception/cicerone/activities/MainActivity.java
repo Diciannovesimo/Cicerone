@@ -80,23 +80,7 @@ public class MainActivity extends AppCompatActivity
         bottomNavigation = findViewById(R.id.bottomNavigationContainer);
         bottomNavigation.setNavigationChangeListener((view, position) -> showSection(position));
 
-        User user = AuthenticationManager.get().getUserLogged();
-
-        ProfileDrawerItem profileDrawerItem = new ProfileDrawerItem()
-                .withName(user != null? user.getDisplayName(): "")
-                .withEmail(user != null? user.getEmail(): "");
-
-        if (user != null)
-        {
-            new ProfileImageFetcher(getApplicationContext())
-                    .fetchImageOf(user, drawable ->
-                    {
-                        profileDrawerItem.withIcon(drawable);
-                        drawMenuWith(profileDrawerItem);
-                    });
-        }
-
-        drawMenuWith(profileDrawerItem);
+        refreshMenu();
 
         if(getIntent().hasExtra("notification_info"))
         {
@@ -132,6 +116,19 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onResume()
+    {
+        if(ObjectSharer.get().getSharedObject("user_changed") != null &&
+                ObjectSharer.get().getSharedObject("user_changed").equals("true"))
+        {
+            refreshMenu();
+            ObjectSharer.get().shareObject("user_changed", "");
+        }
+
+        super.onResume();
+    }
+
     private void showSection(int index)
     {
         FragmentTransaction fragmentTransaction1 = getSupportFragmentManager().beginTransaction();
@@ -158,6 +155,27 @@ public class MainActivity extends AppCompatActivity
         }
 
         fragmentTransaction1.add(R.id.fragmentsContainer, actualFragment).commit();
+    }
+
+    private void refreshMenu()
+    {
+        User user = AuthenticationManager.get().getUserLogged();
+
+        ProfileDrawerItem profileDrawerItem = new ProfileDrawerItem()
+                .withName(user != null? user.getDisplayName(): "")
+                .withEmail(user != null? user.getEmail(): "");
+
+        if (user != null)
+        {
+            new ProfileImageFetcher(getApplicationContext())
+                    .fetchImageOf(user, drawable ->
+                    {
+                        profileDrawerItem.withIcon(drawable);
+                        drawMenuWith(profileDrawerItem);
+                    });
+        }
+
+        drawMenuWith(profileDrawerItem);
     }
 
     public void drawMenuWith(ProfileDrawerItem profileDrawerItem)

@@ -17,6 +17,7 @@ import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Blocker;
+import com.nullpointerexception.cicerone.components.ObjectSharer;
 import com.nullpointerexception.cicerone.components.User;
 
 import java.util.Calendar;
@@ -152,12 +153,16 @@ public class SettingsActivity extends AppCompatActivity
      *
      */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         int id = item.getItemId();
         boolean alright;
 
+        String oldName = user.getName();
+        String oldSurname = user.getSurname();
 
-        if(id == R.id.modify_menu_btn) {
+        if(id == R.id.modify_menu_btn)
+        {
 
             if(!mName.getText().toString().isEmpty())
                 user.setName(mName.getText().toString());
@@ -182,10 +187,17 @@ public class SettingsActivity extends AppCompatActivity
                 }
             }
 
-            if(alright) {
-                BackEndInterface.get().removeEntity(user, new BackEndInterface.OnOperationCompleteListener() {
+            if(alright)
+            {
+                BackEndInterface.get().removeEntity(user, new BackEndInterface.OnOperationCompleteListener()
+                {
                     @Override
-                    public void onSuccess() {
+                    public void onSuccess()
+                    {
+
+                        if(! user.getName().equals(oldName) || ! user.getSurname().equals(oldSurname))
+                            ObjectSharer.get().shareObject("user_changed", "true");
+
                         BackEndInterface.get().storeEntity(user);
                         finish();
                     }

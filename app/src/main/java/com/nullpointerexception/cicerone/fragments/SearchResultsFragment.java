@@ -2,11 +2,14 @@ package com.nullpointerexception.cicerone.fragments;
 
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.nullpointerexception.cicerone.R;
 import com.nullpointerexception.cicerone.activities.ItineraryActivity;
 import com.nullpointerexception.cicerone.components.BackEndInterface;
@@ -99,6 +103,28 @@ public class SearchResultsFragment extends Fragment
         adapter = new FoundItinerariesAdapter(itinerariesList);
         recyclerView.setAdapter(adapter);
 
+        noItinerariesFound.setVisibility(View.GONE);
+
+        //   Add graphic loading animation
+        ViewGroup root = (ViewGroup) recyclerView.getRootView();
+        FrameLayout frameLayout = new FrameLayout(recyclerView.getContext());
+        frameLayout.setBackgroundColor(Color.parseColor("#33000000"));
+        frameLayout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        frameLayout.setZ(999);
+        LottieAnimationView animationView = new LottieAnimationView(recyclerView.getContext());
+        animationView.setAnimation(R.raw.world_loading);
+        animationView.loop(true);
+        int size = getResources().getDisplayMetrics().widthPixels / 2;
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(size, size);
+        params.gravity = Gravity.CENTER;
+        animationView.setLayoutParams(params);
+        animationView.playAnimation();
+        frameLayout.addView(animationView);
+        //  Disables interactions with others views under this
+        frameLayout.setOnTouchListener((view12, motionEvent) -> true);
+        root.addView(frameLayout);
+
         //  Start search
         BackEndInterface.get().searchItinerariesFor(location, date, itinerariesList,
                 new BackEndInterface.OnOperationCompleteListener()
@@ -106,7 +132,13 @@ public class SearchResultsFragment extends Fragment
                     @Override
                     public void onSuccess()
                     {
-                        //  TODO: Add loading animation
+                        //  Remove login animation
+                        if(getActivity() != null)
+                            getActivity().runOnUiThread(() ->
+                            {
+                                if(frameLayout.getParent() != null)
+                                    ((ViewGroup)frameLayout.getParent()).removeView(frameLayout);
+                            });
 
                         adapter.notifyDataSetChanged();
                         noItinerariesFound.setVisibility(itinerariesList.isEmpty() ? View.VISIBLE : View.GONE);
