@@ -534,7 +534,7 @@ public class ItineraryActivity extends AppCompatActivity
 
             @Override
             public void onClick(View v) {
-                if (!mBlocker.block()) {
+                if (!mBlocker.block(2000)) {
                     if(userMode) {
                         if(subscribed) {
                             if(mItinerary.getText().toString().equals("Cancella")) {
