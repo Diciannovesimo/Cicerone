@@ -232,7 +232,7 @@ public class ItineraryActivity extends AppCompatActivity
             mDescriptionCard.setText(itinerary.getDescription());
 
         if(itinerary.getPrice() != 0.0) {
-            final String COMMA_SEPERATED = "###,###.00";
+            final String COMMA_SEPERATED = "###,##0.00";
             DecimalFormat decimalFormat = new DecimalFormat(COMMA_SEPERATED);
             String price = itinerary.getCurrency() + " " + decimalFormat.format(itinerary.getPrice());
             mPriceCard.setText(price);
