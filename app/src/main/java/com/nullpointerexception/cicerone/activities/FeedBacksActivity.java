@@ -36,7 +36,8 @@ import java.util.List;
  * Used class = {@link Feedback} {@link Blocker} {@link AuthenticationManager} {@link ObjectSharer} {@link ProfileImageFetcher} {@link User}
  * @author Mattia
  */
-public class FeedBacksActivity extends AppCompatActivity {
+public class FeedBacksActivity extends AppCompatActivity
+{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,8 @@ public class FeedBacksActivity extends AppCompatActivity {
 
         List<Feedback> feedbacks = new ArrayList<Feedback>();
 
-        if(ObjectSharer.get().getSharedObject("feedback") != null){
+        if(ObjectSharer.get().getSharedObject("feedback") != null)
+        {
             User user = (User) ObjectSharer.get().getSharedObject("feedback");
             String IdUserLogged = AuthenticationManager.get().getUserLogged().getId();
             for(int i=0; i<user.getFeedbacks().size(); i++)

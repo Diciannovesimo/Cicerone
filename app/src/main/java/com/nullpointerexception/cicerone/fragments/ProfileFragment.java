@@ -21,6 +21,7 @@ import com.nullpointerexception.cicerone.activities.MainActivity;
 import com.nullpointerexception.cicerone.activities.ProfileActivity;
 import com.nullpointerexception.cicerone.activities.SettingsActivity;
 import com.nullpointerexception.cicerone.components.AuthenticationManager;
+import com.nullpointerexception.cicerone.components.BackEndInterface;
 import com.nullpointerexception.cicerone.components.Blocker;
 import com.nullpointerexception.cicerone.components.Feedback;
 import com.nullpointerexception.cicerone.components.ObjectSharer;
@@ -42,6 +43,7 @@ public class ProfileFragment extends Fragment
     private ImageView profileImage, settings_btn;
     private RecyclerView recyclerView;
     private RatingBar ratingBarAVG;
+    private User user;
 
     public ProfileFragment() { }
 
@@ -65,6 +67,7 @@ public class ProfileFragment extends Fragment
             @Override
             public void onClick(View v) {
                 if (!mBlocker.block()) {
+                    ObjectSharer.get().shareObject("feedback", user);
                     Intent intent2 = new Intent(getContext(), FeedBacksActivity.class);
                     startActivity(intent2);
                 }
@@ -109,69 +112,85 @@ public class ProfileFragment extends Fragment
     /**
      * @brief Set text field
      */
-    private void setTextField(View v) {
+    private void setTextField(View v)
+    {
 
         //Get user form firebase
-        User user = AuthenticationManager.get().getUserLogged();
+        user = new User();
+        user.setId(AuthenticationManager.get().getUserLogged().getId());
 
-        ratingBarAVG.setRating(user.getAverageFeedback());
+        BackEndInterface.get().getEntity(user,
+                new BackEndInterface.OnOperationCompleteListener()
+         {
+            @Override
+            public void onSuccess()
+            {
+                ratingBarAVG.setRating(user.getAverageFeedback());
 
-        new ProfileImageFetcher(v.getContext())
-                .fetchImageOf(user, drawable -> {
-                    profileImage.setImageDrawable(drawable);
+                new ProfileImageFetcher(v.getContext())
+                        .fetchImageOf(user, drawable -> {
+                            profileImage.setImageDrawable(drawable);
+                        });
+
+                //Set name field
+                mName.setText(user.getDisplayName());
+
+                //set email
+                if(!user.getEmail().isEmpty()) {
+                    mEmail.setText(user.getEmail());
+                }
+
+                //set dateBirth
+                mDate.setText(user.getDateBirth());
+
+                //Set the number of itinerary in which the user participated
+                mItinerariesAsParticipant.setText(String.valueOf(user.getItineraries().size()));
+
+                //Set telephone number
+                mTelephone.setText(user.getPhoneNumber());
+
+                if(user.getFeedbacks().size()<=2){
+                    goFeedBacksList.setVisibility(View.GONE);
+                }
+
+                //Set click listener for settings button
+                settings_btn.setOnClickListener(new View.OnClickListener() {
+                    private Blocker mBlocker = new Blocker();
+
+                    @Override
+                    public void onClick(View v) {
+                        if (!mBlocker.block()) {
+                            startActivity(new Intent(getContext(), SettingsActivity.class));
+                            ObjectSharer.get().shareObject("view", v);
+                        }
+                    }
                 });
 
-        //Set name field
-        mName.setText(user.getDisplayName());
+                List<Feedback> feedbacks = new ArrayList<>();
 
-        //set email
-        if(!user.getEmail().isEmpty()) {
-            mEmail.setText(user.getEmail());
-        }
+                for(int i=0; i<user.getFeedbacks().size(); i++)
+                {
+                    if(!user.getId().equals(user.getFeedbacks().get(i).getIdUser()))
+                        feedbacks.add(user.getFeedbacks().get(i));
+                }
 
-        //set dateBirth
-        mDate.setText(user.getDateBirth());
+                if(feedbacks.size() == 0)
+                    feedbakcTitle.setVisibility(View.GONE);
 
-        //Set the number of itinerary in which the user participated
-        mItinerariesAsParticipant.setText(String.valueOf(user.getItineraries().size()));
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(v.getContext(),
+                        LinearLayoutManager.HORIZONTAL, false);
+                recyclerView.setLayoutManager(linearLayoutManager);
 
-        //Set telephone number
-        mTelephone.setText(user.getPhoneNumber());
-
-        if(user.getFeedbacks().size()<=2){
-            goFeedBacksList.setVisibility(View.GONE);
-        }
-
-        //Set click listener for settings button
-        settings_btn.setOnClickListener(new View.OnClickListener() {
-            private Blocker mBlocker = new Blocker();
+                AdapterReviewProfileFragment adapter = new AdapterReviewProfileFragment(v.getContext(), feedbacks);
+                recyclerView.setAdapter(adapter);
+            }
 
             @Override
-            public void onClick(View v) {
-                if (!mBlocker.block()) {
-                    startActivity(new Intent(getContext(), SettingsActivity.class));
-                    ObjectSharer.get().shareObject("view", v);
-                }
+            public void onError()
+            {
+
             }
         });
-        
-        List<Feedback> feedbacks = new ArrayList<>();
-
-        for(int i=0; i<user.getFeedbacks().size(); i++)
-        {
-            if(!user.getId().equals(user.getFeedbacks().get(i).getIdUser()))
-                feedbacks.add(user.getFeedbacks().get(i));
-        }
-
-        if(feedbacks.size() == 0)
-            feedbakcTitle.setVisibility(View.GONE);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(v.getContext(),
-                LinearLayoutManager.HORIZONTAL, false);
-        recyclerView.setLayoutManager(linearLayoutManager);
-
-        AdapterReviewProfileFragment adapter = new AdapterReviewProfileFragment(v.getContext(), feedbacks);
-        recyclerView.setAdapter(adapter);
     }
 
 }

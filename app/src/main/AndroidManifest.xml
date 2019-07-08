@@ -68,7 +68,8 @@
         <activity
             android:name=".activities.ItineraryActivity"
             android:label="@string/title_activity_itinerary"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activities.FindItineraryActivty"
             android:screenOrientation="portrait" />
