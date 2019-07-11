@@ -151,7 +151,6 @@ class AdapterStage extends RecyclerView.Adapter <AdapterStage.MyViewHolder>
                         {
                             BackEndInterface.get().storeEntity(itinerary);
 
-                            ObjectSharer.get().shareObject("show_trip_as_cicerone", itinerary);
                             if(context instanceof Activity)
                             {
                                 ((Activity) context).setResult(Activity.RESULT_OK);

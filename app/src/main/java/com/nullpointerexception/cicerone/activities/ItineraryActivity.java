@@ -68,7 +68,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
  * This class allow user to show itinerary information
  *
  * This class use = {@link Stage} {@link User} {@link Itinerary} {@link ObjectSharer} {@link AuthenticationManager}
- * {@link BackEndInterface} {@link BackEndInterface} {@link Blocker} {@link ImageFetcher} {@link ProfileImageFetcher}
+ * {@link BackEndInterface} {@link Blocker} {@link ImageFetcher} {@link ProfileImageFetcher}
  * {@link UserNotification}
  *
  * @author Claudio
@@ -267,8 +267,10 @@ public class ItineraryActivity extends AppCompatActivity
 
         //Check if user is already a participant of the itinerary
         for (int i = 0; i < userList.size(); ++i) {
-            if (user.getId().equals(userList.get(i).getId()))
+            if (user.getId().equals(userList.get(i).getId())) {
                 subscribed = true;
+                break;
+            }
         }
 
         //Setting dell'interfaccia
@@ -517,7 +519,7 @@ public class ItineraryActivity extends AppCompatActivity
                     @Override
                     public void onClick(View v) {
                         if (!mBlocker.block()) {
-                            ObjectSharer.get().shareObject("lista_proposte", itinerary);
+                            ObjectSharer.get().shareObject("lista_partecipanti", itinerary);
                             startActivityForResult(new Intent(v.getContext(), ParticipantsActivity.class),
                                     PARTICIPANT_CODE);
                         }
@@ -543,7 +545,7 @@ public class ItineraryActivity extends AppCompatActivity
                                         user.removeItinerary(i);
 
                                         new KAlertDialog(v.getContext())
-                                                .setTitleText("Itinerario cancella")
+                                                .setTitleText("Itinerario cancellato")
                                                 .setContentText("Hai cancellato con successo l'itinerario!")
                                                 .setConfirmText("Ok")
                                                 .setCancelClickListener(kAlertDialog -> finish()).show();
@@ -878,23 +880,8 @@ public class ItineraryActivity extends AppCompatActivity
      * Catch the click on back arrow and remove object on objectSherer
      */
     @Override
-    public boolean onSupportNavigateUp()
-    {
-        if(ObjectSharer.get().getSharedObject("show_trip_as_user") != null)
-            ObjectSharer.get().remove("show_trip_as_user");
-        else if(ObjectSharer.get().getSharedObject("show_trip_as_cicerone") != null)
-            ObjectSharer.get().remove("show_trip_as_cicerone");
-
+    public boolean onSupportNavigateUp() {
         finish();
         return super.onSupportNavigateUp();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(ObjectSharer.get().getSharedObject("show_trip_as_user") != null)
-            ObjectSharer.get().remove("show_trip_as_user");
-        else if(ObjectSharer.get().getSharedObject("show_trip_as_cicerone") != null)
-            ObjectSharer.get().remove("show_trip_as_cicerone");
     }
 }
