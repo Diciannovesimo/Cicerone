@@ -34,7 +34,6 @@ import java.util.Locale;
 
 /**
  * FindItineraryActivityFragment
- * TODO: documenta
  */
 public class FindItineraryActivityFragment extends Fragment
 {

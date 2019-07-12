@@ -368,9 +368,8 @@ public class ItineraryActivity extends AppCompatActivity
                                                 }
                                             });
                                         }
-                                    } else {
+                                    } else
                                         ActivityCompat.requestPermissions(ItineraryActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                                    }
                                 }
                             }
                         });
@@ -835,7 +834,12 @@ public class ItineraryActivity extends AppCompatActivity
     private boolean placeAlreadyExist(LatLng coordinates)
     {
         for(int i = 0; i < itinerary.getStages().size(); ++i) {
-            if(coordinates.equals(itinerary.getStages().get(i).getCoordinates()))
+            if (coordinates.equals(itinerary.getStages().get(i).getCoordinates()))
+                return true;
+        }
+
+        for(int i = 0; i < itinerary.getProposedStages().size(); ++i) {
+            if (coordinates.equals(itinerary.getProposedStages().get(i).getCoordinates()))
                 return true;
         }
         return false;
