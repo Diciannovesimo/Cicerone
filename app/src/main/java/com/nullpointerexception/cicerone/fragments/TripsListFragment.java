@@ -151,8 +151,11 @@ class ParticipatedItinerariesAdapter extends RecyclerView.Adapter
 
         viewHolder.getView().setOnViewClickListener(() ->
         {
-            Itinerary itinerary = dataSet.get(position);
-            String lastMeetingPlace = itinerary.getMeetingPlace();
+            String lastMeetingPlace = dataSet.get(position).getMeetingPlace();
+
+            Itinerary itinerary = new Itinerary();
+            itinerary.setId(dataSet.get(position).getId());
+            itinerary.getFieldsFromId();
 
             BackEndInterface.get().getEntity(itinerary,
                     new BackEndInterface.OnOperationCompleteListener()

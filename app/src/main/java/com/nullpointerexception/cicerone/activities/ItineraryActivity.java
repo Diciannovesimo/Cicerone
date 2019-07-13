@@ -178,7 +178,7 @@ public class ItineraryActivity extends AppCompatActivity
     }
 
     /**
-     * Set text in activity field
+     *    Set text in activity field
      */
     private void setTextField()
     {
@@ -198,9 +198,8 @@ public class ItineraryActivity extends AppCompatActivity
                 @Override
                 public void onImageFound(String url)
                 {
-
                     ((Activity) cityImage.getContext()).runOnUiThread(() ->
-                            Glide.with(cityImage.getContext())
+                            Glide.with(getApplicationContext())
                                     .load(url)
                                     .transition(DrawableTransitionOptions.withCrossFade())
                                     .into(cityImage));
@@ -421,9 +420,9 @@ public class ItineraryActivity extends AppCompatActivity
                                                 @Override
                                                 public void onSuccess()
                                                 {
-                                    /*
-                                          Send notification
-                                     */
+                                                    /*
+                                                          Send notification
+                                                     */
                                                     UserNotification notification = new UserNotification(
                                                             itinerary.getCicerone().getId()
                                                     );
@@ -695,9 +694,9 @@ public class ItineraryActivity extends AppCompatActivity
                                                                             @Override
                                                                             public void onSuccess()
                                                                             {
-                                                /*
-                                                     Send notification
-                                                 */
+                                                                                /*
+                                                                                     Send notification
+                                                                                 */
                                                                                 UserNotification notification = new UserNotification(
                                                                                         itinerary.getCicerone().getId()
                                                                                 );

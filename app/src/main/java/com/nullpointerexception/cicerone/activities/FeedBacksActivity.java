@@ -56,7 +56,6 @@ public class FeedBacksActivity extends AppCompatActivity
         if(getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         List<Feedback> feedbacks = new ArrayList<Feedback>();
 
         if(ObjectSharer.get().getSharedObject("feedback") != null)

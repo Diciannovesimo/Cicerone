@@ -109,10 +109,10 @@ public class ItinerariesListFragment extends Fragment
         //  Get itineraries
         if(AuthenticationManager.get().getUserLogged() != null)
         BackEndInterface.get().getItinerariesOf(AuthenticationManager.get().getUserLogged().getId(),
-                itineraries, new BackEndInterface.OnOperationCompleteListener() 
+                itineraries, new BackEndInterface.OnOperationCompleteListener()
                 {
                     @Override
-                    public void onSuccess() 
+                    public void onSuccess()
                     {
                         //  Remove login animation
                         if(getActivity() != null)
@@ -126,7 +126,7 @@ public class ItinerariesListFragment extends Fragment
                     }
 
                     @Override
-                    public void onError() 
+                    public void onError()
                     {
                         if(getActivity() != null)
                             getActivity().runOnUiThread(() ->
@@ -198,12 +198,15 @@ class ItinerariesAdapter extends RecyclerView.Adapter
 
         viewHolder.getView().setAsLastElement((position == dataSet.size() -1 && dataSet.size() > 3));
 
-        viewHolder.getView().setOnViewClickListener(new ItineraryView.OnViewClickListener() {
+        viewHolder.getView().setOnViewClickListener(new ItineraryView.OnViewClickListener()
+        {
             private Blocker mBlocker = new Blocker();
 
             @Override
-            public void onViewClick() {
-                if (!mBlocker.block()) {
+            public void onViewClick()
+            {
+                if (!mBlocker.block())
+                {
                     Context context = viewHolder.getView().getContext();
                     ObjectSharer.get().shareObject("show_trip_as_cicerone", dataSet.get(position));
                     context.startActivity(new Intent(context, ItineraryActivity.class));
