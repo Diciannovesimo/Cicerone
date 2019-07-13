@@ -368,31 +368,26 @@ public class AuthenticationManager
     {
         AuthCredential credential = FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken());
         auth.signInWithCredential(credential)
-                .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>()
-                {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task)
+                .addOnCompleteListener((Activity) context, task -> {
+                    if (task.isSuccessful())
                     {
-                        if (task.isSuccessful())
+                        if(auth.getCurrentUser() != null)
                         {
-                            if(auth.getCurrentUser() != null)
-                            {
-                                currentUser = new User(auth.getCurrentUser());
+                            currentUser = new User(auth.getCurrentUser());
 
-                                if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
-                                    currentLoginAttempt.getOnLoginResultListener().onLoginResult(true);
-                            }
-                            else
-                            {
-                                if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
-                                    currentLoginAttempt.getOnLoginResultListener().onLoginResult(false);
-                            }
+                            if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
+                                currentLoginAttempt.getOnLoginResultListener().onLoginResult(true);
                         }
                         else
                         {
                             if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
-                                currentLoginAttempt.getOnLoginResultListener().onLoginResult(true);
+                                currentLoginAttempt.getOnLoginResultListener().onLoginResult(false);
                         }
+                    }
+                    else
+                    {
+                        if(currentLoginAttempt != null && currentLoginAttempt.getOnLoginResultListener() != null)
+                            currentLoginAttempt.getOnLoginResultListener().onLoginResult(true);
                     }
                 });
 

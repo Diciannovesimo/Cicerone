@@ -55,7 +55,7 @@ public class ParticipantsActivity extends AppCompatActivity
         if(getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Itinerary itinerary = (Itinerary)ObjectSharer.get().getSharedObject("lista_proposte");
+        Itinerary itinerary = (Itinerary)ObjectSharer.get().getSharedObject("lista_partecipanti");
 
         recyclerView = findViewById(R.id.RecyclerView_Participants);
 
@@ -82,7 +82,7 @@ public class ParticipantsActivity extends AppCompatActivity
     protected void onDestroy()
     {
         super.onDestroy();
-        ObjectSharer.get().remove("lista_proposte");
+        ObjectSharer.get().remove("lista_partecipanti");
     }
 }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,32 +76,37 @@ public class ProfileActivity extends AppCompatActivity
         Intent intent = getIntent();
         String extra = "";
 
-        intent.getExtras().getString("id_cicerone_to_show");
-        extra = intent.getExtras().getString("id_cicerone_to_show");
+        try {
+            intent.getExtras().getString("id_cicerone_to_show");
+            extra = intent.getExtras().getString("id_cicerone_to_show");
+        }catch (Exception e){
+            Log.e(TAG, e.toString());
+            Toast.makeText(getApplicationContext(), "Errore nel caricamento",
+                    Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
         user.setId(extra);
 
-        if(intent.getExtras().getString("id_cicerone_to_show") != null) {
-            BackEndInterface.get().getEntity(user, new BackEndInterface.OnOperationCompleteListener() {
-                @Override
-                public void onSuccess() {
-                    if(user.getId().isEmpty() && user.getDisplayName().isEmpty()) {
-                        Toast.makeText(getApplicationContext(), "Impossibile caricare le" +
-                                "informazioni di profilo", Toast.LENGTH_SHORT);
-                        finish();
+        BackEndInterface.get().getEntity(user, new BackEndInterface.OnOperationCompleteListener() {
+            @Override
+            public void onSuccess() {
+                if(user.getId().isEmpty() && user.getDisplayName().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "Impossibile caricare le" +
+                            "informazioni di profilo", Toast.LENGTH_SHORT).show();
+                    finish();
 
-                    }else {
-                        //Set text in the field
-                        setTextField();
-                    }
+                }else {
+                    //Set text in the field
+                    setTextField();
                 }
+            }
 
-                @Override
-                public void onError() {
+            @Override
+            public void onError() {
 
-                }
-            });
-        }
+            }
+        });
 
         goFeedBacksList.setOnClickListener(new View.OnClickListener() {
             private Blocker mBlocker = new Blocker();
@@ -141,6 +147,7 @@ public class ProfileActivity extends AppCompatActivity
 
         User userLogged = AuthenticationManager.get().getUserLogged();
         Feedback feedback = new Feedback(userLogged);
+        Boolean participateAtLeastOnce = false;
 
         ratingBarAVG.setRating(user.getAverageFeedback());
 
@@ -168,28 +175,33 @@ public class ProfileActivity extends AppCompatActivity
         if(!found)
             removeFeedback.setEnabled(false);
         else
-        if(user.getFeedbacks().get(position).getComment().isEmpty())
-            textFieldBoxes.setVisibility(View.GONE);
+            if(user.getFeedbacks().get(position).getComment().isEmpty())
+                textFieldBoxes.setVisibility(View.GONE);
 
         //Set name field
         mName.setText(user.getDisplayName());
 
         //set email
-        if(user.getEmail() != null) {
+        if(user.getEmail() != null)
             mEmail.setText(user.getEmail());
-        }
 
         //set dateBirth
-        if(user.getDateBirth() != null) {
+        if(user.getDateBirth() != null)
             mDate.setText(user.getDateBirth());
-        }
 
         //Set telephone number
         mTelephone.setText(user.getPhoneNumber());
 
+        //Check if the current user has ever participated in at least one itinerary of the Cicerone
+        for(int i = 0; i < userLogged.getItineraries().size(); ++i) {
+            if(user.getId().equals(userLogged.getItineraries().get(i).getCicerone().getId())) {
+                participateAtLeastOnce = true;
+                break;
+            }
+        }
 
         //Set ratingBar listener
-        if(!user.getId().equals(userLogged.getId())) {
+        if(!user.getId().equals(userLogged.getId()) && participateAtLeastOnce) {
             ratingBarListener();
 
             sndFeedBtn.setOnClickListener(new View.OnClickListener() {
